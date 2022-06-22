@@ -1,0 +1,11 @@
+# requirements for the scan package but without any MPI dependencies for systems that don't have it installed.
+
+numpy >=1.14.5, <= 1.22.3
+
+networkx >= 2.6.0, <= 2.6.3
+pandas >=1.0.0, <= 1.4.2
+
+scipy >=1.4.0, <= 1.8.0
+scikit-learn >= 0.20.0, <= 1.0.2
+
+loguru >= 0.4.0, <= 0.5.3

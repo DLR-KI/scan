@@ -1,0 +1,14 @@
+# requirement.txt for scan testing. This downloads all the newest versions of all packages from pypi that we depend
+# upon, regardless of us having tested them or not.
+
+numpy
+
+networkx
+pandas
+
+scipy
+scikit-learn
+
+loguru
+
+mpi4py

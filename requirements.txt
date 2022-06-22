@@ -1,0 +1,13 @@
+# requirements.txt for the scan package. Specifies the recommended package versions.
+
+numpy >=1.14.5, <= 1.22.3
+
+networkx >= 2.6.0, <= 2.6.3
+pandas >=1.0.0, <= 1.4.2
+
+scipy >=1.4.0, <= 1.8.0
+scikit-learn >= 0.20.0, <= 1.0.2
+
+loguru >= 0.4.0, <= 0.5.3
+
+mpi4py >=3.0.3, <= 3.1.3 # Technically optional, but very useful
