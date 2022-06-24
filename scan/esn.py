@@ -115,7 +115,7 @@ class _ESNCore:
         assert self.act_fct is not None
 
         if save_r:
-            r = np.zeros((x.shape[0], self.network.shape[0]))
+            r = np.zeros((x.shape[0], self.n_dim))
             r[0] = self.act_fct(x[0], self.last_r)
             for t in np.arange(x.shape[0] - 1):
                 r[t + 1] = self.act_fct(x[t + 1], r[t])
@@ -469,7 +469,7 @@ class ESN(_ESNCore):
         """Synchronize and then train the reservoir.
 
         Args:
-            x_train: Input data used to synchronize and then train the reservoir. Shapes (t,), (t,d) and (t,d,s) are
+            x_train: Input data used to synchronize and then train the reservoir. Shapes (t,), (t, d) and (t, d, s) are
                 supported.
             sync_steps: How many steps to use for synchronization before the prediction starts.
             reg_param: Weight for the Tikhonov-regularization term.
@@ -506,7 +506,18 @@ class ESN(_ESNCore):
         elif x_train.ndim == 2:
             x_train = x_train[:, :, np.newaxis]
 
+        if sync_steps == 0:
+            x_sync = None
+        else:
+            x_sync = x_train[:sync_steps]
+            x_train = x_train[sync_steps:]
+
+        # The last value of x_train can't be used for the training, as there is nothing to compare the resulting
+        # prediction with, hence the "-1" in the train_steps variable definition here.
+        train_steps = x_train.shape[0] - 1
         x_dim = x_train.shape[1]
+        slices = x_train.shape[2]
+
         if self.w_in is not None and w_in_no_update:
             if not self.x_dim == x_dim:
                 raise ValueError(
@@ -517,23 +528,17 @@ class ESN(_ESNCore):
 
         self._set_activation_function(act_fct_flag=act_fct_flag)
 
-        if sync_steps == 0:
-            x_sync = None
-        else:
-            x_sync = x_train[:sync_steps]
-            x_train = x_train[sync_steps:]
-
-        r = np.zeros((x_train.shape[0] - 1, self.network.shape[0], x_train.shape[2]))
+        r = np.zeros((train_steps, self.n_dim, slices))
 
         if self.last_r is None:
-            self.last_r = np.zeros(self.network.shape[0])
+            self.last_r = np.zeros(self.n_dim)
 
-        for slice_nr in range(x_train.shape[2]):
+        for slice_nr in range(slices):
             logger.debug(f"Start training of slice Nr.{slice_nr:3d}")
             if reset_r:
                 # Initialize/reset the current reservoir state to zeros before each new slice. That way training doesn't
                 # depend on slice order, only content
-                self.last_r = np.zeros(self.network.shape[0])
+                self.last_r = np.zeros(self.n_dim)
             if x_sync is not None:
                 self.synchronize(x_sync[:, :, slice_nr])
             # The last value of x_train can't be used for the training, as there is nothing to compare the resulting
@@ -542,16 +547,17 @@ class ESN(_ESNCore):
 
         y_train = x_train[1:]
         # I wouldn't be surprised if there was a smarter way to reshape r and y from 3dim to 2dim correctly but this is
-        # the only way I could figure out how to. The problem is that with the currently used meanding for the
+        # the only way I could figure out how to. The problem is that with the currently used meaning for the
         # dimensions of [timestep, x_data-dimension, x_data_slice] the 'fastest changing' index is actually the middle
-        # one. For this reason alone, switch the default meaning from of the first two dim from
+        # one. For this reason alone, switching the default meaning from of the first two dim from
         # [timestep, x-data-dimension] to [x-data-dimension, timestep] might be a good idea. ALSO, doing so may enable
         # the in-place reshaping of r.shape = (r.shape[0] * r.shape[2], r.shape[1]), which of course would be much
         # smarter from a memory usage perspective.
-        r = np.reshape(r.swapaxes(0, 1), newshape=(r.shape[1], r.shape[0] * r.shape[2]), order="F").swapaxes(0, 1)
+        r = np.reshape(r.swapaxes(0, 1), newshape=(self.n_dim, train_steps * slices), order="F").swapaxes(0, 1)
         y_train = np.reshape(
-            y_train.swapaxes(0, 1), newshape=(y_train.shape[1], y_train.shape[0] * y_train.shape[2]), order="F"
+            y_train.swapaxes(0, 1), newshape=(x_dim, train_steps * slices), order="F"
         ).swapaxes(0, 1)
+
         # Fit using all the above train segments, now combined into 2dim arrays
         if save_r:
             self.r_train = r
@@ -594,7 +600,7 @@ class ESN(_ESNCore):
         assert self.network is not None
         assert self.w_out is not None
         # # Having no last r state in the prediction function should never happen. If it for some reason ever does, we
-        # # should probably just assign it the default self.last_r = np.zeros(self.network.shape[0])
+        # # should probably just assign it the default self.last_r = np.zeros(self.n_dim)
         # assert self.last_r is not None
 
         if pred_steps is None:
@@ -607,11 +613,14 @@ class ESN(_ESNCore):
         elif x_pred.ndim == 2:
             x_pred = x_pred[:, :, np.newaxis]
 
+        x_dim = x_pred.shape[1]
+        slices = x_pred.shape[2]
+
         if x_pred.shape[0] > sync_steps + pred_steps + 1:
             x_pred = x_pred[: sync_steps + pred_steps + 1]
 
-        # Automatically generates a y_test to compare the prediction against, if the input data is longer than the
-        # number of synchronization steps
+        # If the input data is longer than the number of synchronization steps, we generate a y_test to compare the
+        # prediction against here.
         if sync_steps == 0:
             x_sync = None
             y_test = x_pred[1:]
@@ -623,17 +632,17 @@ class ESN(_ESNCore):
                 f"Requested sync_steps of {sync_steps} are longer than the supplied input data of shape {x_pred.shape}"
             )
 
-        y_pred = np.zeros((pred_steps, x_pred.shape[1], x_pred.shape[2]))
+        y_pred = np.zeros((pred_steps, x_dim, slices))
 
         if save_r:
-            self.r_pred = np.zeros((pred_steps, self.network.shape[0], x_pred.shape[2]))
+            self.r_pred = np.zeros((pred_steps, self.n_dim, slices))
 
-        for slice_nr in range(x_pred.shape[2]):
+        for slice_nr in range(slices):
             logger.debug(f"Start prediction of slice Nr.{slice_nr:3d}")
             if reset_r:
                 # Initialize/reset the current reservoir state to zeros before each new slice. That way training doesn't
                 # depend on slice order, only content
-                self.last_r = np.zeros(self.network.shape[0])
+                self.last_r = np.zeros(self.n_dim)
             if x_sync is not None:
                 self.synchronize(x_sync[:, :, slice_nr])
 
@@ -655,12 +664,14 @@ class ESN(_ESNCore):
         # This inplace reshaping is only so trivial here because we throw entire dimensions away. If, like in train(),
         # you need to fold higher dimensional arrays into lower dimensional ones, the index order you iterate over
         # becomes very important!
+        # Also note that y_test.shape[0] =/= pred_steps in general, as y_test might be shorter than y_pred if pred_steps
+        # was specified manually.
         if x_pred_input_original_ndim == 1:
-            y_pred.shape = (y_pred.shape[0],)
+            y_pred.shape = (pred_steps,)
             y_test.shape = (y_test.shape[0],)
         elif x_pred_input_original_ndim == 2:
-            y_pred.shape = (y_pred.shape[0], y_pred.shape[1])
-            y_test.shape = (y_test.shape[0], y_test.shape[1])
+            y_pred.shape = (pred_steps, x_dim)
+            y_test.shape = (y_test.shape[0], x_dim)
 
         return y_pred, y_test
 
