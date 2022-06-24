@@ -115,7 +115,7 @@ class _ESNCore:
         assert self.act_fct is not None
 
         if save_r:
-            r = np.zeros((x.shape[0], self.n_dim))
+            r = np.zeros((x.shape[0], self.network.shape[0]))
             r[0] = self.act_fct(x[0], self.last_r)
             for t in np.arange(x.shape[0] - 1):
                 r[t + 1] = self.act_fct(x[t + 1], r[t])
@@ -496,6 +496,7 @@ class ESN(_ESNCore):
         logger.debug("Start training")
 
         assert self.network is not None
+        assert self.n_dim is not None
 
         self.reg_param = reg_param
         self.loc_nbhd = loc_nbhd
@@ -532,9 +533,9 @@ class ESN(_ESNCore):
         r = np.zeros((train_steps * slices, self.n_dim))
         r_view = r.view()  # shape: (train_steps * slices, self.n_dim)
 
-        r_view.shape = (slices, train_steps, self.n_dim)  # C layout, as dimension speed is x_dim > time > slices
-        r_view = r_view.swapaxes(0, 2)  # shape: (train_steps, self.n_dim, slices)
-        r_view = r_view.swapaxes(0, 1)  # shape: (slices, self.n_dim, train_steps)
+        r_view.shape = (slices, train_steps, self.n_dim)  # C layout, as dimension index order during calc is d > t > s
+        r_view = r_view.swapaxes(0, 2)  # shape: (self.n_dim, train_steps, slices)
+        r_view = r_view.swapaxes(0, 1)  # shape: (train_steps, self.n_dim, slices), i.e. the one we want below
 
         if self.last_r is None:
             self.last_r = np.zeros(self.n_dim)
@@ -602,7 +603,9 @@ class ESN(_ESNCore):
 
         assert self.w_in is not None
         assert self.network is not None
+        assert self.n_dim is not None
         assert self.w_out is not None
+
         # # Having no last r state in the prediction function should never happen. If it for some reason ever does, we
         # # should probably just assign it the default self.last_r = np.zeros(self.n_dim)
         # assert self.last_r is not None
