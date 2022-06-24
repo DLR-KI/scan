@@ -239,16 +239,16 @@ class TestESN(TestScanBase):
         reset_r = False
 
         self.create_network_3x3_rand_simple()
-        self.esn.train(x_train=x_train_2d, sync_steps=sync_steps, reset_r=reset_r)
-        exp_last_r = self.esn.last_r
-        exp_w_out = self.esn.w_out
+        self.esn.train(x_train=x_train_3d, sync_steps=sync_steps, reset_r=reset_r)
+        last_r = self.esn.last_r
+        w_out = self.esn.w_out
 
         self.reset()
 
         self.create_network_3x3_rand_simple()
-        self.esn.train(x_train=x_train_3d, sync_steps=sync_steps, reset_r=reset_r)
-        last_r = self.esn.last_r
-        w_out = self.esn.w_out
+        self.esn.train(x_train=x_train_2d, sync_steps=sync_steps, reset_r=reset_r)
+        exp_last_r = self.esn.last_r
+        exp_w_out = self.esn.w_out
 
         assert_array_almost_equal(exp_last_r, last_r)
         assert_array_almost_equal(exp_w_out, w_out)

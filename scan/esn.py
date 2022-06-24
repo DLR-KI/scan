@@ -528,7 +528,13 @@ class ESN(_ESNCore):
 
         self._set_activation_function(act_fct_flag=act_fct_flag)
 
-        r = np.zeros((train_steps, self.n_dim, slices))
+        # r = np.zeros((train_steps, self.n_dim, slices))
+        r = np.zeros((train_steps * slices, self.n_dim))
+        r_view = r.view()  # shape: (train_steps * slices, self.n_dim)
+
+        r_view.shape = (slices, train_steps, self.n_dim)  # C layout, as dimension speed is x_dim > time > slices
+        r_view = r_view.swapaxes(0, 2)  # shape: (train_steps, self.n_dim, slices)
+        r_view = r_view.swapaxes(0, 1)  # shape: (slices, self.n_dim, train_steps)
 
         if self.last_r is None:
             self.last_r = np.zeros(self.n_dim)
@@ -543,7 +549,7 @@ class ESN(_ESNCore):
                 self.synchronize(x_sync[:, :, slice_nr])
             # The last value of x_train can't be used for the training, as there is nothing to compare the resulting
             # prediction with. As such, we cut the last time step of x_train here.
-            r[:, :, slice_nr] = self.synchronize(x_train[:-1, :, slice_nr], save_r=True)
+            r_view[:, :, slice_nr] = self.synchronize(x_train[:-1, :, slice_nr], save_r=True)
 
         y_train = x_train[1:]
         # I wouldn't be surprised if there was a smarter way to reshape r and y from 3dim to 2dim correctly but this is
@@ -553,10 +559,8 @@ class ESN(_ESNCore):
         # [timestep, x-data-dimension] to [x-data-dimension, timestep] might be a good idea. ALSO, doing so may enable
         # the in-place reshaping of r.shape = (r.shape[0] * r.shape[2], r.shape[1]), which of course would be much
         # smarter from a memory usage perspective.
-        r = np.reshape(r.swapaxes(0, 1), newshape=(self.n_dim, train_steps * slices), order="F").swapaxes(0, 1)
-        y_train = np.reshape(
-            y_train.swapaxes(0, 1), newshape=(x_dim, train_steps * slices), order="F"
-        ).swapaxes(0, 1)
+
+        y_train = np.reshape(y_train.swapaxes(0, 1), newshape=(x_dim, train_steps * slices), order="F").swapaxes(0, 1)
 
         # Fit using all the above train segments, now combined into 2dim arrays
         if save_r:
