@@ -3,40 +3,41 @@
 This repository contains the python 3 package _scan_, implementing the machine learning technique Reservoir 
 Computing (RC) and related methods.
 
-SCAN stand for some combination of: {'science', 'simulation', 'system', 'solution', 'software'}, {'chaos', 'control', 
+SCAN stands for some combination of: {'science', 'simulation', 'system', 'solution', 'software'}, {'chaos', 'control', 
 'complex', 'computing'}, {'analysis, analytic'}, {'neural', 'net/network'}.  
 At some point we should probably choose what it actually stands for.
 
 ### License
-This repository is, so far, explicitly non-licensed and propriatery property of the DLR subject to confidentiallity.
+The code in this repository is proprietary property of the DLR subject to confidentiality.
 The usual NDA clauses apply, so unless you have explicit permission to do so:
 * Do not upload this package to non-DLR servers (especially not GitHub).
-* Do not share this package with anyone outside of the DLR.
+* Do not share this package with anyone outside the DLR.
 
 ### Documentation Website
 
-The Docuemntation has not yet been transferred to this GitLab repository, mostly due to the necessary CI/CD-Pipeline 
-not yet being available. Until then, please see the Code Docstrings, tests and the related
+The PDF-Docuemntation has not yet been transferred to this GitLab repository, mostly due to the necessary CI/CD-Pipeline 
+not yet being available. Until then, please see the code docstrings, tests and the related
 [Rescomp documentation website](https://glsrc.github.io/rescomp/).
 
 ### Installation
 #### Prerequisites
 * Git
 * Python 3.8+
-* Pip or Conda (typically via MMiniforge) as package installer
+* Pip or Conda (the latter typically via Miniforge)
 
 #### The Basics
 
-First, clone the scan repository to a folder of your choice:
-```
-git clone THISLINKISTODO scan
-```
-Enter it, and tell git who you are 
+First, clone the scan repository to a folder of your choice. If you are new to git and don't know how to do that, please follow the 
+[tutorial on our teamsite](https://teamsites-extranet.dlr.de/sites/InRe/SitePages/GitLab-and-Scan-Package-Setup.aspx).
+
+Once you have done this, enter the cloned folder, and tell git who you are:
 ```
 git config user.name "Lastname, Firstname"
 git config user.email "Firstname.Lastname@dlr.de"
 ```
-From here, follow either the conda or pip installation instructions below
+From here, follow either the conda or pip installation instructions below. If you don't know which one to choose, 
+[install miniforge](https://github.com/conda-forge/miniforge) as conda distribution and then follow the conda 
+installation instructions.
 
 #### Installation using Conda
 Create a new python 3.9 environment named scan and install the scan package requirements as well as the packages used 
