@@ -23,12 +23,12 @@
 
 * More expansive module structure
   * Added the modules data_processing, file_handling, logging and mpi with appropriate contents
-* Added "slices" for train and predcit input 
+* Added "slices" for train and predict input 
   * 3d input of shape (t, d, s), instead of only 2d input of shape (t, d), supported to train and/or predict at multiple 
 positions in the time series at once 
   * Backwards compatible
 * Slight restructure of internal esn train/predict methods for a reduced memory overhead
-* Complete independece from the global numpy random seed seed via two new, also independent, seed parameters: n_seed and 
+* Complete independence from the global numpy random seed via two new, also independent, seed parameters: n_seed and 
 w_in_seed
   * This enables full software level reproducibility, even in parallel or not entirely user controlled contexts!
 * The "reset_r" parameter, resetting the reservoir to a known state of all zeros before each slice. This makes training
@@ -58,7 +58,7 @@ and prediction depend only on the content of the time series, not the slice orde
 * Added support for python 3.10
 * Requirements_dev.txt for easy setup of the development environment
 * Added conventions.md, describing the naming and other conventions of the package
-* Update docstrings to reflect slighlty updated conventions outlined in scan_conventions.md
+* Update docstrings to reflect slightly updated conventions outlined in scan_conventions.md
 
 
 #### Breaking Changes
