@@ -139,31 +139,63 @@ class _ESNCore:
             The generalized reservoir state.
 
         """
+
         if self.w_out_fit_flag == 0:
             return r
         elif self.w_out_fit_flag == 1:
+            # class LazyEvaluation(object):
+            #     def __init__(self):
+            #         self.transforms = []
+            #
+            #     def add_transform(self, function, selection=slice(None), args={}):
+            #         self.transforms.append((function, selection, args))
+            #
+            #     def __call__(self, x):
+            #         y = x.copy()
+            #         for function, selection, args in self.transforms:
+            #             y[selection] = function(y[selection], **args)
+            #         return y
+            # le = LazyEvaluation()
+            # le.add_transform(lambda x: x ** 2, (slice(None), slice(self.network.shape[0], None)))
+            # return le(np.hstack((r, r.view())))
+
             return np.hstack((r, r**2))
         else:
             raise ValueError(f"self.w_out_fit_flag {self.w_out_fit_flag} unknown!")
 
-    def _fit_w_out(self, y_train: np.ndarray, r: np.ndarray) -> None:
+    def _fit_w_out(self, y_train: np.ndarray, r_gen: np.ndarray) -> None:
         """Fit the output matrix self.w_out after training.
 
         Uses linear regression and Tikhonov regularization.
 
         Args:
             y_train: Desired prediction from the reservoir states, shape (t, d).
-            r: Reservoir states, shape (t, d).
+            r_gen: Generalized reservoir states, shape (t, d) or (t, whatever_the_r_gen_dimension_is).
 
         """
         logger.debug("Fit _w_out according to method %s" % str(self.w_out_fit_flag))
 
         assert self.reg_param is not None
 
-        # Note: Memory inefficient, as it seemingly copies r twice! if the hstack is called
-        r_gen = self.r_to_generalized_r(r)
+        # # Note: Memory inefficient, as it seemingly copies r twice! if the hstack is called
+        # r_gen = self.r_to_generalized_r(r)
 
-        # Note: Slow to calc. Due to the above hstack not the mem bottleneck for T bound applications though
+        if self.w_out_fit_flag == 0:
+            pass
+        elif self.w_out_fit_flag == 1:
+            # Three times as memory efficient as a = a**2
+            np.square(r_gen[:, :self.network.shape[0]], out=r_gen[:, self.network.shape[0]:])
+
+            # Twice as memory efficient as a = a**2
+            # r_gen[:, self.network.shape[0]:] = r_gen[:, :self.network.shape[0]]
+            # np.square(r_gen[:, self.network.shape[0]:], out=r_gen[:, self.network.shape[0]:])
+
+            # "default"
+            # r_gen[:, self.network.shape[0]:] = r_gen[:, :self.network.shape[0]]**2
+        else:
+            raise ValueError(f"self.w_out_fit_flag {self.w_out_fit_flag} unknown!")
+
+        # Note: Very slow to calc. Relevant for peak memory consumption too
         a = r_gen.T @ r_gen
         # Note: Trivial from a computation time and memory perspective
         a += self.reg_param * np.eye(r_gen.shape[1])
@@ -178,8 +210,6 @@ class _ESNCore:
         # Note: Surprisingly fast, even for an 8000 ndim network! (for x_dim=1, anyway)
         #  Obviously the memory bottleneck for n_dim bound applications
         self.w_out = np.linalg.solve(a, b).T
-
-        return None
 
     def _predict_step(self, x: np.ndarray) -> np.ndarray:
         """Predict a single time step.
@@ -537,11 +567,34 @@ class ESN(_ESNCore):
         # Also note that the dimension indexing order during the calculation is d > t > s which, annoyingly, is neither
         # C nor F style memory layout. Hence, the weird initial r_view shape of (s, t, d) as that is C-style layout with
         # the last index varying the fastest and the two swapaxes commands afterwards, to get it to (t, d, s).
-        r = np.zeros((train_steps * slices, self.n_dim))
-        r_view = r.view()  # shape: (train_steps * slices, self.n_dim)
-        r_view.shape = (slices, train_steps, self.n_dim)  # C layout, as dimension index order during calc is d > t > s
-        r_view = r_view.swapaxes(0, 2)  # shape: (self.n_dim, train_steps, slices)
-        r_view = r_view.swapaxes(0, 1)  # shape: (train_steps, self.n_dim, slices), i.e. the one we want below
+
+        logger.debug("Train according to method %s" % str(self.w_out_fit_flag))
+        # r_gen_steps = train_steps * slices
+        # TODO: r_gen knowledge needed here
+        if self.w_out_fit_flag == 0:
+            r_gen_dim = self.n_dim
+        elif self.w_out_fit_flag == 1:
+            r_gen_dim = self.n_dim * 2
+        else:
+            raise ValueError(f"self.w_out_fit_flag {self.w_out_fit_flag} unknown!")
+
+        # TODO: r_gen knowledge needed here
+        r_gen = np.zeros((train_steps * slices, r_gen_dim))
+        r_gen_view = r_gen.view()  # shape: (train_steps * slices, self.n_dim)
+        r_gen_view.shape = (slices, train_steps, r_gen_dim)  # C layout, as dimension index order during calc is d > t > s
+        r_gen_view = r_gen_view.swapaxes(0, 2)  # shape: (self.n_dim, train_steps, slices)
+        r_gen_view = r_gen_view.swapaxes(0, 1)  # shape: (train_steps, self.n_dim, slices), i.e. the one we want below
+
+        # TODO: r_gen knowledge needed here
+        if self.w_out_fit_flag == 0:
+            r_view = r_gen_view
+        elif self.w_out_fit_flag == 1:
+            # # NOTE: this is only the r_state here, but after _fit_w_out the unmodified r_state will be
+            # #  r_gen_view[:, :self.n_dim, :], note the difference in the 2nd dimension!
+            # r_view = r_gen_view[:, self.n_dim:, :]
+            r_view = r_gen_view[:, :self.n_dim, :]
+        else:
+            raise ValueError(f"self.w_out_fit_flag {self.w_out_fit_flag} unknown!")
 
         if self.last_r is None:
             self.last_r = np.zeros(self.n_dim)
@@ -564,10 +617,11 @@ class ESN(_ESNCore):
         y_train = x_train[1:]
         y_train = np.reshape(y_train.swapaxes(0, 1), newshape=(x_dim, train_steps * slices), order="F").swapaxes(0, 1)
 
-        if save_r:
-            self.r_train = r
+        self._fit_w_out(y_train, r_gen)
 
-        self._fit_w_out(y_train, r)
+        if save_r:
+            # TODO: r_gen knowledge needed here
+            self.r_train = r_gen[:, :self.n_dim]
 
     def predict(
         self,
