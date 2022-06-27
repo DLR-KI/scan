@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import gc
-from copy import deepcopy
 from typing import Any, Callable
 
 import networkx as nx
@@ -94,7 +92,7 @@ class _ESNCore:
         else:
             return self.__hash__() == other.__hash__()
 
-    def synchronize(self, x: np.ndarray, save_r: bool = False) -> np.ndarray | None:
+    def synchronize(self, x: np.ndarray, r_out: np.ndarray | None = None) -> np.ndarray | None:
         """Synchronize the reservoir state with the input time series.
 
         This is usually done automatically in the training and prediction functions.
@@ -104,7 +102,7 @@ class _ESNCore:
 
         Args:
             x: Input data to be used for the synchronization, shape (t, d).
-            save_r: If true, saves and returns r.
+            r_out: Array to save the r states in, shape (t, n_dim)
 
         Returns:
             All r states if save_r is True, None if False
@@ -114,13 +112,13 @@ class _ESNCore:
         assert self.last_r is not None
         assert self.act_fct is not None
 
-        if save_r:
-            r = np.zeros((x.shape[0], self.network.shape[0]))
-            r[0] = self.act_fct(x[0], self.last_r)
+        if r_out is not None:
+            # r = np.zeros((x.shape[0], self.network.shape[0]))
+            r_out[0] = self.act_fct(x[0], self.last_r)
             for t in np.arange(x.shape[0] - 1):
-                r[t + 1] = self.act_fct(x[t + 1], r[t])
-            self.last_r = deepcopy(r[-1])
-            return r
+                r_out[t + 1] = self.act_fct(x[t + 1], r_out[t])
+            self.last_r = np.copy(r_out[-1])  # TODO: np.copy
+            return r_out
         else:
             for t in np.arange(x.shape[0]):
                 self.last_r = self.act_fct(x[t], self.last_r)
@@ -184,7 +182,7 @@ class _ESNCore:
             pass
         elif self.w_out_fit_flag == 1:
             # Three times as memory efficient as a = a**2
-            np.square(r_gen[:, :self.network.shape[0]], out=r_gen[:, self.network.shape[0]:])
+            np.square(r_gen[:, : self.network.shape[0]], out=r_gen[:, self.network.shape[0] :])
 
             # Twice as memory efficient as a = a**2
             # r_gen[:, self.network.shape[0]:] = r_gen[:, :self.network.shape[0]]
@@ -581,7 +579,7 @@ class ESN(_ESNCore):
         # TODO: r_gen knowledge needed here
         r_gen = np.zeros((train_steps * slices, r_gen_dim))
         r_gen_view = r_gen.view()  # shape: (train_steps * slices, self.n_dim)
-        r_gen_view.shape = (slices, train_steps, r_gen_dim)  # C layout, as dimension index order during calc is d > t > s
+        r_gen_view.shape = (slices, train_steps, r_gen_dim)  # C layout, as index order during calc is d > t > s
         r_gen_view = r_gen_view.swapaxes(0, 2)  # shape: (self.n_dim, train_steps, slices)
         r_gen_view = r_gen_view.swapaxes(0, 1)  # shape: (train_steps, self.n_dim, slices), i.e. the one we want below
 
@@ -592,7 +590,7 @@ class ESN(_ESNCore):
             # # NOTE: this is only the r_state here, but after _fit_w_out the unmodified r_state will be
             # #  r_gen_view[:, :self.n_dim, :], note the difference in the 2nd dimension!
             # r_view = r_gen_view[:, self.n_dim:, :]
-            r_view = r_gen_view[:, :self.n_dim, :]
+            r_view = r_gen_view[:, : self.n_dim, :]
         else:
             raise ValueError(f"self.w_out_fit_flag {self.w_out_fit_flag} unknown!")
 
@@ -609,7 +607,7 @@ class ESN(_ESNCore):
                 self.synchronize(x_sync[:, :, slice_nr])
             # The last value of x_train can't be used for the training, as there is nothing to compare the resulting
             # prediction with. As such, we cut the last time step of x_train here.
-            r_view[:, :, slice_nr] = self.synchronize(x_train[:-1, :, slice_nr], save_r=True)
+            r_view[:, :, slice_nr] = self.synchronize(x_train[:-1, :, slice_nr], r_out=r_view[:, :, slice_nr])
 
         # Memory inefficiently reshape y_train from 3d to 2d, as that's the shape _fit_w_out expects. One could use
         # similar view magic to avoid the copying of memory as we did above for r, but due to the significantly smaller
@@ -621,7 +619,7 @@ class ESN(_ESNCore):
 
         if save_r:
             # TODO: r_gen knowledge needed here
-            self.r_train = r_gen[:, :self.n_dim]
+            self.r_train = r_gen[:, : self.n_dim]
 
     def predict(
         self,
