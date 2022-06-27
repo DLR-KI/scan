@@ -529,10 +529,16 @@ class ESN(_ESNCore):
 
         self._set_activation_function(act_fct_flag=act_fct_flag)
 
-        # r = np.zeros((train_steps, self.n_dim, slices))
+        # We use some view magic here so that we can easily assign values into r using the 3dim array of (t, d, s) the
+        # code expects below while the underlying array is actually of shape (t * s, d), which is the shape _fit_w_out
+        # expects. Of course, one could just reshape everything from 3dim to 2dim after the slices for loop, but that
+        # is only possible via copy, which uses significant amounts of memory, while the 3dim view on a 2dim array is
+        # just a view, i.e. without any memory duplication.
+        # Also note that the dimension indexing order during the calculation is d > t > s which, annoyingly, is neither
+        # C nor F style memory layout. Hence, the weird initial r_view shape of (s, t, d) as that is C-style layout with
+        # the last index varying the fastest and the two swapaxes commands afterwards, to get it to (t, d, s).
         r = np.zeros((train_steps * slices, self.n_dim))
         r_view = r.view()  # shape: (train_steps * slices, self.n_dim)
-
         r_view.shape = (slices, train_steps, self.n_dim)  # C layout, as dimension index order during calc is d > t > s
         r_view = r_view.swapaxes(0, 2)  # shape: (self.n_dim, train_steps, slices)
         r_view = r_view.swapaxes(0, 1)  # shape: (train_steps, self.n_dim, slices), i.e. the one we want below
@@ -544,7 +550,7 @@ class ESN(_ESNCore):
             logger.debug(f"Start training of slice Nr.{slice_nr:3d}")
             if reset_r:
                 # Initialize/reset the current reservoir state to zeros before each new slice. That way training doesn't
-                # depend on slice order, only content
+                # depend on slice order, only content.
                 self.last_r = np.zeros(self.n_dim)
             if x_sync is not None:
                 self.synchronize(x_sync[:, :, slice_nr])
@@ -552,18 +558,12 @@ class ESN(_ESNCore):
             # prediction with. As such, we cut the last time step of x_train here.
             r_view[:, :, slice_nr] = self.synchronize(x_train[:-1, :, slice_nr], save_r=True)
 
+        # Memory inefficiently reshape y_train from 3d to 2d, as that's the shape _fit_w_out expects. One could use
+        # similar view magic to avoid the copying of memory as we did above for r, but due to the significantly smaller
+        # size of x and y, that seems like more hassle than it's worth.
         y_train = x_train[1:]
-        # I wouldn't be surprised if there was a smarter way to reshape r and y from 3dim to 2dim correctly but this is
-        # the only way I could figure out how to. The problem is that with the currently used meaning for the
-        # dimensions of [timestep, x_data-dimension, x_data_slice] the 'fastest changing' index is actually the middle
-        # one. For this reason alone, switching the default meaning from of the first two dim from
-        # [timestep, x-data-dimension] to [x-data-dimension, timestep] might be a good idea. ALSO, doing so may enable
-        # the in-place reshaping of r.shape = (r.shape[0] * r.shape[2], r.shape[1]), which of course would be much
-        # smarter from a memory usage perspective.
-
         y_train = np.reshape(y_train.swapaxes(0, 1), newshape=(x_dim, train_steps * slices), order="F").swapaxes(0, 1)
 
-        # Fit using all the above train segments, now combined into 2dim arrays
         if save_r:
             self.r_train = r
 
