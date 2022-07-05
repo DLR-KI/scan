@@ -20,14 +20,20 @@
 * Adjusted style and formatting to follow the new InRe Style Guide
 * Automated formatting tools black and isort to assist in achieving
 
-
 * More expansive module structure
   * Added the modules data_processing, file_handling, logging and mpi with appropriate contents
 * Added "slices" for train and predict input 
   * 3d input of shape (t, d, s), instead of only 2d input of shape (t, d), supported to train and/or predict at multiple 
 positions in the time series at once 
   * Backwards compatible
-* Slight restructure of internal esn train/predict methods for a reduced memory overhead
+* Significantly reduced peak memory usage for the ESN classes. For larger data and reservoir sizes, where memory 
+constrains matter most, peak memory usage is down by about 50%.
+  * Old peak memory usage:
+    * "linear_r": (time_steps * slices * n_dim * **2**) * 64 bit + 150 MB
+    * "linear_and_square_r": (time_steps * slices * n_dim * **4** ) * 64 bit + 150 MB
+  * New:
+    * "linear_r": (time_steps * slices * n_dim + 2 * n_dim**2) * 64 bit + 150 MB
+    * "linear_and_square_r": (time_steps * slices * n_dim * **2** + 2 * (n_dim * 2)**2) * 64 bit + 150 MB
 * Complete independence from the global numpy random seed via two new, also independent, seed parameters: n_seed and 
 w_in_seed
   * This enables full software level reproducibility, even in parallel or not entirely user controlled contexts!
