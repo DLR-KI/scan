@@ -691,6 +691,38 @@ class TestESN(TestScanBase):
         assert_array_equal(exp_y_test, y_test)
         assert_array_almost_equal(exp_y_pred, y_pred)
 
+    def test_predict_x_pred_3d_sync_steps_linear_and_square_r(self):
+        input_dim = 3  # needs to be 3 to use the self.train_simple_3x3_x_train() below
+        x_time_steps = 5
+        pred_slices = 4
+
+        sync_steps = 1
+        reset_r = True
+
+        x_pred_3d = np.random.rand(x_time_steps, input_dim, pred_slices) - 0.5
+        self.set_seed()
+
+        # Not a big fan of explicitly defining the output arrays' dimensions here as, in principle, they could change
+        # without effecting the test in such a way that it should fail.
+        exp_y_pred = np.zeros(shape=(x_time_steps - sync_steps - 1, input_dim, pred_slices))
+        exp_y_test = np.zeros(shape=(x_time_steps - sync_steps - 1, input_dim, pred_slices))
+
+        for slice_nr in range(pred_slices):
+            self.create_network_3x3_rand_simple()
+            self.train_simple_3x3_x_train(w_out_fit_flag="linear_and_square_r")
+            exp_y_pred[:, :, slice_nr], exp_y_test[:, :, slice_nr] = self.esn.predict(
+                x_pred_3d[:, :, slice_nr], sync_steps=sync_steps, reset_r=reset_r
+            )
+
+            self.reset()
+
+        self.create_network_3x3_rand_simple()
+        self.train_simple_3x3_x_train(w_out_fit_flag="linear_and_square_r")
+        y_pred, y_test = self.esn.predict(x_pred_3d, sync_steps=sync_steps, reset_r=reset_r)
+
+        assert_array_equal(exp_y_test, y_test)
+        assert_array_almost_equal(exp_y_pred, y_pred)
+
     def test_predict_repeated_use_of_same_class_instance(self):
         input_dim = 3  # needs to be 3 to use the self.train_simple_3x3_x_train() below
         x_time_steps = 5

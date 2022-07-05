@@ -117,7 +117,7 @@ class _ESNCore:
             r_out[0] = self.act_fct(x[0], self.last_r)
             for t in np.arange(x.shape[0] - 1):
                 r_out[t + 1] = self.act_fct(x[t + 1], r_out[t])
-            self.last_r = np.copy(r_out[-1])  # TODO: np.copy
+            self.last_r = np.copy(r_out[-1])
             return r_out
         else:
             for t in np.arange(x.shape[0]):
@@ -138,28 +138,13 @@ class _ESNCore:
 
         """
 
+        # NOTE: r_gen knowledge needed here, Part 6/6.
         if self.w_out_fit_flag == 0:
             return r
         elif self.w_out_fit_flag == 1:
-            # class LazyEvaluation(object):
-            #     def __init__(self):
-            #         self.transforms = []
-            #
-            #     def add_transform(self, function, selection=slice(None), args={}):
-            #         self.transforms.append((function, selection, args))
-            #
-            #     def __call__(self, x):
-            #         y = x.copy()
-            #         for function, selection, args in self.transforms:
-            #             y[selection] = function(y[selection], **args)
-            #         return y
-            # le = LazyEvaluation()
-            # le.add_transform(lambda x: x ** 2, (slice(None), slice(self.network.shape[0], None)))
-            # return le(np.hstack((r, r.view())))
-
             return np.hstack((r, r**2))
-        else:
-            raise ValueError(f"self.w_out_fit_flag {self.w_out_fit_flag} unknown!")
+        # else:
+        #     raise ValueError(f"self.w_out_fit_flag {self.w_out_fit_flag} unknown!")
 
     def _fit_w_out(self, y_train: np.ndarray, r_gen: np.ndarray) -> None:
         """Fit the output matrix self.w_out after training.
@@ -174,10 +159,9 @@ class _ESNCore:
         logger.debug("Fit _w_out according to method %s" % str(self.w_out_fit_flag))
 
         assert self.reg_param is not None
+        assert self.network is not None
 
-        # # Note: Memory inefficient, as it seemingly copies r twice! if the hstack is called
-        # r_gen = self.r_to_generalized_r(r)
-
+        # NOTE: r_gen knowledge needed here, Part 5/6.
         if self.w_out_fit_flag == 0:
             pass
         elif self.w_out_fit_flag == 1:
@@ -190,8 +174,8 @@ class _ESNCore:
 
             # "default"
             # r_gen[:, self.network.shape[0]:] = r_gen[:, :self.network.shape[0]]**2
-        else:
-            raise ValueError(f"self.w_out_fit_flag {self.w_out_fit_flag} unknown!")
+        # else:
+        #     raise ValueError(f"self.w_out_fit_flag {self.w_out_fit_flag} unknown!")
 
         # Note: Very slow to calc. Relevant for peak memory consumption too
         a = r_gen.T @ r_gen
@@ -229,7 +213,7 @@ class _ESNCore:
         self.last_r = self.act_fct(x, self.last_r)
         self.last_r_gen = self.r_to_generalized_r(self.last_r)
 
-        # NOTE: Seemingly, type hinting of numpy's matmul is broken, which is why we need the manual type hint below
+        # NOTE: Seemingly, type hinting of numpy matmul is broken, which is why we need the manual type hint here
         y: np.ndarray = self.w_out @ self.last_r_gen
 
         if self.loc_nbhd is not None:
@@ -455,7 +439,7 @@ class ESN(_ESNCore):
         """
         assert self.w_in is not None
         assert self.network is not None
-        # NOTE: Seemingly, type hinting of numpy's matmul is broken, which is why we need the manual type hint below
+        # NOTE: Seemingly, type hinting of numpy matmul is broken, which is why we need the manual type hint here
         out: np.ndarray = np.tanh(self.w_in @ x + self.network @ r)
         return out
 
@@ -530,6 +514,8 @@ class ESN(_ESNCore):
         self.loc_nbhd = loc_nbhd
         self.w_out_fit_flag = w_out_fit_flag_synonyms.find_flag(w_out_fit_flag)
 
+        logger.debug("Train according to method %s" % str(self.w_out_fit_flag))
+
         if x_train.ndim == 1:
             x_train = x_train[:, np.newaxis, np.newaxis]
         elif x_train.ndim == 2:
@@ -559,16 +545,13 @@ class ESN(_ESNCore):
 
         # We use some view magic here so that we can easily assign values into r using the 3dim array of (t, d, s) the
         # code expects below while the underlying array is actually of shape (t * s, d), which is the shape _fit_w_out
-        # expects. Of course, one could just reshape everything from 3dim to 2dim after the slices for loop, but that
+        # expects. Of course, one could just reshape everything from 3dim to 2dim after the slices-for-loop, but that
         # is only possible via copy, which uses significant amounts of memory, while the 3dim view on a 2dim array is
         # just a view, i.e. without any memory duplication.
         # Also note that the dimension indexing order during the calculation is d > t > s which, annoyingly, is neither
-        # C nor F style memory layout. Hence, the weird initial r_view shape of (s, t, d) as that is C-style layout with
-        # the last index varying the fastest and the two swapaxes commands afterwards, to get it to (t, d, s).
-
-        logger.debug("Train according to method %s" % str(self.w_out_fit_flag))
-        # r_gen_steps = train_steps * slices
-        # TODO: r_gen knowledge needed here
+        # C nor F style memory layout. Hence, the weird initial r_view shape of (s, t, d) as that is C-style layout
+        # (the last index varying the fastest) and the two swapaxes commands afterwards, to get it to (t, d, s).
+        # NOTE: r_gen knowledge needed here, Part 1/6.
         if self.w_out_fit_flag == 0:
             r_gen_dim = self.n_dim
         elif self.w_out_fit_flag == 1:
@@ -576,23 +559,20 @@ class ESN(_ESNCore):
         else:
             raise ValueError(f"self.w_out_fit_flag {self.w_out_fit_flag} unknown!")
 
-        # TODO: r_gen knowledge needed here
+        # NOTE: r_gen knowledge needed here, Part 2/6.
         r_gen = np.zeros((train_steps * slices, r_gen_dim))
         r_gen_view = r_gen.view()  # shape: (train_steps * slices, self.n_dim)
         r_gen_view.shape = (slices, train_steps, r_gen_dim)  # C layout, as index order during calc is d > t > s
         r_gen_view = r_gen_view.swapaxes(0, 2)  # shape: (self.n_dim, train_steps, slices)
         r_gen_view = r_gen_view.swapaxes(0, 1)  # shape: (train_steps, self.n_dim, slices), i.e. the one we want below
 
-        # TODO: r_gen knowledge needed here
+        # NOTE: r_gen knowledge needed here, Part 3/6.
         if self.w_out_fit_flag == 0:
             r_view = r_gen_view
         elif self.w_out_fit_flag == 1:
-            # # NOTE: this is only the r_state here, but after _fit_w_out the unmodified r_state will be
-            # #  r_gen_view[:, :self.n_dim, :], note the difference in the 2nd dimension!
-            # r_view = r_gen_view[:, self.n_dim:, :]
             r_view = r_gen_view[:, : self.n_dim, :]
-        else:
-            raise ValueError(f"self.w_out_fit_flag {self.w_out_fit_flag} unknown!")
+        # else:
+        #     raise ValueError(f"self.w_out_fit_flag {self.w_out_fit_flag} unknown!")
 
         if self.last_r is None:
             self.last_r = np.zeros(self.n_dim)
@@ -618,7 +598,7 @@ class ESN(_ESNCore):
         self._fit_w_out(y_train, r_gen)
 
         if save_r:
-            # TODO: r_gen knowledge needed here
+            # NOTE: r_gen knowledge needed here, Part 4/6.
             self.r_train = r_gen[:, : self.n_dim]
 
     def predict(
