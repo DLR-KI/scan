@@ -21,11 +21,8 @@ class TestSimulations(TestScanBase):
         simulation_time_steps = 2
         starting_point = np.array([-14.03020521, -20.88693127, 25.53545])
 
-        sim_data = scan.simulations.Lorenz63(
-            dt=2e-2
-        ).simulate(
-            time_steps=simulation_time_steps,
-            starting_point=starting_point
+        sim_data = scan.simulations.Lorenz63(dt=2e-2).simulate(
+            time_steps=simulation_time_steps, starting_point=starting_point
         )
 
         exp_sim_data = np.array(
@@ -36,13 +33,11 @@ class TestSimulations(TestScanBase):
 
     def test_simulate_trajectory_lorenz63_default_starting_point_single_step_trivial_test(self):
         simulation_time_steps = 2
-        sim_data = scan.simulations.Lorenz63(
-            dt=2e-2
-        ).simulate(
-            time_steps=simulation_time_steps
-        )
+        sim_data = scan.simulations.Lorenz63(dt=2e-2).simulate(time_steps=simulation_time_steps)
 
-        exp_sim_data = np.array([[0.0, -0.01, 9.0], [-1.8168870026079268e-03, -1.0161406771353333e-02, 8.5325756633139491e+00]])
+        exp_sim_data = np.array(
+            [[0.0, -0.01, 9.0], [-1.8168870026079268e-03, -1.0161406771353333e-02, 8.5325756633139491e00]]
+        )
 
         assert_array_equal(sim_data, exp_sim_data)
 
@@ -55,11 +50,8 @@ class TestSimulations(TestScanBase):
         self.set_seed()
         starting_point = lor_force * np.ones(lor_dim) + 1e-2 * np.random.rand(lor_dim)
 
-        sim_data = scan.simulations.Lorenz96(
-            force=lor_force,
-            dt=lor_dt
-        ).simulate(
-            time_steps=simulation_time_steps,starting_point=starting_point
+        sim_data = scan.simulations.Lorenz96(force=lor_force, dt=lor_dt).simulate(
+            time_steps=simulation_time_steps, starting_point=starting_point
         )
 
         exp_sim_data = np.array(
@@ -76,43 +68,66 @@ class TestSimulations(TestScanBase):
 
         self.set_seed()
 
-        sim_data = scan.simulations.Lorenz96(
-        ).simulate(
-            time_steps=simulation_time_steps
-        )
+        sim_data = scan.simulations.Lorenz96().simulate(time_steps=simulation_time_steps)
 
-        exp_sim_data = np.array([np.sin(np.arange(30)),
-                                 [0.3769009997531504, 1.2048911212671174, 1.2602415620124692,
-                                  0.4409127670578584, -0.3558303924604377, -0.5112232787601698,
-                                  0.07503500757496134, 1.005512609974874, 1.3583335117552717,
-                                  0.714030171527682, -0.18099116196016424, -0.5450477863753878,
-                                  -0.15566505877288883, 0.756972305739906, 1.3655846500065303,
-                                  0.968056644989393, 0.04054393941189638, -0.5163763982152564,
-                                  -0.33974865011922695, 0.4841133914492217, 1.2824544729906988,
-                                  1.176981382103961, 0.2966082002705891, -0.426938493134693,
-                                  -0.4678259531746986, 0.21180527032161653, 1.1189395692923816,
-                                  1.3175211558905413, 0.5701852056224413, -0.26074897061166247]])
+        exp_sim_data = np.array(
+            [
+                np.sin(np.arange(30)),
+                [
+                    0.3769009997531504,
+                    1.2048911212671174,
+                    1.2602415620124692,
+                    0.4409127670578584,
+                    -0.3558303924604377,
+                    -0.5112232787601698,
+                    0.07503500757496134,
+                    1.005512609974874,
+                    1.3583335117552717,
+                    0.714030171527682,
+                    -0.18099116196016424,
+                    -0.5450477863753878,
+                    -0.15566505877288883,
+                    0.756972305739906,
+                    1.3655846500065303,
+                    0.968056644989393,
+                    0.04054393941189638,
+                    -0.5163763982152564,
+                    -0.33974865011922695,
+                    0.4841133914492217,
+                    1.2824544729906988,
+                    1.176981382103961,
+                    0.2966082002705891,
+                    -0.426938493134693,
+                    -0.4678259531746986,
+                    0.21180527032161653,
+                    1.1189395692923816,
+                    1.3175211558905413,
+                    0.5701852056224413,
+                    -0.26074897061166247,
+                ],
+            ]
+        )
 
         assert_array_equal(sim_data, exp_sim_data)
 
     def test_simulate_trajectory_roessler_default_starting_point_single_step_trivial_test(self):
         sim_data = scan.simulations.Roessler().simulate(time_steps=2)
 
-        exp_sim_data = np.array([[-9.0, 0.0, 0.0], [-8.955425338833333, -0.90756655,  0.009868544904350832]])
+        exp_sim_data = np.array([[-9.0, 0.0, 0.0], [-8.955425338833333, -0.90756655, 0.009868544904350832]])
 
         assert_array_equal(sim_data, exp_sim_data)
 
     def test_simulate_trajectory_complex_butterfly_default_starting_point_single_step_trivial_test(self):
         sim_data = scan.simulations.ComplexButterly().simulate(time_steps=2)
 
-        exp_sim_data = np.array([[0.2, 0., 0.], [0.19458405593782552, 0.0010022759114583332, -0.04013613366536458]])
+        exp_sim_data = np.array([[0.2, 0.0, 0.0], [0.19458405593782552, 0.0010022759114583332, -0.04013613366536458]])
 
         assert_array_equal(sim_data, exp_sim_data)
 
     def test_simulate_trajectory_chen_default_starting_point_single_step_trivial_test(self):
         sim_data = scan.simulations.Chen().simulate(time_steps=2)
 
-        exp_sim_data = np.array([[-10., 0., 37.], [-6.3845564682890625, 4.1595207530446, 35.746433277481756]])
+        exp_sim_data = np.array([[-10.0, 0.0, 37.0], [-6.3845564682890625, 4.1595207530446, 35.746433277481756]])
 
         assert_array_equal(sim_data, exp_sim_data)
 
@@ -147,14 +162,23 @@ class TestSimulations(TestScanBase):
     def test_simulate_trajectory_henon_default_starting_point_single_step_trivial_test(self):
         sim_data = scan.simulations.Henon().simulate(time_steps=2)
 
-        exp_sim_data = np.array([[0.0, 0.9], [1.27,  0.0]])
+        exp_sim_data = np.array([[0.0, 0.9], [1.27, 0.0]])
 
         assert_array_equal(sim_data, exp_sim_data)
 
     def test_simulate_trajectory_logistic_default_starting_point_single_step_trivial_test(self):
         sim_data = scan.simulations.Logistic().simulate(time_steps=2)
 
-        exp_sim_data = np.array([[0.1, ], [0.36000000000000004, ]])
+        exp_sim_data = np.array(
+            [
+                [
+                    0.1,
+                ],
+                [
+                    0.36000000000000004,
+                ],
+            ]
+        )
 
         assert_array_equal(sim_data, exp_sim_data)
 
@@ -177,11 +201,7 @@ class TestSimulations(TestScanBase):
         system_size = 2
         dt = 0.5
 
-        sim_data = scan.simulations.KuramotoSivashinsky(
-            dimensions=dimensions,
-            system_size=system_size,
-            dt=dt
-        ).simulate(
+        sim_data = scan.simulations.KuramotoSivashinsky(dimensions=dimensions, system_size=system_size, dt=dt).simulate(
             time_steps=3
         )
 
@@ -190,12 +210,8 @@ class TestSimulations(TestScanBase):
         starting_point = sim_data[1]
 
         exp_sim_data = scan.simulations.KuramotoSivashinsky(
-            dimensions=dimensions,
-            system_size=system_size,
-            dt=dt
-        ).simulate(
-            time_steps=2, starting_point=starting_point
-        )
+            dimensions=dimensions, system_size=system_size, dt=dt
+        ).simulate(time_steps=2, starting_point=starting_point)
 
         # Due to the FFT parts of the KS algorithm, putting in the same real space point as corresponds to some in
         # point in Fourier Space, actually results in a fairly large simulation difference, even after a single
@@ -207,24 +223,16 @@ class TestSimulations(TestScanBase):
         system_size = 2
         dt = 0.5
         sim_data = scan.simulations.KuramotoSivashinskyCustom(
-            dimensions=dimensions,
-            system_size=system_size,
-            dt=dt
-        ).simulate(
-            time_steps=3
-        )
+            dimensions=dimensions, system_size=system_size, dt=dt
+        ).simulate(time_steps=3)
 
         # Note that, right now, the KS simulation is the only simulation function that returns the starting point as
         # first point of the prediction, so we have to take that into account here.
         starting_point = sim_data[1]
 
         exp_sim_data = scan.simulations.KuramotoSivashinskyCustom(
-            dimensions=dimensions,
-            system_size=system_size,
-            dt=dt
-        ).simulate(
-            time_steps=2,starting_point=starting_point
-        )
+            dimensions=dimensions, system_size=system_size, dt=dt
+        ).simulate(time_steps=2, starting_point=starting_point)
 
         # Due to the FFT parts of the KS algorithm, putting in the same real space point as corresponds to some in
         # point in Fourier Space, actually results in a fairly large simulation difference, even after a single
@@ -240,13 +248,8 @@ class TestSimulations(TestScanBase):
         fft_type = "numpy"
 
         sim_data = scan.simulations.KuramotoSivashinskyCustom(
-            dimensions=dimensions,
-            system_size=system_size,
-            dt=dt,
-            fft_type=fft_type
-        ).simulate(
-            time_steps=time_steps
-        )
+            dimensions=dimensions, system_size=system_size, dt=dt, fft_type=fft_type
+        ).simulate(time_steps=time_steps)
 
         exp_sim_data = scan.simulations.KuramotoSivashinskyCustom(
             dimensions=dimensions,
@@ -254,9 +257,7 @@ class TestSimulations(TestScanBase):
             dt=dt,
             precision=64,
             fft_type=fft_type,
-        ).simulate(
-            time_steps=time_steps
-        )
+        ).simulate(time_steps=time_steps)
 
         assert_array_equal(sim_data, exp_sim_data)
 
@@ -274,9 +275,7 @@ class TestSimulations(TestScanBase):
             dt=dt,
             precision=128,
             fft_type=fft_type,
-        ).simulate(
-            time_steps=time_steps
-        )
+        ).simulate(time_steps=time_steps)
 
         exp_sim_data = scan.simulations.KuramotoSivashinskyCustom(
             dimensions=dimensions,
@@ -284,9 +283,7 @@ class TestSimulations(TestScanBase):
             dt=dt,
             precision=64,
             fft_type=fft_type,
-        ).simulate(
-            time_steps=time_steps
-        )
+        ).simulate(time_steps=time_steps)
 
         assert_array_not_equal(sim_data, exp_sim_data)
 
@@ -305,9 +302,7 @@ class TestSimulations(TestScanBase):
                 dt=dt,
                 precision="this_precision_does_not_exist",
                 fft_type=fft_type,
-            ).simulate(
-                time_steps=time_steps
-            )
+            ).simulate(time_steps=time_steps)
 
     def test_kuramoto_sivashinski_custom_40d_22l_05t_unknown_fft_type(self):
         dimensions = 40
@@ -323,9 +318,7 @@ class TestSimulations(TestScanBase):
                 dt=dt,
                 precision=None,
                 fft_type="this_ffttype_does_not_exist",
-            ).simulate(
-                time_steps=time_steps
-            )
+            ).simulate(time_steps=time_steps)
 
 
 class TestKuramotSivashinskiVariantsDivergence40d22l05t(unittest.TestCase):
@@ -347,12 +340,10 @@ class TestKuramotSivashinskiVariantsDivergence40d22l05t(unittest.TestCase):
         time_steps = 1000
 
         sim_data = scan.simulations.KuramotoSivashinsky(
-                        dimensions=dimensions,
-                        system_size=system_size,
-                        dt=dt,
-                    ).simulate(
-                        time_steps=time_steps
-                    )
+            dimensions=dimensions,
+            system_size=system_size,
+            dt=dt,
+        ).simulate(time_steps=time_steps)
 
         assert not np.isnan(sim_data).any()
         assert np.amax(np.abs(sim_data)) < 100
@@ -366,14 +357,12 @@ class TestKuramotSivashinskiVariantsDivergence40d22l05t(unittest.TestCase):
         fft_type = "numpy"
 
         sim_data = scan.simulations.KuramotoSivashinskyCustom(
-                        dimensions=self.dimensions,
-                        system_size=self.system_size,
-                        dt=self.dt,
-                        precision=precision,
-                        fft_type=fft_type,
-                    ).simulate(
-                        time_steps=self.time_steps
-                    )
+            dimensions=self.dimensions,
+            system_size=self.system_size,
+            dt=self.dt,
+            precision=precision,
+            fft_type=fft_type,
+        ).simulate(time_steps=self.time_steps)
 
         assert not np.isnan(sim_data).any()
         assert np.amax(np.abs(sim_data)) < 100
@@ -387,14 +376,12 @@ class TestKuramotSivashinskiVariantsDivergence40d22l05t(unittest.TestCase):
         fft_type = "numpy"
 
         sim_data = scan.simulations.KuramotoSivashinskyCustom(
-                        dimensions=self.dimensions,
-                        system_size=self.system_size,
-                        dt=self.dt,
-                        precision=precision,
-                        fft_type=fft_type,
-                    ).simulate(
-                        time_steps=self.time_steps
-                    )
+            dimensions=self.dimensions,
+            system_size=self.system_size,
+            dt=self.dt,
+            precision=precision,
+            fft_type=fft_type,
+        ).simulate(time_steps=self.time_steps)
 
         assert not np.isnan(sim_data).any()
         assert np.amax(np.abs(sim_data)) < 100
@@ -408,14 +395,12 @@ class TestKuramotSivashinskiVariantsDivergence40d22l05t(unittest.TestCase):
         fft_type = "numpy"
 
         sim_data = scan.simulations.KuramotoSivashinskyCustom(
-                        dimensions=self.dimensions,
-                        system_size=self.system_size,
-                        dt=self.dt,
-                        precision=precision,
-                        fft_type=fft_type,
-                    ).simulate(
-                        time_steps=self.time_steps
-                    )
+            dimensions=self.dimensions,
+            system_size=self.system_size,
+            dt=self.dt,
+            precision=precision,
+            fft_type=fft_type,
+        ).simulate(time_steps=self.time_steps)
 
         assert not np.isnan(sim_data).any()
         assert np.amax(np.abs(sim_data)) < 100
@@ -429,14 +414,12 @@ class TestKuramotSivashinskiVariantsDivergence40d22l05t(unittest.TestCase):
         fft_type = "numpy"
 
         sim_data = scan.simulations.KuramotoSivashinskyCustom(
-                        dimensions=self.dimensions,
-                        system_size=self.system_size,
-                        dt=self.dt,
-                        precision=precision,
-                        fft_type=fft_type,
-                    ).simulate(
-                        time_steps=self.time_steps
-                    )
+            dimensions=self.dimensions,
+            system_size=self.system_size,
+            dt=self.dt,
+            precision=precision,
+            fft_type=fft_type,
+        ).simulate(time_steps=self.time_steps)
 
         assert not np.isnan(sim_data).any()
         assert np.amax(np.abs(sim_data)) < 100
@@ -450,14 +433,12 @@ class TestKuramotSivashinskiVariantsDivergence40d22l05t(unittest.TestCase):
         fft_type = "scipy"
 
         sim_data = scan.simulations.KuramotoSivashinskyCustom(
-                        dimensions=self.dimensions,
-                        system_size=self.system_size,
-                        dt=self.dt,
-                        precision=precision,
-                        fft_type=fft_type,
-                    ).simulate(
-                        time_steps=self.time_steps
-                    )
+            dimensions=self.dimensions,
+            system_size=self.system_size,
+            dt=self.dt,
+            precision=precision,
+            fft_type=fft_type,
+        ).simulate(time_steps=self.time_steps)
 
         assert not np.isnan(sim_data).any()
         assert np.amax(np.abs(sim_data)) < 100

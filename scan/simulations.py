@@ -11,8 +11,8 @@ from typing import Callable
 
 import numpy as np
 
-def _runge_kutta(
-    f: Callable[[np.ndarray], np.ndarray], dt: float, x: np.ndarray) -> np.ndarray:
+
+def _runge_kutta(f: Callable[[np.ndarray], np.ndarray], dt: float, x: np.ndarray) -> np.ndarray:
     """Simulate one step for ODEs of the form dx/dt = f(x(t)).
 
     Args:
@@ -32,9 +32,9 @@ def _runge_kutta(
     return next_step
 
 
-def _timestep_iterator(f: Callable[[np.ndarray], np.ndarray],
-                       time_steps: int,
-                       starting_point: np.ndarray) -> np.ndarray:
+def _timestep_iterator(
+    f: Callable[[np.ndarray], np.ndarray], time_steps: int, starting_point: np.ndarray
+) -> np.ndarray:
     """Iterate a function f: x(i+1) = f(x(i)) multiple times to obtain a full trajectory.
 
     Args:
@@ -52,7 +52,7 @@ def _timestep_iterator(f: Callable[[np.ndarray], np.ndarray],
     traj = np.zeros(traj_size)
     traj[0, :] = starting_point
     for t in range(1, traj_size[0]):
-        traj[t] = f(traj[t-1])
+        traj[t] = f(traj[t - 1])
     return traj
 
 
@@ -66,8 +66,8 @@ class Lorenz63:
     - Kaplan-Yorke dimension: 2.06215
     - Correlation dimension: 2.068 +- 0.086
     """
-    def __init__(self, sigma: float = 10, rho: float = 28, beta: float = 8 / 3,
-                 dt: float = 0.05) -> None:
+
+    def __init__(self, sigma: float = 10, rho: float = 28, beta: float = 8 / 3, dt: float = 0.05) -> None:
         """Define the system parameters.
 
         Args:
@@ -90,9 +90,7 @@ class Lorenz63:
             : (dx/dt, dy/dt, dz/dt) corresponding to input x.
 
         """
-        return np.array([self.sigma * (x[1] - x[0]),
-                         x[0] * (self.rho - x[2]) - x[1],
-                         x[0] * x[1] - self.beta * x[2]])
+        return np.array([self.sigma * (x[1] - x[0]), x[0] * (self.rho - x[2]) - x[1], x[0] * x[1] - self.beta * x[2]])
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
         """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)) and dt
@@ -106,8 +104,7 @@ class Lorenz63:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int,
-                 starting_point: np.ndarray = np.array([0.0, -0.01, 9.0])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([0.0, -0.01, 9.0])) -> np.ndarray:
         """Simulate Lorenz63 trajectory.
 
         Args:
@@ -117,7 +114,7 @@ class Lorenz63:
             Trajectory of shape (t, 3).
 
         """
-        return  _timestep_iterator(self.iterate, time_steps, starting_point)
+        return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
 class Roessler:
@@ -130,6 +127,7 @@ class Roessler:
     - Kaplan-Yorke dimension: 2.0132
     - Correlation dimension: 1.991 +- 0.065
     """
+
     def __init__(self, a: float = 0.2, b: float = 0.2, c: float = 5.7, dt: float = 0.1) -> None:
         """Define the system parameters
 
@@ -167,8 +165,7 @@ class Roessler:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int,
-                 starting_point: np.ndarray = np.array([-9.0, 0.0, 0.0])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([-9.0, 0.0, 0.0])) -> np.ndarray:
         """Simulate Roessler trajectory.
 
         Args:
@@ -178,7 +175,7 @@ class Roessler:
             Trajectory of shape (t, 3).
 
         """
-        return  _timestep_iterator(self.iterate, time_steps, starting_point)
+        return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
 class ComplexButterly:
@@ -191,6 +188,7 @@ class ComplexButterly:
     - Kaplan-Yorke dimension: 2.2350
     - Correlation dimension: 2.491 +- 0.131
     """
+
     def __init__(self, a: float = 0.55, dt: float = 0.05) -> None:
         """Define the system parameters.
 
@@ -224,8 +222,7 @@ class ComplexButterly:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int,
-                 starting_point: np.ndarray = np.array([0.2, 0.0, 0.0])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([0.2, 0.0, 0.0])) -> np.ndarray:
         """Simulate Complex butterfly trajectory.
 
         Args:
@@ -235,7 +232,7 @@ class ComplexButterly:
             Trajectory of shape (t, 3).
 
         """
-        return  _timestep_iterator(self.iterate, time_steps, starting_point)
+        return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
 class Chen:
@@ -248,6 +245,7 @@ class Chen:
     - Kaplan-Yorke dimension: 2.1686
     - Correlation dimension: 2.147 +- 0.117
     """
+
     def __init__(self, a: float = 35, b: float = 3, c: float = 28, dt: float = 0.01) -> None:
         """Define the system parameters.
 
@@ -271,9 +269,13 @@ class Chen:
             : (dx/dt, dy/dt, dz/dt) corresponding to input x.
 
         """
-        return np.array([self.a * (x[1] - x[0]),
-                         (self.c - self.a) * x[0] - x[0] * x[2] + self.c * x[1],
-                         x[0] * x[1] - self.b * x[2]])
+        return np.array(
+            [
+                self.a * (x[1] - x[0]),
+                (self.c - self.a) * x[0] - x[0] * x[2] + self.c * x[1],
+                x[0] * x[1] - self.b * x[2],
+            ]
+        )
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
         """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)) and dt
@@ -287,8 +289,7 @@ class Chen:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int,
-                 starting_point: np.ndarray = np.array([-10.0, 0.0, 37.0])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([-10.0, 0.0, 37.0])) -> np.ndarray:
         """Simulate Chen's system trajectory.
 
         Args:
@@ -298,7 +299,7 @@ class Chen:
             Trajectory of shape (t, 3).
 
         """
-        return  _timestep_iterator(self.iterate, time_steps, starting_point)
+        return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
 class ChuaCircuit:
@@ -311,8 +312,10 @@ class ChuaCircuit:
     - Kaplan-Yorke dimension: 2.1298
     - Correlation dimension: 2.215 +- 0.098
     """
-    def __init__(self, alpha: float = 9, beta: float = 100 / 7, a: float = 8 / 7, b: float = 5 / 7,
-                 dt: float = 0.05) -> None:
+
+    def __init__(
+        self, alpha: float = 9, beta: float = 100 / 7, a: float = 8 / 7, b: float = 5 / 7, dt: float = 0.05
+    ) -> None:
         """Define the system parameters
 
         Args:
@@ -337,10 +340,14 @@ class ChuaCircuit:
             : (dx/dt, dy/dt, dz/dt) corresponding to input x.
 
         """
-        return np.array([self.alpha * (x[1] - x[0] + self.b * x[0] + 0.5 * (self.a - self.b) *
-                                       (np.abs(x[0] + 1) - np.abs(x[0] - 1))),
-                         x[0] - x[1] + x[2],
-                         -self.beta * x[1]])
+        return np.array(
+            [
+                self.alpha
+                * (x[1] - x[0] + self.b * x[0] + 0.5 * (self.a - self.b) * (np.abs(x[0] + 1) - np.abs(x[0] - 1))),
+                x[0] - x[1] + x[2],
+                -self.beta * x[1],
+            ]
+        )
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
         """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)) and dt
@@ -354,8 +361,7 @@ class ChuaCircuit:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int,
-                 starting_point: np.ndarray = np.array([0.0, 0.0, 0.6])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([0.0, 0.0, 0.6])) -> np.ndarray:
         """Simulate Chua's Circuit trajectory.
 
         Args:
@@ -365,7 +371,7 @@ class ChuaCircuit:
             Trajectory of shape (t, 3).
 
         """
-        return  _timestep_iterator(self.iterate, time_steps, starting_point)
+        return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
 class Thomas:
@@ -378,8 +384,8 @@ class Thomas:
     - Kaplan-Yorke dimension: 2.0607
     - Correlation dimension: 1.843 +- 0.075
     """
-    def __init__(self, b: float = 0.18,
-                 dt: float = 0.2) -> None:
+
+    def __init__(self, b: float = 0.18, dt: float = 0.2) -> None:
         """Define the system parameters.
 
         Args:
@@ -412,8 +418,7 @@ class Thomas:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int,
-                 starting_point: np.ndarray = np.array([0.1, 0.0, 0.0])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([0.1, 0.0, 0.0])) -> np.ndarray:
         """Simulate Thomas' cyclically symmetric attractor trajectory.
 
         Args:
@@ -423,7 +428,7 @@ class Thomas:
             Trajectory of shape (t, 3).
 
         """
-        return  _timestep_iterator(self.iterate, time_steps, starting_point)
+        return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
 class WindmiAttractor:
@@ -458,7 +463,7 @@ class WindmiAttractor:
             : (dx/dt, dy/dt, dz/dt) corresponding to input x.
 
         """
-        return np.array([x[1], x[2], -self.a*x[2] - x[1] + self.b - np.exp(x[0])])
+        return np.array([x[1], x[2], -self.a * x[2] - x[1] + self.b - np.exp(x[0])])
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
         """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)) and dt
@@ -472,8 +477,7 @@ class WindmiAttractor:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int,
-                 starting_point: np.ndarray = np.array([0.0, 0.8, 0.0])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([0.0, 0.8, 0.0])) -> np.ndarray:
         """Simulate the WINDMI attractor trajectory.
 
         Args:
@@ -517,8 +521,7 @@ class Rucklidge:
             : (dx/dt, dy/dt, dz/dt) corresponding to input x.
 
         """
-        return np.array([-self.kappa * x[0] + self.lam * x[1] - x[1] * x[2],
-                         x[0], -x[2] + x[1] ** 2])
+        return np.array([-self.kappa * x[0] + self.lam * x[1] - x[1] * x[2], x[0], -x[2] + x[1] ** 2])
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
         """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)) and dt
@@ -532,8 +535,7 @@ class Rucklidge:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int,
-                 starting_point: np.ndarray = np.array([1.0, 0.0, 4.5])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([1.0, 0.0, 4.5])) -> np.ndarray:
         """Simulate the Rucklidge attractor trajectory.
 
         Args:
@@ -556,6 +558,7 @@ class Henon:
     - Kaplan-Yorke dimension: 1.25827
     - Correlation dimension: 1.220 +- 0.036
     """
+
     def __init__(self, a: float = 1.4, b: float = 0.3) -> None:
         """Define the system parameters.
 
@@ -575,10 +578,9 @@ class Henon:
             : (x(i+1), y(i+1)) corresponding to input x.
 
         """
-        return np.array([1 - self.a*x[0]**2 + self.b * x[1], x[0]])
+        return np.array([1 - self.a * x[0] ** 2 + self.b * x[1], x[0]])
 
-    def simulate(self, time_steps: int,
-                 starting_point: np.ndarray = np.array([0.0, 0.9])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([0.0, 0.9])) -> np.ndarray:
         """Simulate Henon trajectory.
 
         Args:
@@ -601,6 +603,7 @@ class Logistic:
     - Kaplan-Yorke dimension: 1.0
     - Correlation dimension: 1.0
     """
+
     def __init__(self, r: float = 4) -> None:
         """Define the system parameters.
 
@@ -618,10 +621,21 @@ class Logistic:
             : (x(i+1), ) corresponding to input x.
 
         """
-        return np.array([self.r * x[0] * (1 - x[0]), ])
+        return np.array(
+            [
+                self.r * x[0] * (1 - x[0]),
+            ]
+        )
 
-    def simulate(self, time_steps: int,
-                 starting_point: np.ndarray = np.array([0.1, ])) -> np.ndarray:
+    def simulate(
+        self,
+        time_steps: int,
+        starting_point: np.ndarray = np.array(
+            [
+                0.1,
+            ]
+        ),
+    ) -> np.ndarray:
         """Simulate Lorenz63 trajectory.
 
         Args:
@@ -644,6 +658,7 @@ class SimplestDrivenChaotic:
     - Kaplan-Yorke dimension: 3.0
     - Correlation dimension: 2.634 +- 0.160
     """
+
     def __init__(self, omega: float = 1.88, dt: float = 0.1) -> None:
         """Define the system parameters.
 
@@ -677,18 +692,17 @@ class SimplestDrivenChaotic:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int,
-                 starting_point: np.ndarray = np.array([0.0, 0.0])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([0.0, 0.0])) -> np.ndarray:
         """Simulate Simplest Driven Chaotic flow trajectory.
 
-         Args:
-             time_steps: Number of time steps t to simulate.
-             starting_point: Starting point of the trajectory of shape (2,) (time dimension
-             excluded).
-         Returns:
-             Trajectory of shape (t, 2).
+        Args:
+            time_steps: Number of time steps t to simulate.
+            starting_point: Starting point of the trajectory of shape (2,) (time dimension
+            excluded).
+        Returns:
+            Trajectory of shape (t, 2).
 
-         """
+        """
         starting_point = np.hstack((starting_point, 0.0))
         return _timestep_iterator(self.iterate, time_steps, starting_point)[:, :-1]
 
@@ -703,6 +717,7 @@ class UedaOscillator:
     - Kaplan-Yorke dimension: 2.6741
     - Correlation dimension: 2.675 +- 0.132
     """
+
     def __init__(self, b: float = 0.05, A: float = 7.5, omega: float = 1, dt: float = 0.05) -> None:
         """Define the system parameters.
 
@@ -726,7 +741,7 @@ class UedaOscillator:
             : (dx/dt, dy/dt, dt/dt=1) corresponding to input x.
 
         """
-        return np.array([x[1], -(x[0]**3) - self.b * x[1] + self.A * np.sin(self.omega * x[2]), 1])
+        return np.array([x[1], -(x[0] ** 3) - self.b * x[1] + self.A * np.sin(self.omega * x[2]), 1])
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
         """Calculates next timestep (x(i+1), y(i+1), t(i+1)) with given (x(i),y(i),t(i)) and dt
@@ -740,18 +755,17 @@ class UedaOscillator:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int,
-                 starting_point: np.ndarray = np.array([2.5, 0.0])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([2.5, 0.0])) -> np.ndarray:
         """Simulate Ueda oscillator trajectory.
 
-         Args:
-             time_steps: Number of time steps t to simulate.
-             starting_point: Starting point of the trajectory of shape (2,) (time dimension
-             excluded).
-         Returns:
-             Trajectory of shape (t, 2).
+        Args:
+            time_steps: Number of time steps t to simulate.
+            starting_point: Starting point of the trajectory of shape (2,) (time dimension
+            excluded).
+        Returns:
+            Trajectory of shape (t, 2).
 
-         """
+        """
         starting_point = np.hstack((starting_point, 0.0))
         return _timestep_iterator(self.iterate, time_steps, starting_point)[:, :-1]
 
@@ -768,8 +782,8 @@ class KuramotoSivashinsky:
     Python implementation at: https://github.com/E-Renshaw/kuramoto-sivashinsky
 
     """
-    def __init__(self, dimensions: int = 50, system_size: float = 36, eps: float = 0,
-                 dt: float = 0.1) -> None:
+
+    def __init__(self, dimensions: int = 50, system_size: float = 36, eps: float = 0, dt: float = 0.1) -> None:
         """
 
         Args:
@@ -784,15 +798,20 @@ class KuramotoSivashinsky:
         self.dt = dt
         self._prepare()
 
-    def _prepare(self):
+    def _prepare(self) -> None:
         """function to calculate auxiliary variables."""
         k = (
-            np.transpose(np.conj(np.concatenate((np.arange(0, self.dimensions / 2), np.array([0]),
-                                                 np.arange(-self.dimensions / 2 + 1, 0)))))
+            np.transpose(
+                np.conj(
+                    np.concatenate(
+                        (np.arange(0, self.dimensions / 2), np.array([0]), np.arange(-self.dimensions / 2 + 1, 0))
+                    )
+                )
+            )
             * 2
             * np.pi
             / self.system_size
-            )
+        )
 
         L = (1 + self.eps) * k**2 - k**4
 
@@ -800,14 +819,11 @@ class KuramotoSivashinsky:
         self.E_2 = np.exp(self.dt * L / 2)
         M = 64
         r = np.exp(1j * np.pi * (np.arange(1, M + 1) - 0.5) / M)
-        LR = self.dt * np.transpose(np.repeat([L], M, axis=0)) + np.repeat([r], self.dimensions,
-                                                                           axis=0)
+        LR = self.dt * np.transpose(np.repeat([L], M, axis=0)) + np.repeat([r], self.dimensions, axis=0)
         self.Q = self.dt * np.real(np.mean((np.exp(LR / 2) - 1) / LR, axis=1))
-        self.f1 = self.dt * np.real(
-            np.mean((-4 - LR + np.exp(LR) * (4 - 3 * LR + LR ** 2)) / LR ** 3, axis=1))
-        self.f2 = self.dt * np.real(np.mean((2 + LR + np.exp(LR) * (-2 + LR)) / LR ** 3, axis=1))
-        self.f3 = self.dt * np.real(
-            np.mean((-4 - 3 * LR - LR ** 2 + np.exp(LR) * (4 - LR)) / LR ** 3, axis=1))
+        self.f1 = self.dt * np.real(np.mean((-4 - LR + np.exp(LR) * (4 - 3 * LR + LR**2)) / LR**3, axis=1))
+        self.f2 = self.dt * np.real(np.mean((2 + LR + np.exp(LR) * (-2 + LR)) / LR**3, axis=1))
+        self.f3 = self.dt * np.real(np.mean((-4 - 3 * LR - LR**2 + np.exp(LR) * (4 - LR)) / LR**3, axis=1))
 
         self.g = -0.5j * k
 
@@ -832,8 +848,7 @@ class KuramotoSivashinsky:
         v = self.E * v + Nv * self.f1 + 2 * (Na + Nb) * self.f2 + Nc * self.f3
         return np.real(np.fft.ifft(v))
 
-    def simulate(self, time_steps: int,
-                 starting_point: np.ndarray | None = None) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
         """Simulate Kuramoto-Sivashinsky trajectory.
 
         Args:
@@ -845,14 +860,13 @@ class KuramotoSivashinsky:
         """
         if starting_point is None:
             # Use the starting point from the Kassam_2005 paper
-            x = self.system_size * np.transpose(np.conj(np.arange(1, self.dimensions + 1))) \
-                / self.dimensions
-            starting_point = np.cos(2 * np.pi * x / self.system_size) * \
-                             (1 + np.sin(2 * np.pi * x / self.system_size))
+            x = self.system_size * np.transpose(np.conj(np.arange(1, self.dimensions + 1))) / self.dimensions
+            starting_point = np.cos(2 * np.pi * x / self.system_size) * (1 + np.sin(2 * np.pi * x / self.system_size))
         else:
             if starting_point.shape[0] != self.dimensions:
-                raise Exception(f"starting_point wrong dimension: Expected {self.dimensions} but "
-                                f"got {starting_point.shape[0]}")
+                raise Exception(
+                    f"starting_point wrong dimension: Expected {self.dimensions} but got {starting_point.shape[0]}"
+                )
 
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
@@ -868,8 +882,15 @@ class KuramotoSivashinskyCustom:
     Python implementation at: https://github.com/E-Renshaw/kuramoto-sivashinsky
 
     """
-    def __init__(self, dimensions: int = 50, system_size: float = 36, dt: float = 0.01,
-                 precision: int | None = None, fft_type: str | None = None) -> None:
+
+    def __init__(
+        self,
+        dimensions: int = 50,
+        system_size: float = 36,
+        dt: float = 0.01,
+        precision: int | None = None,
+        fft_type: str | None = None,
+    ) -> None:
         """
 
         Args:
@@ -923,15 +944,20 @@ class KuramotoSivashinskyCustom:
 
         self._prepare()
 
-    def _prepare(self):
+    def _prepare(self) -> None:
         """function to calculate auxiliary variables."""
         k = (
-            np.transpose(np.conj(np.concatenate((np.arange(0, self.dimensions / 2), np.array([0]),
-                                                 np.arange(-self.dimensions / 2 + 1, 0)))))
+            np.transpose(
+                np.conj(
+                    np.concatenate(
+                        (np.arange(0, self.dimensions / 2), np.array([0]), np.arange(-self.dimensions / 2 + 1, 0))
+                    )
+                )
+            )
             * 2
             * np.pi
             / self.system_size
-            )
+        )
 
         if self.change_precision:
             k = k.astype(self.f_dtype)
@@ -948,22 +974,19 @@ class KuramotoSivashinskyCustom:
         r = np.exp(1j * np.pi * (np.arange(1, M + 1) - 0.5) / M)
         if self.change_precision:
             r = r.astype(self.c_dtype)
-        LR = self.dt * np.transpose(np.repeat([L], M, axis=0)) + np.repeat([r], self.dimensions,
-                                                                           axis=0)
+        LR = self.dt * np.transpose(np.repeat([L], M, axis=0)) + np.repeat([r], self.dimensions, axis=0)
         if self.change_precision:
             LR = LR.astype(self.c_dtype)
         self.Q = self.dt * np.real(np.mean((np.exp(LR / 2) - 1) / LR, axis=1))
         if self.change_precision:
             self.Q = self.Q.astype(self.c_dtype)
-        self.f1 = self.dt * np.real(
-            np.mean((-4 - LR + np.exp(LR) * (4 - 3 * LR + LR ** 2)) / LR ** 3, axis=1))
+        self.f1 = self.dt * np.real(np.mean((-4 - LR + np.exp(LR) * (4 - 3 * LR + LR**2)) / LR**3, axis=1))
         if self.change_precision:
             self.f1 = self.f1.astype(self.c_dtype)
-        self.f2 = self.dt * np.real(np.mean((2 + LR + np.exp(LR) * (-2 + LR)) / LR ** 3, axis=1))
+        self.f2 = self.dt * np.real(np.mean((2 + LR + np.exp(LR) * (-2 + LR)) / LR**3, axis=1))
         if self.change_precision:
             self.f2 = self.f2.astype(self.c_dtype)
-        self.f3 = self.dt * np.real(
-            np.mean((-4 - 3 * LR - LR ** 2 + np.exp(LR) * (4 - LR)) / LR ** 3, axis=1))
+        self.f3 = self.dt * np.real(np.mean((-4 - 3 * LR - LR**2 + np.exp(LR) * (4 - LR)) / LR**3, axis=1))
         if self.change_precision:
             self.f3 = self.f3.astype(self.c_dtype)
 
@@ -1008,8 +1031,7 @@ class KuramotoSivashinskyCustom:
             v = v.astype(self.c_dtype)
         return np.real(self.custom_ifft(v))
 
-    def simulate(self, time_steps: int,
-                 starting_point: np.ndarray | None = None) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
         """Simulate Kuramoto-Sivashinsky trajectory.
 
         Args:
@@ -1021,24 +1043,22 @@ class KuramotoSivashinskyCustom:
         """
         if starting_point is None:
             # Use the starting point from the Kassam_2005 paper
-            x = self.system_size * np.transpose(np.conj(np.arange(1, self.dimensions + 1))) \
-                / self.dimensions
-            starting_point = np.cos(2 * np.pi * x / self.system_size) * \
-                             (1 + np.sin(2 * np.pi * x / self.system_size))
+            x = self.system_size * np.transpose(np.conj(np.arange(1, self.dimensions + 1))) / self.dimensions
+            starting_point = np.cos(2 * np.pi * x / self.system_size) * (1 + np.sin(2 * np.pi * x / self.system_size))
         else:
             if starting_point.shape[0] != self.dimensions:
-                raise Exception(f"starting_point wrong dimension: Expected {self.dimensions} but "
-                                f"got {starting_point.shape[0]}")
+                raise Exception(
+                    f"starting_point wrong dimension: Expected {self.dimensions} but got {starting_point.shape[0]}"
+                )
         if self.change_precision:
             starting_point = starting_point.astype(self.f_dtype)
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
 class Lorenz96:
-    """Simulate the n-dimensional dynamical system: Lorenz 96 model.
+    """Simulate the n-dimensional dynamical system: Lorenz 96 model."""
 
-    """
-    def __init__(self,  force: float = 8, dt: float = 0.05) -> None:
+    def __init__(self, force: float = 8, dt: float = 0.05) -> None:
         """Define the system parameters.
 
         Args:
@@ -1062,8 +1082,9 @@ class Lorenz96:
         # Periodic Boundary Conditions for the 3 edge cases i=1,2,system_dimension
         derivative[0] = (x[1] - x[system_dimension - 2]) * x[system_dimension - 1] - x[0]
         derivative[1] = (x[2] - x[system_dimension - 1]) * x[0] - x[1]
-        derivative[system_dimension - 1] = (x[0] - x[system_dimension - 3]) * \
-                                           x[system_dimension - 2] - x[system_dimension - 1]
+        derivative[system_dimension - 1] = (x[0] - x[system_dimension - 3]) * x[system_dimension - 2] - x[
+            system_dimension - 1
+        ]
 
         # TODO: Rewrite using numpy vectorization to make faster
         for i in range(2, system_dimension - 1):
@@ -1084,8 +1105,7 @@ class Lorenz96:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int,
-                 starting_point: np.ndarray | None = None) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
         """Simulate Lorenz 93 model.
 
         Args:
@@ -1099,4 +1119,4 @@ class Lorenz96:
         if starting_point is None:
             starting_point = np.sin(np.arange(30))
 
-        return  _timestep_iterator(self.iterate, time_steps, starting_point)
+        return _timestep_iterator(self.iterate, time_steps, starting_point)
