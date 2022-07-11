@@ -20,9 +20,7 @@ class TestSimulations(TestScanBase):
     def test_simulate_trajectory_lorenz63_single_step_trivial_test(self):
         simulation_time_steps = 2
         starting_point = np.array([-14.03020521, -20.88693127, 25.53545])
-        # sim_data = scan.simulate_trajectory(
-        #     sys_flag="lorenz", dt=2e-2, time_steps=simulation_time_steps, starting_point=starting_point
-        # )
+
         sim_data = scan.simulations.Lorenz63(
             dt=2e-2
         ).simulate(
@@ -38,14 +36,12 @@ class TestSimulations(TestScanBase):
 
     def test_simulate_trajectory_lorenz63_default_starting_point_single_step_trivial_test(self):
         simulation_time_steps = 2
-        # sim_data = scan.simulate_trajectory(sys_flag="lorenz", dt=2e-2, time_steps=simulation_time_steps)
         sim_data = scan.simulations.Lorenz63(
             dt=2e-2
         ).simulate(
             time_steps=simulation_time_steps
         )
 
-        # exp_sim_data = np.array([[1.0, 2.0, 3.0], [1.2275093315399999, 2.5108524200767555, 2.893000748906853]])
         exp_sim_data = np.array([[0.0, -0.01, 9.0], [-1.8168870026079268e-03, -1.0161406771353333e-02, 8.5325756633139491e+00]])
 
         assert_array_equal(sim_data, exp_sim_data)
@@ -58,13 +54,7 @@ class TestSimulations(TestScanBase):
 
         self.set_seed()
         starting_point = lor_force * np.ones(lor_dim) + 1e-2 * np.random.rand(lor_dim)
-        # sim_data = scan.simulate_trajectory(
-        #     sys_flag="lorenz_96",
-        #     dt=lor_dt,
-        #     time_steps=simulation_time_steps,
-        #     starting_point=starting_point,
-        #     force=lor_force,
-        # )
+
         sim_data = scan.simulations.Lorenz96(
             force=lor_force,
             dt=lor_dt
@@ -83,36 +73,110 @@ class TestSimulations(TestScanBase):
 
     def test_simulate_trajectory_lorenz96_single_step_no_starting_point(self):
         simulation_time_steps = 2
-        lor_dt = 1.0
-        lor_force = 5
 
         self.set_seed()
-        # sim_data = scan.simulate_trajectory(
-        #     sys_flag="lorenz_96",
-        #     dt=lor_dt,
-        #     time_steps=simulation_time_steps,
-        #     starting_point=None,
-        #     force=lor_force,
-        # )
+
         sim_data = scan.simulations.Lorenz96(
-            force=lor_force,
-            dt=lor_dt
         ).simulate(
             time_steps=simulation_time_steps
         )
 
-        exp_sim_data = np.array([[1.0, 2.0, 3.0], [3.5, 3.875, 4.25]])
+        exp_sim_data = np.array([np.sin(np.arange(30)),
+                                 [0.3769009997531504, 1.2048911212671174, 1.2602415620124692,
+                                  0.4409127670578584, -0.3558303924604377, -0.5112232787601698,
+                                  0.07503500757496134, 1.005512609974874, 1.3583335117552717,
+                                  0.714030171527682, -0.18099116196016424, -0.5450477863753878,
+                                  -0.15566505877288883, 0.756972305739906, 1.3655846500065303,
+                                  0.968056644989393, 0.04054393941189638, -0.5163763982152564,
+                                  -0.33974865011922695, 0.4841133914492217, 1.2824544729906988,
+                                  1.176981382103961, 0.2966082002705891, -0.426938493134693,
+                                  -0.4678259531746986, 0.21180527032161653, 1.1189395692923816,
+                                  1.3175211558905413, 0.5701852056224413, -0.26074897061166247]])
+
+        assert_array_equal(sim_data, exp_sim_data)
+
+    def test_simulate_trajectory_roessler_default_starting_point_single_step_trivial_test(self):
+        sim_data = scan.simulations.Roessler().simulate(time_steps=2)
+
+        exp_sim_data = np.array([[-9.0, 0.0, 0.0], [-8.955425338833333, -0.90756655,  0.009868544904350832]])
+
+        assert_array_equal(sim_data, exp_sim_data)
+
+    def test_simulate_trajectory_complex_butterfly_default_starting_point_single_step_trivial_test(self):
+        sim_data = scan.simulations.ComplexButterly().simulate(time_steps=2)
+
+        exp_sim_data = np.array([[0.2, 0., 0.], [0.19458405593782552, 0.0010022759114583332, -0.04013613366536458]])
+
+        assert_array_equal(sim_data, exp_sim_data)
+
+    def test_simulate_trajectory_chen_default_starting_point_single_step_trivial_test(self):
+        sim_data = scan.simulations.Chen().simulate(time_steps=2)
+
+        exp_sim_data = np.array([[-10., 0., 37.], [-6.3845564682890625, 4.1595207530446, 35.746433277481756]])
+
+        assert_array_equal(sim_data, exp_sim_data)
+
+    def test_simulate_trajectory_chua_default_starting_point_single_step_trivial_test(self):
+        sim_data = scan.simulations.ChuaCircuit().simulate(time_steps=2)
+
+        exp_sim_data = np.array([[0.0, 0.0, 0.6], [0.006776632653061224, 0.029199732142857142, 0.5894738520408163]])
+
+        assert_array_equal(sim_data, exp_sim_data)
+
+    def test_simulate_trajectory_thomas_default_starting_point_single_step_trivial_test(self):
+        sim_data = scan.simulations.Thomas().simulate(time_steps=2)
+
+        exp_sim_data = np.array([[0.1, 0.0, 0.0], [0.0965923504007725, 0.0019260974789302725, 0.019268419498910318]])
+
+        assert_array_equal(sim_data, exp_sim_data)
+
+    def test_simulate_trajectory_windmi_default_starting_point_single_step_trivial_test(self):
+        sim_data = scan.simulations.WindmiAttractor().simulate(time_steps=2)
+
+        exp_sim_data = np.array([[0.0, 0.8, 0.0], [0.08011122410215064, 0.8032831905478534, 0.06347854657651615]])
+
+        assert_array_equal(sim_data, exp_sim_data)
+
+    def test_simulate_trajectory_rucklidge_default_starting_point_single_step_trivial_test(self):
+        sim_data = scan.simulations.Rucklidge().simulate(time_steps=2)
+
+        exp_sim_data = np.array([[1.0, 0.0, 4.5], [0.9075854977280031, 0.047626990242513025, 4.280570709227276]])
+
+        assert_array_equal(sim_data, exp_sim_data)
+
+    def test_simulate_trajectory_henon_default_starting_point_single_step_trivial_test(self):
+        sim_data = scan.simulations.Henon().simulate(time_steps=2)
+
+        exp_sim_data = np.array([[0.0, 0.9], [1.27,  0.0]])
+
+        assert_array_equal(sim_data, exp_sim_data)
+
+    def test_simulate_trajectory_logistic_default_starting_point_single_step_trivial_test(self):
+        sim_data = scan.simulations.Logistic().simulate(time_steps=2)
+
+        exp_sim_data = np.array([[0.1, ], [0.36000000000000004, ]])
+
+        assert_array_equal(sim_data, exp_sim_data)
+
+    def test_simulate_trajectory_simple_driven_chaotic_default_starting_point_single_step_trivial_test(self):
+        sim_data = scan.simulations.SimplestDrivenChaotic().simulate(time_steps=2)
+
+        exp_sim_data = np.array([[0.0, 0.0], [0.00031287210159712276, 0.009372350531852047]])
+
+        assert_array_equal(sim_data, exp_sim_data)
+
+    def test_simulate_trajectory_ueda_default_starting_point_single_step_trivial_test(self):
+        sim_data = scan.simulations.UedaOscillator().simulate(time_steps=2)
+
+        exp_sim_data = np.array([[2.5, 0.0], [2.4807171482576695, -0.7648847867534123]])
 
         assert_array_equal(sim_data, exp_sim_data)
 
     def test_kuramoto_sivashinski_6d_2l_05t_custom_starting_point_single_step(self):
-        # ks_sys_flag = "kuramoto_sivashinsky"
         dimensions = 6
         system_size = 2
         dt = 0.5
-        # sim_data = scan.simulate_trajectory(
-        #     sys_flag=ks_sys_flag, dimensions=dimensions, system_size=system_size, dt=dt, time_steps=3
-        # )
+
         sim_data = scan.simulations.KuramotoSivashinsky(
             dimensions=dimensions,
             system_size=system_size,
@@ -124,14 +188,6 @@ class TestSimulations(TestScanBase):
         # Note that, right now, the KS simulation is the only simulation function that returns the starting point as
         # first point of the prediction, so we have to take that into account here.
         starting_point = sim_data[1]
-        # exp_sim_data = scan.simulate_trajectory(
-        #     sys_flag=ks_sys_flag,
-        #     dimensions=dimensions,
-        #     system_size=system_size,
-        #     dt=dt,
-        #     time_steps=2,
-        #     starting_point=starting_point,
-        # )
 
         exp_sim_data = scan.simulations.KuramotoSivashinsky(
             dimensions=dimensions,
@@ -147,13 +203,9 @@ class TestSimulations(TestScanBase):
         assert_array_almost_equal(sim_data[-1], exp_sim_data[-1], decimal=6)
 
     def test_kuramoto_sivashinski_custom_6d_2l_05t_custom_starting_point_single_step(self):
-        # ks_sys_flag = "kuramoto_sivashinsky_custom"
         dimensions = 6
         system_size = 2
         dt = 0.5
-        # sim_data = scan.simulate_trajectory(
-        #     sys_flag=ks_sys_flag, dimensions=dimensions, system_size=system_size, dt=dt, time_steps=3
-        # )
         sim_data = scan.simulations.KuramotoSivashinskyCustom(
             dimensions=dimensions,
             system_size=system_size,
@@ -165,14 +217,7 @@ class TestSimulations(TestScanBase):
         # Note that, right now, the KS simulation is the only simulation function that returns the starting point as
         # first point of the prediction, so we have to take that into account here.
         starting_point = sim_data[1]
-        # exp_sim_data = scan.simulate_trajectory(
-        #     sys_flag=ks_sys_flag,
-        #     dimensions=dimensions,
-        #     system_size=system_size,
-        #     dt=dt,
-        #     time_steps=2,
-        #     starting_point=starting_point,
-        # )
+
         exp_sim_data = scan.simulations.KuramotoSivashinskyCustom(
             dimensions=dimensions,
             system_size=system_size,
@@ -194,16 +239,6 @@ class TestSimulations(TestScanBase):
         time_steps = 10
         fft_type = "numpy"
 
-        # sim_data = scan.simulate_trajectory(
-        #     sys_flag=ks_sys_flag,
-        #     dimensions=dimensions,
-        #     system_size=system_size,
-        #     dt=dt,
-        #     time_steps=time_steps,
-        #     precision=None,
-        #     fft_type=fft_type,
-        # )
-
         sim_data = scan.simulations.KuramotoSivashinskyCustom(
             dimensions=dimensions,
             system_size=system_size,
@@ -212,16 +247,6 @@ class TestSimulations(TestScanBase):
         ).simulate(
             time_steps=time_steps
         )
-
-        # exp_sim_data = scan.simulate_trajectory(
-        #     sys_flag=ks_sys_flag,
-        #     dimensions=dimensions,
-        #     system_size=system_size,
-        #     dt=dt,
-        #     time_steps=time_steps,
-        #     precision=64,
-        #     fft_type=fft_type,
-        # )
 
         exp_sim_data = scan.simulations.KuramotoSivashinskyCustom(
             dimensions=dimensions,
@@ -237,22 +262,11 @@ class TestSimulations(TestScanBase):
 
     @pytest.mark.xfail(reason="Datatype does not exist on all systems.")
     def test_kuramoto_sivashinski_custom_40d_22l_05t_npfft_128_precision(self):
-        # ks_sys_flag = "kuramoto_sivashinsky_custom"
         dimensions = 40
         system_size = 22
         dt = 0.5
         time_steps = 10
         fft_type = "numpy"
-
-        # sim_data = scan.simulate_trajectory(
-        #     sys_flag=ks_sys_flag,
-        #     dimensions=dimensions,
-        #     system_size=system_size,
-        #     dt=dt,
-        #     time_steps=time_steps,
-        #     precision=128,
-        #     fft_type=fft_type,
-        # )
 
         sim_data = scan.simulations.KuramotoSivashinskyCustom(
             dimensions=dimensions,
@@ -263,16 +277,6 @@ class TestSimulations(TestScanBase):
         ).simulate(
             time_steps=time_steps
         )
-
-        # exp_sim_data = scan.simulate_trajectory(
-        #     sys_flag=ks_sys_flag,
-        #     dimensions=dimensions,
-        #     system_size=system_size,
-        #     dt=dt,
-        #     time_steps=time_steps,
-        #     precision=64,
-        #     fft_type=fft_type,
-        # )
 
         exp_sim_data = scan.simulations.KuramotoSivashinskyCustom(
             dimensions=dimensions,
@@ -287,7 +291,6 @@ class TestSimulations(TestScanBase):
         assert_array_not_equal(sim_data, exp_sim_data)
 
     def test_kuramoto_sivashinski_custom_40d_22l_05t_unknown_precision(self):
-        # ks_sys_flag = "kuramoto_sivashinsky_custom"
         dimensions = 40
         system_size = 22
         dt = 0.5
@@ -295,15 +298,6 @@ class TestSimulations(TestScanBase):
         fft_type = "numpy"
 
         with pytest.raises(ValueError):
-            # scan.simulate_trajectory(
-            #     sys_flag=ks_sys_flag,
-            #     dimensions=dimensions,
-            #     system_size=system_size,
-            #     dt=dt,
-            #     time_steps=time_steps,
-            #     precision="this_precision_does_not_exist",
-            #     fft_type=fft_type,
-            # )
 
             scan.simulations.KuramotoSivashinskyCustom(
                 dimensions=dimensions,
@@ -316,22 +310,12 @@ class TestSimulations(TestScanBase):
             )
 
     def test_kuramoto_sivashinski_custom_40d_22l_05t_unknown_fft_type(self):
-        # ks_sys_flag = "kuramoto_sivashinsky_custom"
         dimensions = 40
         system_size = 22
         dt = 0.5
         time_steps = 10
 
         with pytest.raises(ValueError):
-            # scan.simulate_trajectory(
-            #     sys_flag=ks_sys_flag,
-            #     dimensions=dimensions,
-            #     system_size=system_size,
-            #     dt=dt,
-            #     time_steps=time_steps,
-            #     precision=None,
-            #     fft_type="this_ffttype_does_not_exist",
-            # )
 
             scan.simulations.KuramotoSivashinskyCustom(
                 dimensions=dimensions,
@@ -342,11 +326,6 @@ class TestSimulations(TestScanBase):
             ).simulate(
                 time_steps=time_steps
             )
-
-
-    # def test_simulate_trajectory_unknown_flag(self):
-    #     with pytest.raises(ValueError):
-    #         scan.simulate_trajectory(sys_flag="this_flag_doesnt_exist")
 
 
 class TestKuramotSivashinskiVariantsDivergence40d22l05t(unittest.TestCase):
@@ -362,14 +341,10 @@ class TestKuramotSivashinskiVariantsDivergence40d22l05t(unittest.TestCase):
         # NOTE: This isn't actually all that great of a test, as it doesn't really test for the actual logic/algorithm
         #  we implemented and only checks if it diverges or not. Refactor by usinge e.g. a more sophisticated Lyapunov
         #  exponent test.
-        # ks_sys_flag = "kuramoto_sivashinsky"
         dimensions = 40
         system_size = 22
         dt = 0.5
         time_steps = 1000
-        # sim_data = scan.simulate_trajectory(
-        #     sys_flag=ks_sys_flag, dimensions=dimensions, system_size=system_size, dt=dt, time_steps=time_steps
-        # )
 
         sim_data = scan.simulations.KuramotoSivashinsky(
                         dimensions=dimensions,
@@ -389,15 +364,6 @@ class TestKuramotSivashinskiVariantsDivergence40d22l05t(unittest.TestCase):
         #  exponent test.
         precision = 64
         fft_type = "numpy"
-        # sim_data = scan.simulate_trajectory(
-        #     sys_flag=self.ks_sys_flag,
-        #     dimensions=self.dimensions,
-        #     system_size=self.system_size,
-        #     dt=self.dt,
-        #     time_steps=self.time_steps,
-        #     precision=precision,
-        #     fft_type=fft_type,
-        # )
 
         sim_data = scan.simulations.KuramotoSivashinskyCustom(
                         dimensions=self.dimensions,
@@ -419,15 +385,6 @@ class TestKuramotSivashinskiVariantsDivergence40d22l05t(unittest.TestCase):
         #  exponent test.
         precision = 128
         fft_type = "numpy"
-        # sim_data = scan.simulate_trajectory(
-        #     sys_flag=self.ks_sys_flag,
-        #     dimensions=self.dimensions,
-        #     system_size=self.system_size,
-        #     dt=self.dt,
-        #     time_steps=self.time_steps,
-        #     precision=precision,
-        #     fft_type=fft_type,
-        # )
 
         sim_data = scan.simulations.KuramotoSivashinskyCustom(
                         dimensions=self.dimensions,
@@ -449,15 +406,6 @@ class TestKuramotSivashinskiVariantsDivergence40d22l05t(unittest.TestCase):
         #  exponent test.
         precision = 32
         fft_type = "numpy"
-        # sim_data = scan.simulate_trajectory(
-        #     sys_flag=self.ks_sys_flag,
-        #     dimensions=self.dimensions,
-        #     system_size=self.system_size,
-        #     dt=self.dt,
-        #     time_steps=self.time_steps,
-        #     precision=precision,
-        #     fft_type=fft_type,
-        # )
 
         sim_data = scan.simulations.KuramotoSivashinskyCustom(
                         dimensions=self.dimensions,
@@ -479,15 +427,6 @@ class TestKuramotSivashinskiVariantsDivergence40d22l05t(unittest.TestCase):
         #  exponent test.
         precision = 16
         fft_type = "numpy"
-        # sim_data = scan.simulate_trajectory(
-        #     sys_flag=self.ks_sys_flag,
-        #     dimensions=self.dimensions,
-        #     system_size=self.system_size,
-        #     dt=self.dt,
-        #     time_steps=self.time_steps,
-        #     precision=precision,
-        #     fft_type=fft_type,
-        # )
 
         sim_data = scan.simulations.KuramotoSivashinskyCustom(
                         dimensions=self.dimensions,
@@ -509,15 +448,6 @@ class TestKuramotSivashinskiVariantsDivergence40d22l05t(unittest.TestCase):
         pytest.importorskip("scipy")
         precision = 64
         fft_type = "scipy"
-        # sim_data = scan.simulate_trajectory(
-        #     sys_flag=self.ks_sys_flag,
-        #     dimensions=self.dimensions,
-        #     system_size=self.system_size,
-        #     dt=self.dt,
-        #     time_steps=self.time_steps,
-        #     precision=precision,
-        #     fft_type=fft_type,
-        # )
 
         sim_data = scan.simulations.KuramotoSivashinskyCustom(
                         dimensions=self.dimensions,

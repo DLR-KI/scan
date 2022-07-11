@@ -130,7 +130,7 @@ class Roessler:
     - Kaplan-Yorke dimension: 2.0132
     - Correlation dimension: 1.991 +- 0.065
     """
-    def __init__(self, a: float = 0.2, b: float = 0.2, c: float = 5.7, dt: float = 0.05) -> None:
+    def __init__(self, a: float = 0.2, b: float = 0.2, c: float = 5.7, dt: float = 0.1) -> None:
         """Define the system parameters
 
         Args:
@@ -248,7 +248,7 @@ class Chen:
     - Kaplan-Yorke dimension: 2.1686
     - Correlation dimension: 2.147 +- 0.117
     """
-    def __init__(self, a: float = 35, b: float = 3, c: float = 28, dt: float = 0.05) -> None:
+    def __init__(self, a: float = 35, b: float = 3, c: float = 28, dt: float = 0.01) -> None:
         """Define the system parameters.
 
         Args:
@@ -379,7 +379,7 @@ class Thomas:
     - Correlation dimension: 1.843 +- 0.075
     """
     def __init__(self, b: float = 0.18,
-                 dt: float = 0.05) -> None:
+                 dt: float = 0.2) -> None:
         """Define the system parameters.
 
         Args:
@@ -437,7 +437,7 @@ class WindmiAttractor:
     - Correlation dimension: 2.035 +- 0.095
     """
 
-    def __init__(self, a: float = 0.7, b: float = 2.5, dt: float = 0.05) -> None:
+    def __init__(self, a: float = 0.7, b: float = 2.5, dt: float = 0.1) -> None:
         """Define the system parameters.
 
         Args:
@@ -703,7 +703,7 @@ class UedaOscillator:
     - Kaplan-Yorke dimension: 2.6741
     - Correlation dimension: 2.675 +- 0.132
     """
-    def __init__(self, b: float = 0.05, A: float = 7.5, omega: float = 1, dt: float = 0.1) -> None:
+    def __init__(self, b: float = 0.05, A: float = 7.5, omega: float = 1, dt: float = 0.05) -> None:
         """Define the system parameters.
 
         Args:
@@ -769,7 +769,7 @@ class KuramotoSivashinsky:
 
     """
     def __init__(self, dimensions: int = 50, system_size: float = 36, eps: float = 0,
-                 dt: float = 0.01) -> None:
+                 dt: float = 0.1) -> None:
         """
 
         Args:
@@ -1085,7 +1085,7 @@ class Lorenz96:
         return _runge_kutta(self.flow, self.dt, x)
 
     def simulate(self, time_steps: int,
-                 starting_point: np.ndarray = np.array([1.0, 2.0, 3.0])) -> np.ndarray:
+                 starting_point: np.ndarray | None = None) -> np.ndarray:
         """Simulate Lorenz 93 model.
 
         Args:
@@ -1096,5 +1096,7 @@ class Lorenz96:
             Trajectory of shape (t, input_dimension).
 
         """
-        # TODO: sensible starting_point
+        if starting_point is None:
+            starting_point = np.sin(np.arange(30))
+
         return  _timestep_iterator(self.iterate, time_steps, starting_point)
