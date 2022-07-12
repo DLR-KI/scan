@@ -864,7 +864,7 @@ class KuramotoSivashinsky:
             starting_point = np.cos(2 * np.pi * x / self.system_size) * (1 + np.sin(2 * np.pi * x / self.system_size))
         else:
             if starting_point.shape[0] != self.dimensions:
-                raise Exception(
+                raise ValueError(
                     f"starting_point wrong dimension: Expected {self.dimensions} but got {starting_point.shape[0]}"
                 )
 
@@ -1047,7 +1047,7 @@ class KuramotoSivashinskyCustom:
             starting_point = np.cos(2 * np.pi * x / self.system_size) * (1 + np.sin(2 * np.pi * x / self.system_size))
         else:
             if starting_point.shape[0] != self.dimensions:
-                raise Exception(
+                raise ValueError(
                     f"starting_point wrong dimension: Expected {self.dimensions} but got {starting_point.shape[0]}"
                 )
         if self.change_precision:

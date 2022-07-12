@@ -287,6 +287,28 @@ class TestSimulations(TestScanBase):
 
         assert_array_not_equal(sim_data, exp_sim_data)
 
+    def test_kuramoto_sivashinski_dimension_missmatch(self):
+        dimensions = 10
+        time_steps = 10
+        starting_point = np.ones(11)
+
+        with pytest.raises(ValueError):
+
+            scan.simulations.KuramotoSivashinsky(
+                dimensions=dimensions,
+            ).simulate(time_steps=time_steps, starting_point=starting_point)
+
+    def test_kuramoto_sivashinski_custom_dimension_missmatch(self):
+        dimensions = 10
+        time_steps = 10
+        starting_point = np.ones(11)
+
+        with pytest.raises(ValueError):
+
+            scan.simulations.KuramotoSivashinskyCustom(
+                dimensions=dimensions,
+            ).simulate(time_steps=time_steps, starting_point=starting_point)
+
     def test_kuramoto_sivashinski_custom_40d_22l_05t_unknown_precision(self):
         dimensions = 40
         system_size = 22
