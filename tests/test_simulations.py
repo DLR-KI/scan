@@ -13,6 +13,7 @@ from tests.test_base import (
     assert_array_not_equal,
 )
 
+DECIMALS = 14
 
 # Use print(np.array_repr(np_array, max_line_width=120, precision=18)) in the debugger to easily get the copy-pastable
 # representation of a numpy array.
@@ -29,7 +30,7 @@ class TestSimulations(TestScanBase):
             [[-14.03020521, -20.88693127, 25.53545], [-15.257976883416845, -20.510306180264724, 30.15606333510718]]
         )
 
-        assert_array_equal(sim_data, exp_sim_data)
+        assert_array_almost_equal(sim_data, exp_sim_data, decimal=14)
 
     def test_simulate_trajectory_lorenz63_default_starting_point_single_step_trivial_test(self):
         simulation_time_steps = 2
@@ -39,7 +40,15 @@ class TestSimulations(TestScanBase):
             [[0.0, -0.01, 9.0], [-1.8168870026079268e-03, -1.0161406771353333e-02, 8.5325756633139491e00]]
         )
 
-        assert_array_equal(sim_data, exp_sim_data)
+        assert_array_almost_equal(sim_data, exp_sim_data, decimal=DECIMALS)
+
+    def test_simulate_trajectory_lorenz63_simulate_instance_twice(self):
+        simulation_time_steps = 2
+
+        isntance = scan.simulations.Lorenz63()
+        sim_data_1 = isntance.simulate(time_steps=simulation_time_steps)
+        sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
+        assert_array_equal(sim_data_1, sim_data_2)
 
     def test_simulate_trajectory_lorenz96_single_step_trivial_test(self):
         simulation_time_steps = 2
@@ -61,7 +70,7 @@ class TestSimulations(TestScanBase):
             ]
         )
 
-        assert_array_equal(sim_data, exp_sim_data)
+        assert_array_almost_equal(sim_data, exp_sim_data, decimal=DECIMALS)
 
     def test_simulate_trajectory_lorenz96_single_step_no_starting_point(self):
         simulation_time_steps = 2
@@ -108,63 +117,135 @@ class TestSimulations(TestScanBase):
             ]
         )
 
-        assert_array_equal(sim_data, exp_sim_data)
+        assert_array_almost_equal(sim_data, exp_sim_data, decimal=DECIMALS)
+
+    def test_simulate_trajectory_lorenz96_simulate_instance_twice(self):
+        simulation_time_steps = 2
+
+        isntance = scan.simulations.Lorenz96()
+        sim_data_1 = isntance.simulate(time_steps=simulation_time_steps)
+        sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
+        assert_array_equal(sim_data_1, sim_data_2)
 
     def test_simulate_trajectory_roessler_default_starting_point_single_step_trivial_test(self):
         sim_data = scan.simulations.Roessler().simulate(time_steps=2)
 
         exp_sim_data = np.array([[-9.0, 0.0, 0.0], [-8.955425338833333, -0.90756655, 0.009868544904350832]])
 
-        assert_array_equal(sim_data, exp_sim_data)
+        assert_array_almost_equal(sim_data, exp_sim_data, decimal=DECIMALS)
+
+    def test_simulate_trajectory_roessler_simulate_instance_twice(self):
+        simulation_time_steps = 2
+
+        isntance = scan.simulations.Roessler()
+        sim_data_1 = isntance.simulate(time_steps=simulation_time_steps)
+        sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
+        assert_array_equal(sim_data_1, sim_data_2)
 
     def test_simulate_trajectory_complex_butterfly_default_starting_point_single_step_trivial_test(self):
         sim_data = scan.simulations.ComplexButterly().simulate(time_steps=2)
 
         exp_sim_data = np.array([[0.2, 0.0, 0.0], [0.19458405593782552, 0.0010022759114583332, -0.04013613366536458]])
 
-        assert_array_equal(sim_data, exp_sim_data)
+        assert_array_almost_equal(sim_data, exp_sim_data, decimal=DECIMALS)
+
+    def test_simulate_trajectory_complex_butterfly_simulate_instance_twice(self):
+        simulation_time_steps = 2
+
+        isntance = scan.simulations.ComplexButterly()
+        sim_data_1 = isntance.simulate(time_steps=simulation_time_steps)
+        sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
+        assert_array_equal(sim_data_1, sim_data_2)
 
     def test_simulate_trajectory_chen_default_starting_point_single_step_trivial_test(self):
         sim_data = scan.simulations.Chen().simulate(time_steps=2)
 
         exp_sim_data = np.array([[-10.0, 0.0, 37.0], [-6.3845564682890625, 4.1595207530446, 35.746433277481756]])
 
-        assert_array_equal(sim_data, exp_sim_data)
+        assert_array_almost_equal(sim_data, exp_sim_data, decimal=DECIMALS)
+
+    def test_simulate_trajectory_chen_simulate_instance_twice(self):
+        simulation_time_steps = 2
+
+        isntance = scan.simulations.Chen()
+        sim_data_1 = isntance.simulate(time_steps=simulation_time_steps)
+        sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
+        assert_array_equal(sim_data_1, sim_data_2)
 
     def test_simulate_trajectory_chua_default_starting_point_single_step_trivial_test(self):
         sim_data = scan.simulations.ChuaCircuit().simulate(time_steps=2)
 
         exp_sim_data = np.array([[0.0, 0.0, 0.6], [0.006776632653061224, 0.029199732142857142, 0.5894738520408163]])
 
-        assert_array_equal(sim_data, exp_sim_data)
+        assert_array_almost_equal(sim_data, exp_sim_data, decimal=DECIMALS)
+
+    def test_simulate_trajectory_chua_simulate_instance_twice(self):
+        simulation_time_steps = 2
+
+        isntance = scan.simulations.ChuaCircuit()
+        sim_data_1 = isntance.simulate(time_steps=simulation_time_steps)
+        sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
+        assert_array_equal(sim_data_1, sim_data_2)
 
     def test_simulate_trajectory_thomas_default_starting_point_single_step_trivial_test(self):
         sim_data = scan.simulations.Thomas().simulate(time_steps=2)
 
         exp_sim_data = np.array([[0.1, 0.0, 0.0], [0.0965923504007725, 0.0019260974789302725, 0.019268419498910318]])
 
-        assert_array_equal(sim_data, exp_sim_data)
+        assert_array_almost_equal(sim_data, exp_sim_data, decimal=DECIMALS)
+
+    def test_simulate_trajectory_thomas_simulate_instance_twice(self):
+        simulation_time_steps = 2
+
+        isntance = scan.simulations.Thomas()
+        sim_data_1 = isntance.simulate(time_steps=simulation_time_steps)
+        sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
+        assert_array_equal(sim_data_1, sim_data_2)
 
     def test_simulate_trajectory_windmi_default_starting_point_single_step_trivial_test(self):
         sim_data = scan.simulations.WindmiAttractor().simulate(time_steps=2)
 
         exp_sim_data = np.array([[0.0, 0.8, 0.0], [0.08011122410215064, 0.8032831905478534, 0.06347854657651615]])
 
-        assert_array_equal(sim_data, exp_sim_data)
+        assert_array_almost_equal(sim_data, exp_sim_data, decimal=DECIMALS)
+
+    def test_simulate_trajectory_windmi_simulate_instance_twice(self):
+        simulation_time_steps = 2
+
+        isntance = scan.simulations.WindmiAttractor()
+        sim_data_1 = isntance.simulate(time_steps=simulation_time_steps)
+        sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
+        assert_array_equal(sim_data_1, sim_data_2)
 
     def test_simulate_trajectory_rucklidge_default_starting_point_single_step_trivial_test(self):
         sim_data = scan.simulations.Rucklidge().simulate(time_steps=2)
 
         exp_sim_data = np.array([[1.0, 0.0, 4.5], [0.9075854977280031, 0.047626990242513025, 4.280570709227276]])
 
-        assert_array_equal(sim_data, exp_sim_data)
+        assert_array_almost_equal(sim_data, exp_sim_data, decimal=DECIMALS)
+
+    def test_simulate_trajectory_rucklidge_simulate_instance_twice(self):
+        simulation_time_steps = 2
+
+        isntance = scan.simulations.Rucklidge()
+        sim_data_1 = isntance.simulate(time_steps=simulation_time_steps)
+        sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
+        assert_array_equal(sim_data_1, sim_data_2)
 
     def test_simulate_trajectory_henon_default_starting_point_single_step_trivial_test(self):
         sim_data = scan.simulations.Henon().simulate(time_steps=2)
 
         exp_sim_data = np.array([[0.0, 0.9], [1.27, 0.0]])
 
-        assert_array_equal(sim_data, exp_sim_data)
+        assert_array_almost_equal(sim_data, exp_sim_data, decimal=DECIMALS)
+
+    def test_simulate_trajectory_henon_simulate_instance_twice(self):
+        simulation_time_steps = 2
+
+        isntance = scan.simulations.Henon()
+        sim_data_1 = isntance.simulate(time_steps=simulation_time_steps)
+        sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
+        assert_array_equal(sim_data_1, sim_data_2)
 
     def test_simulate_trajectory_logistic_default_starting_point_single_step_trivial_test(self):
         sim_data = scan.simulations.Logistic().simulate(time_steps=2)
@@ -180,21 +261,45 @@ class TestSimulations(TestScanBase):
             ]
         )
 
-        assert_array_equal(sim_data, exp_sim_data)
+        assert_array_almost_equal(sim_data, exp_sim_data, decimal=DECIMALS)
+
+    def test_simulate_trajectory_logistic_simulate_instance_twice(self):
+        simulation_time_steps = 2
+
+        isntance = scan.simulations.Logistic()
+        sim_data_1 = isntance.simulate(time_steps=simulation_time_steps)
+        sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
+        assert_array_equal(sim_data_1, sim_data_2)
 
     def test_simulate_trajectory_simple_driven_chaotic_default_starting_point_single_step_trivial_test(self):
         sim_data = scan.simulations.SimplestDrivenChaotic().simulate(time_steps=2)
 
         exp_sim_data = np.array([[0.0, 0.0], [0.00031287210159712276, 0.009372350531852047]])
 
-        assert_array_equal(sim_data, exp_sim_data)
+        assert_array_almost_equal(sim_data, exp_sim_data, decimal=DECIMALS)
+
+    def test_simulate_trajectory_simple_driven_chaotic_simulate_instance_twice(self):
+        simulation_time_steps = 2
+
+        isntance = scan.simulations.SimplestDrivenChaotic()
+        sim_data_1 = isntance.simulate(time_steps=simulation_time_steps)
+        sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
+        assert_array_equal(sim_data_1, sim_data_2)
 
     def test_simulate_trajectory_ueda_default_starting_point_single_step_trivial_test(self):
         sim_data = scan.simulations.UedaOscillator().simulate(time_steps=2)
 
         exp_sim_data = np.array([[2.5, 0.0], [2.4807171482576695, -0.7648847867534123]])
 
-        assert_array_equal(sim_data, exp_sim_data)
+        assert_array_almost_equal(sim_data, exp_sim_data, decimal=DECIMALS)
+
+    def test_simulate_trajectory_ueda_simulate_instance_twice(self):
+        simulation_time_steps = 2
+
+        isntance = scan.simulations.UedaOscillator()
+        sim_data_1 = isntance.simulate(time_steps=simulation_time_steps)
+        sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
+        assert_array_equal(sim_data_1, sim_data_2)
 
     def test_kuramoto_sivashinski_6d_2l_05t_custom_starting_point_single_step(self):
         dimensions = 6
@@ -218,6 +323,14 @@ class TestSimulations(TestScanBase):
         # simulation step!
         assert_array_almost_equal(sim_data[-1], exp_sim_data[-1], decimal=6)
 
+    def test_simulate_trajectory_kuramoto_sivashinski_simulate_instance_twice(self):
+        simulation_time_steps = 2
+
+        isntance = scan.simulations.KuramotoSivashinsky()
+        sim_data_1 = isntance.simulate(time_steps=simulation_time_steps)
+        sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
+        assert_array_equal(sim_data_1, sim_data_2)
+
     def test_kuramoto_sivashinski_custom_6d_2l_05t_custom_starting_point_single_step(self):
         dimensions = 6
         system_size = 2
@@ -239,6 +352,14 @@ class TestSimulations(TestScanBase):
         # simulation step!
         assert_array_almost_equal(sim_data[-1], exp_sim_data[-1], decimal=6)
 
+    def test_simulate_trajectory_kuramoto_sivashinski_custom_simulate_instance_twice(self):
+        simulation_time_steps = 2
+
+        isntance = scan.simulations.KuramotoSivashinskyCustom()
+        sim_data_1 = isntance.simulate(time_steps=simulation_time_steps)
+        sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
+        assert_array_equal(sim_data_1, sim_data_2)
+
     def test_kuramoto_sivashinski_custom_40d_22l_05t_npfft_no_precision_change(self):
         # ks_sys_flag = "kuramoto_sivashinsky_custom"
         dimensions = 40
@@ -259,7 +380,7 @@ class TestSimulations(TestScanBase):
             fft_type=fft_type,
         ).simulate(time_steps=time_steps)
 
-        assert_array_equal(sim_data, exp_sim_data)
+        assert_array_almost_equal(sim_data, exp_sim_data, decimal=DECIMALS)
 
     @pytest.mark.xfail(reason="Datatype does not exist on all systems.")
     def test_kuramoto_sivashinski_custom_40d_22l_05t_npfft_128_precision(self):
