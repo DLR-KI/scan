@@ -232,6 +232,83 @@ class TestSimulations(TestScanBase):
         sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
         assert_array_equal(sim_data_1, sim_data_2)
 
+    def test_simulate_trajectory_simplest_quadratic_default_starting_point_single_step_trivial_test(self):
+        sim_data = scan.simulations.SimplestQuadraticChaotic().simulate(time_steps=2)
+
+        exp_sim_data = np.array([[-0.9, 0.0, 0.5], [-0.897517119397917, 0.049492007344059, 0.490173819781445]])
+
+        assert_array_almost_equal(sim_data, exp_sim_data, decimal=DECIMALS)
+
+    def test_simulate_trajectory_simplest_quadratic_simulate_instance_twice(self):
+        simulation_time_steps = 2
+
+        isntance = scan.simulations.SimplestQuadraticChaotic()
+        sim_data_1 = isntance.simulate(time_steps=simulation_time_steps)
+        sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
+        assert_array_equal(sim_data_1, sim_data_2)
+
+    def test_simulate_trajectory_simplest_cubic_default_starting_point_single_step_trivial_test(self):
+        sim_data = scan.simulations.SimplestCubicChaotic().simulate(time_steps=2)
+
+        exp_sim_data = np.array(
+            [[0.0, 0.96, 0.0], [9.599968640000001e-02, 9.599880919807999e-01, -3.522283392479332e-04]]
+        )
+
+        assert_array_almost_equal(sim_data, exp_sim_data, decimal=DECIMALS)
+
+    def test_simulate_trajectory_simplest_cubic_simulate_instance_twice(self):
+        simulation_time_steps = 2
+
+        isntance = scan.simulations.SimplestCubicChaotic()
+        sim_data_1 = isntance.simulate(time_steps=simulation_time_steps)
+        sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
+        assert_array_equal(sim_data_1, sim_data_2)
+
+    def test_simulate_trajectory_simplest_piecewise_default_starting_point_single_step_trivial_test(self):
+        sim_data = scan.simulations.SimplestPiecewiseLinearChaotic().simulate(time_steps=2)
+
+        exp_sim_data = np.array([[0.0, -0.7, 0.0], [-0.070046333333333, -0.701354283333333, -0.025639846666667]])
+
+        assert_array_almost_equal(sim_data, exp_sim_data, decimal=DECIMALS)
+
+    def test_simulate_trajectory_simplest_piecewise_simulate_instance_twice(self):
+        simulation_time_steps = 2
+
+        isntance = scan.simulations.SimplestPiecewiseLinearChaotic()
+        sim_data_1 = isntance.simulate(time_steps=simulation_time_steps)
+        sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
+        assert_array_equal(sim_data_1, sim_data_2)
+
+    def test_simulate_trajectory_double_scroll_default_starting_point_single_step_trivial_test(self):
+        sim_data = scan.simulations.DoubleScroll().simulate(time_steps=2)
+
+        exp_sim_data = np.array([[0.01, 0.01, 0.0], [0.01112802, 0.013813637333333, 0.0752040608]])
+
+        assert_array_almost_equal(sim_data, exp_sim_data, decimal=DECIMALS)
+
+    def test_simulate_trajectory_double_scroll_simulate_instance_twice(self):
+        simulation_time_steps = 2
+
+        isntance = scan.simulations.DoubleScroll()
+        sim_data_1 = isntance.simulate(time_steps=simulation_time_steps)
+        sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
+        assert_array_equal(sim_data_1, sim_data_2)
+
+    def test_simulate_trajectory_linear_default_starting_point_single_step_trivial_test(self):
+        sim_data = scan.simulations.LinearSystem().simulate(time_steps=2)
+
+        exp_sim_data = np.array([[1.0, 1.0], [0.895170833333333, 1.0948375]])
+
+        assert_array_almost_equal(sim_data, exp_sim_data, decimal=DECIMALS)
+
+    def test_simulate_trajectory_linear_simulate_instance_twice(self):
+        simulation_time_steps = 2
+
+        isntance = scan.simulations.LinearSystem()
+        sim_data_1 = isntance.simulate(time_steps=simulation_time_steps)
+        sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
+        assert_array_equal(sim_data_1, sim_data_2)
+
     def test_simulate_trajectory_henon_default_starting_point_single_step_trivial_test(self):
         sim_data = scan.simulations.Henon().simulate(time_steps=2)
 

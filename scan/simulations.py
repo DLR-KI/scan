@@ -548,6 +548,243 @@ class Rucklidge:
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
+class SimplestQuadraticChaotic:
+    """Simulate the 3-dimensional autonomous flow: Simplest Quadratic Chaotic flow.
+
+    See: Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
+    analysis. Vol. 69. Oxford: Oxford university press, 2003.
+
+    Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
+    analysis. Vol. 69. Oxford: Oxford university press, 2003.) for default parameters and
+    starting_point:
+    - Lyapunov exponents: (0.0551, 0.0, -2.0721)
+    - Kaplan-Yorke dimension: 2.0266
+    - Correlation dimension: 2.187 +- 0.075
+    """
+
+    def __init__(self, a: float = 2.017, dt: float = 0.1) -> None:
+        """Define the system parameters.
+
+        Args:
+            a: 'a' parameter in Simplest Quadratic Chaotic flow.
+            dt: Size of time steps.
+        """
+        self.a = a
+        self.dt = dt
+
+    def flow(self, x: np.ndarray) -> np.ndarray:
+        """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
+
+        Args:
+            x: (x,y,z) coordinates. Needs to have shape (3,).
+        Returns:
+            : (dx/dt, dy/dt, dz/dt) corresponding to input x.
+
+        """
+        return np.array([x[1], x[2], -self.a * x[2] + x[1] ** 2 - x[0]])
+
+    def iterate(self, x: np.ndarray) -> np.ndarray:
+        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)) and dt
+        with RK4.
+
+        Args:
+            x: (x,y,z) coordinates. Needs to have shape (3,).
+        Returns:
+            : (x(i+1), y(i+1), z(i+1)) corresponding to input x.
+
+        """
+        return _runge_kutta(self.flow, self.dt, x)
+
+    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([-0.9, 0.0, 0.5])) -> np.ndarray:
+        """Simulate the Simplest Quadratic Chaotic flow trajectory.
+
+        Args:
+            time_steps: Number of time steps t to simulate.
+            starting_point: Starting point of the trajectory of shape (3,).
+        Returns:
+            Trajectory of shape (t, 3).
+
+        """
+        return _timestep_iterator(self.iterate, time_steps, starting_point)
+
+
+class SimplestCubicChaotic:
+    """Simulate the 3-dimensional autonomous flow: Simplest Cubic Chaotic flow.
+
+    See: Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
+    analysis. Vol. 69. Oxford: Oxford university press, 2003.
+
+    Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
+    analysis. Vol. 69. Oxford: Oxford university press, 2003.) for default parameters and
+    starting_point:
+    - Lyapunov exponents: (0.0837, 0.0, -2.1117)
+    - Kaplan-Yorke dimension: 2.0396
+    - Correlation dimension: 2.174 +- 0.083
+    """
+
+    def __init__(self, a: float = 2.028, dt: float = 0.1) -> None:
+        """Define the system parameters.
+
+        Args:
+            a: 'a' parameter in Simplest Cubic Chaotic flow.
+            dt: Size of time steps.
+        """
+        self.a = a
+        self.dt = dt
+
+    def flow(self, x: np.ndarray) -> np.ndarray:
+        """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
+
+        Args:
+            x: (x,y,z) coordinates. Needs to have shape (3,).
+        Returns:
+            : (dx/dt, dy/dt, dz/dt) corresponding to input x.
+
+        """
+        return np.array([x[1], x[2], -self.a * x[2] + x[1] ** 2 * x[0] - x[0]])
+
+    def iterate(self, x: np.ndarray) -> np.ndarray:
+        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)) and dt
+        with RK4.
+
+        Args:
+            x: (x,y,z) coordinates. Needs to have shape (3,).
+        Returns:
+            : (x(i+1), y(i+1), z(i+1)) corresponding to input x.
+
+        """
+        return _runge_kutta(self.flow, self.dt, x)
+
+    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([0.0, 0.96, 0.0])) -> np.ndarray:
+        """Simulate the Simplest Cubic Chaotic flow trajectory.
+
+        Args:
+            time_steps: Number of time steps t to simulate.
+            starting_point: Starting point of the trajectory of shape (3,).
+        Returns:
+            Trajectory of shape (t, 3).
+
+        """
+        return _timestep_iterator(self.iterate, time_steps, starting_point)
+
+
+class SimplestPiecewiseLinearChaotic:
+    """Simulate the 3-dimensional autonomous flow: Simplest Piecewise Linear Chaotic flow.
+
+    See: Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
+    analysis. Vol. 69. Oxford: Oxford university press, 2003.
+
+    Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
+    analysis. Vol. 69. Oxford: Oxford university press, 2003.) for default parameters and
+    starting_point:
+    - Lyapunov exponents: (0.0362, 0.0, -0.6362)
+    - Kaplan-Yorke dimension: 2.0569
+    - Correlation dimension: 2.131 +- 0.072
+    """
+
+    def __init__(self, a: float = 0.6, dt: float = 0.1) -> None:
+        """Define the system parameters.
+
+        Args:
+            a: 'a' parameter in Simplest Piecewise Linear Chaotic flow.
+            dt: Size of time steps.
+        """
+        self.a = a
+        self.dt = dt
+
+    def flow(self, x: np.ndarray) -> np.ndarray:
+        """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
+
+        Args:
+            x: (x,y,z) coordinates. Needs to have shape (3,).
+        Returns:
+            : (dx/dt, dy/dt, dz/dt) corresponding to input x.
+
+        """
+        return np.array([x[1], x[2], -self.a * x[2] - x[1] + np.abs(x[0]) - 1])
+
+    def iterate(self, x: np.ndarray) -> np.ndarray:
+        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)) and dt
+        with RK4.
+
+        Args:
+            x: (x,y,z) coordinates. Needs to have shape (3,).
+        Returns:
+            : (x(i+1), y(i+1), z(i+1)) corresponding to input x.
+
+        """
+        return _runge_kutta(self.flow, self.dt, x)
+
+    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([0.0, -0.7, 0.0])) -> np.ndarray:
+        """Simulate the Simplest Piecewise Linear Chaotic flow trajectory.
+
+        Args:
+            time_steps: Number of time steps t to simulate.
+            starting_point: Starting point of the trajectory of shape (3,).
+        Returns:
+            Trajectory of shape (t, 3).
+
+        """
+        return _timestep_iterator(self.iterate, time_steps, starting_point)
+
+
+class DoubleScroll:
+    """Simulate the 3-dimensional autonomous flow: Double Scroll system
+
+    Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
+    analysis. Vol. 69. Oxford: Oxford university press, 2003.) for default parameters and
+    starting_point:
+    - Lyapunov exponents: (0.0497, 0.0, -0.8497)
+    - Kaplan-Yorke dimension: 2.0585
+    - Correlation dimension: 2.184 +- 0.107
+    """
+
+    def __init__(self, a: float = 0.8, dt: float = 0.1) -> None:
+        """Define the system parameters.
+
+        Args:
+            a: 'a' parameter in Double Scroll system.
+            dt: Size of time steps.
+        """
+        self.a = a
+        self.dt = dt
+
+    def flow(self, x: np.ndarray) -> np.ndarray:
+        """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
+
+        Args:
+            x: (x,y,z) coordinates. Needs to have shape (3,).
+        Returns:
+            : (dx/dt, dy/dt, dz/dt) corresponding to input x.
+
+        """
+        return np.array([x[1], x[2], -self.a * (x[2] + x[1] + x[0] - np.sign(x[0]))])
+
+    def iterate(self, x: np.ndarray) -> np.ndarray:
+        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)) and dt
+        with RK4.
+
+        Args:
+            x: (x,y,z) coordinates. Needs to have shape (3,).
+        Returns:
+            : (x(i+1), y(i+1), z(i+1)) corresponding to input x.
+
+        """
+        return _runge_kutta(self.flow, self.dt, x)
+
+    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([0.01, 0.01, 0.0])) -> np.ndarray:
+        """Simulate the Double Scroll system trajectory.
+
+        Args:
+            time_steps: Number of time steps t to simulate.
+            starting_point: Starting point of the trajectory of shape (3,).
+        Returns:
+            Trajectory of shape (t, 3).
+
+        """
+        return _timestep_iterator(self.iterate, time_steps, starting_point)
+
+
 class Henon:
     """Simulate the 2-dimensional dissipative map: Henon map.
 
@@ -650,6 +887,9 @@ class Logistic:
 
 class SimplestDrivenChaotic:
     """Simulate the 2+1 dim (2 space, 1 time) conservative flow: Simplest Driven Chaotic flow.
+
+    See: Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
+    analysis. Vol. 69. Oxford: Oxford university press, 2003.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
     analysis. Vol. 69. Oxford: Oxford university press, 2003.) for default parameters and
@@ -1118,5 +1358,63 @@ class Lorenz96:
         """
         if starting_point is None:
             starting_point = np.sin(np.arange(30))
+
+        return _timestep_iterator(self.iterate, time_steps, starting_point)
+
+
+class LinearSystem:
+    """Simulate a generic n-dimensional linear dynamical system x_t = A*x"""
+
+    def __init__(self, A: np.ndarray | None = None, dt: float = 0.1) -> None:
+        """Define the system parameters.
+
+        Args:
+            A: The Matrix describing the linear system: x_t = A*x
+            dt: Size of time steps.
+        """
+
+        if A is None:
+            self.A = np.array([[-0.0, -1.0], [1.0, 0.0]])
+
+        self.dimension = self.A.shape[0]
+        self.dt = dt
+
+    def flow(self, x: np.ndarray) -> np.ndarray:
+        """Calculates (dx_0/dt, dx_1/dt, ..) with given (x_0,x_1,..) for RK4.
+
+        Args:
+            x: (x_0,x_1,..) coordinates. Adapts automatically to shape (dimensions, ).
+        Returns:
+            : (dx_0/dt, dx_1/dt, ..) corresponding to input x.
+
+        """
+
+        return np.array(np.dot(self.A, x))
+
+    def iterate(self, x: np.ndarray) -> np.ndarray:
+        """Calculates next timestep (x_0(i+1),x_1(i+1),..) with given (x_0(i),x_0(i),..) and dt
+        with RK4.
+
+        Args:
+            x: (x_0(i),x_1(i),..) coordinates. Needs to have shape (self.dimensions,).
+        Returns:
+            : (x_0(i+1),x_1(i+1),..) corresponding to input x.
+
+        """
+        return _runge_kutta(self.flow, self.dt, x)
+
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
+        """Simulate linear dynamical system trajectory.
+
+        Args:
+            time_steps: Number of time steps t to simulate.
+            starting_point: Starting point of the trajectory. Automatically adapts to dimension of
+            input.
+        Returns:
+            Trajectory of shape (t, input_dimension).
+
+        """
+        if starting_point is None:
+            starting_point = np.ones(self.dimension)
 
         return _timestep_iterator(self.iterate, time_steps, starting_point)
