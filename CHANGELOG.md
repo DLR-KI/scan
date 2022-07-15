@@ -1,5 +1,45 @@
 ## Changelog
 
+### Scan 0.6.0 - Simulating dynamical systems: Refactoring and new systems
+* Removed the function `scan.simulations.simulate_trajectory`.
+* Instead of using `simulate_trajectory`, there is now a class for every dynamical system implemented.
+  * The dynamical-system classes have a common structure: 
+    * The system parameters (including time step `dt`, if the system is a flow) are specified in 
+    the class constructor (i.e. when calling `__init__`).
+    * Every class has the method `simulate` which can be used to simulate the whole trajectory. 
+    It takes the positional argument `time_steps` and the keyword argument `starting_point`.
+    * If you simulate for _n_ `time_steps`, the returned trajectory has exactly _n_ elements, where 
+    the first element is the starting point. So actually one only simulates _n-1_ new time steps.
+    * All system classes have a method `iterate`, that iterates the system to the next time step. Some 
+    systems also have the method `flow`, which calculates the time derivative at a given point. 
+  * Example to simulate a trajectory of the _Lorenz63_ system with 1000 time steps:
+    * `trajectory = Lorenz63(sigma=10, rho=28, beta=8/3, dt=0.05).simulate(1000, starting_point=np.array([0, 1, 2]))` 
+    or just `Lorenz63().simulate(1000)` with default parameters and default starting_point.
+* Added more dynamical Systems, with default parameters and starting_points from _Sprott, Julien 
+Clinton, and Julien C. Sprott. Chaos and time-series
+    analysis. Vol. 69. Oxford: Oxford university press, 2003._
+* List of supported dynamical systems: 
+  - Lorenz63 
+  - Roessler
+  - ComplexButterfly (see _Sprott_)
+  - Chen
+  - ChuaCircuit
+  - Thomas
+  - WindmiAttractor (see _Sprott_)
+  - Rucklidge
+  - SimplestQuadraticChaotic (see _Sprott_)
+  - SimplestCubicChaotic (see _Sprott_)
+  - SimplestPiecewiseLinearChaotic (see _Sprott_)
+  - DoubleScroll
+  - Henon
+  - Logistic
+  - SimplestDrivenChaotic (see _Sprott_)
+  - UedaOscillator
+  - KuramotoSivashinsky
+  - KuramotoSivashinskyCustom
+  - Lorenz96
+  - LinearSystem (A general n_dimensional linear system: x_t = A*x with matrix A)
+  
 ### Scan 0.5.0 - Compared to Rescomp 0.3.2
 
 #### Non-Breaking Changes

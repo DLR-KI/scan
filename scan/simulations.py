@@ -1,8 +1,8 @@
 """Simulate various chaotic system to generate artificial data.
 
 Every dynamical system is represented as a class.
-The syntax for simulating the trajectory is:
-trajectory = SystemClass(parameters).simulate(time_steps, starting_point)
+The general syntax for simulating the trajectory is:
+trajectory = SystemClass(parameters=<default>).simulate(time_steps, starting_point=<default>)
 """
 
 from __future__ import annotations
@@ -86,6 +86,7 @@ class Lorenz63:
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (dx/dt, dy/dt, dz/dt) corresponding to input x.
 
@@ -93,11 +94,13 @@ class Lorenz63:
         return np.array([self.sigma * (x[1] - x[0]), x[0] * (self.rho - x[2]) - x[1], x[0] * x[1] - self.beta * x[2]])
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
-        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)) and dt
-        with RK4.
+        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)).
+
+        Uses RK4 and time step dt.
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (x(i+1), y(i+1), z(i+1)) corresponding to input x.
 
@@ -110,6 +113,7 @@ class Lorenz63:
         Args:
             time_steps: Number of time steps t to simulate.
             starting_point: Starting point of the trajectory of shape (3,).
+
         Returns:
             Trajectory of shape (t, 3).
 
@@ -147,6 +151,7 @@ class Roessler:
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (dx/dt, dy/dt, dz/dt) corresponding to input x.
 
@@ -154,11 +159,13 @@ class Roessler:
         return np.array([-x[1] - x[2], x[0] + self.a * x[1], self.b + x[2] * (x[0] - self.c)])
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
-        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)) and dt
-        with RK4.
+        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)).
+
+        Uses RK4 and time step dt.
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (x(i+1), y(i+1), z(i+1)) corresponding to input x.
 
@@ -171,6 +178,7 @@ class Roessler:
         Args:
             time_steps: Number of time steps t to simulate.
             starting_point: Starting point of the trajectory of shape (3,).
+
         Returns:
             Trajectory of shape (t, 3).
 
@@ -204,6 +212,7 @@ class ComplexButterly:
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (dx/dt, dy/dt, dz/dt) corresponding to input x.
 
@@ -211,11 +220,13 @@ class ComplexButterly:
         return np.array([self.a * (x[1] - x[0]), -x[2] * np.sign(x[0]), np.abs(x[0]) - 1])
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
-        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)) and dt
-        with RK4.
+        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)).
+
+        Uses RK4 and time step dt.
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (x(i+1), y(i+1), z(i+1)) corresponding to input x.
 
@@ -228,6 +239,7 @@ class ComplexButterly:
         Args:
             time_steps: Number of time steps t to simulate.
             starting_point: Starting point of the trajectory of shape (3,).
+
         Returns:
             Trajectory of shape (t, 3).
 
@@ -265,6 +277,7 @@ class Chen:
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (dx/dt, dy/dt, dz/dt) corresponding to input x.
 
@@ -278,11 +291,13 @@ class Chen:
         )
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
-        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)) and dt
-        with RK4.
+        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)).
+
+        Uses RK4 and time step dt.
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (x(i+1), y(i+1), z(i+1)) corresponding to input x.
 
@@ -295,6 +310,7 @@ class Chen:
         Args:
             time_steps: Number of time steps t to simulate.
             starting_point: Starting point of the trajectory of shape (3,).
+
         Returns:
             Trajectory of shape (t, 3).
 
@@ -336,6 +352,7 @@ class ChuaCircuit:
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (dx/dt, dy/dt, dz/dt) corresponding to input x.
 
@@ -350,11 +367,13 @@ class ChuaCircuit:
         )
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
-        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)) and dt
-        with RK4.
+        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)).
+
+        Uses RK4 and time step dt.
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (x(i+1), y(i+1), z(i+1)) corresponding to input x.
 
@@ -367,6 +386,7 @@ class ChuaCircuit:
         Args:
             time_steps: Number of time steps t to simulate.
             starting_point: Starting point of the trajectory of shape (3,).
+
         Returns:
             Trajectory of shape (t, 3).
 
@@ -400,6 +420,7 @@ class Thomas:
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (dx/dt, dy/dt, dz/dt) corresponding to input x.
 
@@ -407,11 +428,13 @@ class Thomas:
         return np.array([-self.b * x[0] + np.sin(x[1]), -self.b * x[1] + np.sin(x[2]), -self.b * x[2] + np.sin(x[0])])
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
-        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)) and dt
-        with RK4.
+        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)).
+
+        Uses RK4 and time step dt.
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (x(i+1), y(i+1), z(i+1)) corresponding to input x.
 
@@ -424,6 +447,7 @@ class Thomas:
         Args:
             time_steps: Number of time steps t to simulate.
             starting_point: Starting point of the trajectory of shape (3,).
+
         Returns:
             Trajectory of shape (t, 3).
 
@@ -459,6 +483,7 @@ class WindmiAttractor:
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (dx/dt, dy/dt, dz/dt) corresponding to input x.
 
@@ -466,11 +491,13 @@ class WindmiAttractor:
         return np.array([x[1], x[2], -self.a * x[2] - x[1] + self.b - np.exp(x[0])])
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
-        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)) and dt
-        with RK4.
+        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)).
+
+        Uses RK4 and time step dt.
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (x(i+1), y(i+1), z(i+1)) corresponding to input x.
 
@@ -483,6 +510,7 @@ class WindmiAttractor:
         Args:
             time_steps: Number of time steps t to simulate.
             starting_point: Starting point of the trajectory of shape (3,).
+
         Returns:
             Trajectory of shape (t, 3).
 
@@ -517,6 +545,7 @@ class Rucklidge:
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (dx/dt, dy/dt, dz/dt) corresponding to input x.
 
@@ -524,11 +553,13 @@ class Rucklidge:
         return np.array([-self.kappa * x[0] + self.lam * x[1] - x[1] * x[2], x[0], -x[2] + x[1] ** 2])
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
-        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)) and dt
-        with RK4.
+        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)).
+
+        Uses RK4 and time step dt.
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (x(i+1), y(i+1), z(i+1)) corresponding to input x.
 
@@ -541,6 +572,7 @@ class Rucklidge:
         Args:
             time_steps: Number of time steps t to simulate.
             starting_point: Starting point of the trajectory of shape (3,).
+
         Returns:
             Trajectory of shape (t, 3).
 
@@ -577,6 +609,7 @@ class SimplestQuadraticChaotic:
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (dx/dt, dy/dt, dz/dt) corresponding to input x.
 
@@ -584,11 +617,13 @@ class SimplestQuadraticChaotic:
         return np.array([x[1], x[2], -self.a * x[2] + x[1] ** 2 - x[0]])
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
-        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)) and dt
-        with RK4.
+        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)).
+
+        Uses RK4 and time step dt.
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (x(i+1), y(i+1), z(i+1)) corresponding to input x.
 
@@ -601,6 +636,7 @@ class SimplestQuadraticChaotic:
         Args:
             time_steps: Number of time steps t to simulate.
             starting_point: Starting point of the trajectory of shape (3,).
+
         Returns:
             Trajectory of shape (t, 3).
 
@@ -637,6 +673,7 @@ class SimplestCubicChaotic:
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (dx/dt, dy/dt, dz/dt) corresponding to input x.
 
@@ -644,11 +681,13 @@ class SimplestCubicChaotic:
         return np.array([x[1], x[2], -self.a * x[2] + x[1] ** 2 * x[0] - x[0]])
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
-        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)) and dt
-        with RK4.
+        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)).
+
+        Uses RK4 and time step dt.
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (x(i+1), y(i+1), z(i+1)) corresponding to input x.
 
@@ -661,6 +700,7 @@ class SimplestCubicChaotic:
         Args:
             time_steps: Number of time steps t to simulate.
             starting_point: Starting point of the trajectory of shape (3,).
+
         Returns:
             Trajectory of shape (t, 3).
 
@@ -697,6 +737,7 @@ class SimplestPiecewiseLinearChaotic:
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (dx/dt, dy/dt, dz/dt) corresponding to input x.
 
@@ -704,11 +745,13 @@ class SimplestPiecewiseLinearChaotic:
         return np.array([x[1], x[2], -self.a * x[2] - x[1] + np.abs(x[0]) - 1])
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
-        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)) and dt
-        with RK4.
+        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)).
+
+        Uses RK4 and time step dt.
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (x(i+1), y(i+1), z(i+1)) corresponding to input x.
 
@@ -721,6 +764,7 @@ class SimplestPiecewiseLinearChaotic:
         Args:
             time_steps: Number of time steps t to simulate.
             starting_point: Starting point of the trajectory of shape (3,).
+
         Returns:
             Trajectory of shape (t, 3).
 
@@ -754,6 +798,7 @@ class DoubleScroll:
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (dx/dt, dy/dt, dz/dt) corresponding to input x.
 
@@ -761,11 +806,13 @@ class DoubleScroll:
         return np.array([x[1], x[2], -self.a * (x[2] + x[1] + x[0] - np.sign(x[0]))])
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
-        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)) and dt
-        with RK4.
+        """Calculates next timestep (x(i+1), y(i+1), z(i+1)) with given (x(i),y(i),z(i)).
+
+        Uses RK4 and time step dt.
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (x(i+1), y(i+1), z(i+1)) corresponding to input x.
 
@@ -778,6 +825,7 @@ class DoubleScroll:
         Args:
             time_steps: Number of time steps t to simulate.
             starting_point: Starting point of the trajectory of shape (3,).
+
         Returns:
             Trajectory of shape (t, 3).
 
@@ -811,6 +859,7 @@ class Henon:
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (2,).
+
         Returns:
             : (x(i+1), y(i+1)) corresponding to input x.
 
@@ -823,6 +872,7 @@ class Henon:
         Args:
             time_steps: Number of time steps t to simulate.
             starting_point: Starting point of the trajectory of shape (2,).
+
         Returns:
             Trajectory of shape (t, 2).
 
@@ -854,6 +904,7 @@ class Logistic:
 
         Args:
             x: (x, ) coordinates. Needs to have shape (1,).
+
         Returns:
             : (x(i+1), ) corresponding to input x.
 
@@ -878,6 +929,7 @@ class Logistic:
         Args:
             time_steps: Number of time steps t to simulate.
             starting_point: Starting point of the trajectory of shape (1,).
+
         Returns:
             Trajectory of shape (t, 1).
 
@@ -914,6 +966,7 @@ class SimplestDrivenChaotic:
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (dx/dt, dy/dt, dt/dt=1) corresponding to input x.
 
@@ -921,11 +974,14 @@ class SimplestDrivenChaotic:
         return np.array([x[1], -(x[0] ** 3) + np.sin(self.omega * x[2]), 1])
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
-        """Calculates next timestep (x(i+1), y(i+1), t(i+1)) with given (x(i),y(i),t(i)) and dt.
-        with RK4. The third coordinate is time: t(i+1) = t(i) + dt.
+        """Calculates next timestep (x(i+1), y(i+1), t(i+1)) with given (x(i),y(i),t(i)).
+
+        Uses RK4 and time step dt.
+        The third coordinate is time: t(i+1) = t(i) + dt.
 
         Args:
             x: (x,y,t) coordinates. Needs to have shape (3,).
+
         Returns:
             : (x(i+1), y(i+1), t(i+1)) corresponding to input x.
 
@@ -939,6 +995,7 @@ class SimplestDrivenChaotic:
             time_steps: Number of time steps t to simulate.
             starting_point: Starting point of the trajectory of shape (2,) (time dimension
             excluded).
+
         Returns:
             Trajectory of shape (t, 2).
 
@@ -977,6 +1034,7 @@ class UedaOscillator:
 
         Args:
             x: (x,y,z) coordinates. Needs to have shape (3,).
+
         Returns:
             : (dx/dt, dy/dt, dt/dt=1) corresponding to input x.
 
@@ -984,11 +1042,14 @@ class UedaOscillator:
         return np.array([x[1], -(x[0] ** 3) - self.b * x[1] + self.A * np.sin(self.omega * x[2]), 1])
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
-        """Calculates next timestep (x(i+1), y(i+1), t(i+1)) with given (x(i),y(i),t(i)) and dt
-        with RK4. The third coordinate is time: t(i+1) = t(i) + dt.
+        """Calculates next timestep (x(i+1), y(i+1), t(i+1)) with given (x(i),y(i),t(i)).
+
+        Uses RK4 and time step dt.
+        The third coordinate is time: t(i+1) = t(i) + dt.
 
         Args:
             x: (x,y,t) coordinates. Needs to have shape (3,).
+
         Returns:
             : (x(i+1), y(i+1), t(i+1)) corresponding to input x.
 
@@ -1002,6 +1063,7 @@ class UedaOscillator:
             time_steps: Number of time steps t to simulate.
             starting_point: Starting point of the trajectory of shape (2,) (time dimension
             excluded).
+
         Returns:
             Trajectory of shape (t, 2).
 
@@ -1072,6 +1134,7 @@ class KuramotoSivashinsky:
 
         Args:
             x: (x_0(i),x_1(i),..) coordinates. Needs to have shape (self.dimensions,).
+
         Returns:
             : (x_0(i+1),x_1(i+1),..) corresponding to input x.
 
@@ -1094,6 +1157,7 @@ class KuramotoSivashinsky:
         Args:
             time_steps: Number of time steps t to simulate.
             starting_point: Starting point of the trajectory of shape (self.dimensions,).
+
         Returns:
             Trajectory of shape (t, self.dimensions).
 
@@ -1239,6 +1303,7 @@ class KuramotoSivashinskyCustom:
 
         Args:
             x: (x_0(i),x_1(i),..) coordinates. Needs to have shape (self.dimensions,).
+
         Returns:
             : (x_0(i+1),x_1(i+1),..) corresponding to input x.
 
@@ -1277,6 +1342,7 @@ class KuramotoSivashinskyCustom:
         Args:
             time_steps: Number of time steps t to simulate.
             starting_point: Starting point of the trajectory of shape (self.dimensions,).
+
         Returns:
             Trajectory of shape (t, self.dimensions).
 
@@ -1313,6 +1379,7 @@ class Lorenz96:
 
         Args:
             x: (x_0,x_1,..) coordinates. Adapts automatically to shape (dimensions, ).
+
         Returns:
             : (dx_0/dt, dx_1/dt, ..) corresponding to input x.
 
@@ -1334,11 +1401,13 @@ class Lorenz96:
         return derivative
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
-        """Calculates next timestep (x_0(i+1),x_1(i+1),..) with given (x_0(i),x_0(i),..) and dt
-        with RK4.
+        """Calculates next timestep (x_0(i+1),x_1(i+1),..) with given (x_0(i),x_0(i),..).
+
+        Uses RK4 and time step dt.
 
         Args:
             x: (x_0(i),x_1(i),..) coordinates. Needs to have shape (self.dimensions,).
+
         Returns:
             : (x_0(i+1),x_1(i+1),..) corresponding to input x.
 
@@ -1352,6 +1421,7 @@ class Lorenz96:
             time_steps: Number of time steps t to simulate.
             starting_point: Starting point of the trajectory. Automatically adapts to dimension of
             input.
+
         Returns:
             Trajectory of shape (t, input_dimension).
 
@@ -1384,6 +1454,7 @@ class LinearSystem:
 
         Args:
             x: (x_0,x_1,..) coordinates. Adapts automatically to shape (dimensions, ).
+
         Returns:
             : (dx_0/dt, dx_1/dt, ..) corresponding to input x.
 
@@ -1392,11 +1463,13 @@ class LinearSystem:
         return np.array(np.dot(self.A, x))
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
-        """Calculates next timestep (x_0(i+1),x_1(i+1),..) with given (x_0(i),x_0(i),..) and dt
-        with RK4.
+        """Calculates next timestep (x_0(i+1),x_1(i+1),..) with given (x_0(i),x_0(i),..).
+
+        Uses RK4 and time step dt.
 
         Args:
             x: (x_0(i),x_1(i),..) coordinates. Needs to have shape (self.dimensions,).
+
         Returns:
             : (x_0(i+1),x_1(i+1),..) corresponding to input x.
 
@@ -1410,6 +1483,7 @@ class LinearSystem:
             time_steps: Number of time steps t to simulate.
             starting_point: Starting point of the trajectory. Automatically adapts to dimension of
             input.
+
         Returns:
             Trajectory of shape (t, input_dimension).
 
