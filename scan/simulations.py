@@ -527,6 +527,12 @@ class Rucklidge:
     - Lyapunov exponents: (0.0643, 0.0, -3.0643)
     - Kaplan-Yorke dimension: 2.0210
     - Correlation dimension: 2.108 +- 0.095
+
+    Literature values for LLE according to different study (Rusyn, V. "Modeling, analysis and
+    control of chaotic Rucklidge system." Journal of Telecommunication, Electronic and Computer
+    Engineering (JTEC) 11.1 (2019): 43-47.). Same parameters are used but starting_point is
+    (1.2, 0.8, 1.4).
+    - Lyapunov Exponents: (0.1877, 0.0, -3.1893)
     """
 
     def __init__(self, kappa: float = 2, lam: float = 6.7, dt: float = 0.05) -> None:
