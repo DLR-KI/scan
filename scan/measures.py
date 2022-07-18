@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from typing import Callable
 import numpy as np
 
 from scan import utilities
@@ -114,3 +115,169 @@ def rmse(
         raise ValueError("Type of normalization not implemented")
 
     return error
+
+
+def largest_lyapunov_exponent(iterator_func: Callable[[np.ndarray], np.ndarray],
+                              starting_point: np.ndarray,
+                              deviation_scale: float = 1e-10,
+                              N: int = int(1e5),
+                              part_time_steps: int = 10,
+                              dt: float = 1.0,
+                              initial_perturbation: np.ndarray | None = None
+                              ) -> float | np.ndarray:
+    """Numerically calculate the largest lyapunov exponent given an iterator function.
+
+    See: Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series analysis. Vol. 69.
+    Oxford: Oxford university press, 2003.
+
+    Args:
+        iterator_func: Function to iterate the system to the next time step: x(i+1) = F(x(i))
+        starting_point: The starting_point of the main trajectory.
+        deviation_scale: The L2-norm of the initial perturbation.
+        N: Number of renormalization steps.
+        part_time_steps: Time steps between renormalization steps.
+        dt: Size of time step.
+        initial_perturbation:
+            - If np.ndarray: The direction of the initial perturbation.
+            - If None: The direction of the initial perturbation is assumed to be np.ones(..).
+
+    Returns:
+        The largest Lyapunov Exponent.
+    """
+
+    x_dim = starting_point.size
+
+    if initial_perturbation is None:
+        initial_perturbation = np.ones(x_dim)
+
+    initial_perturbation *= deviation_scale/np.linalg.norm(initial_perturbation)
+
+    log_divergence = np.zeros(N)
+
+    x = starting_point
+    x_pert = starting_point + initial_perturbation
+
+    for i_n in range(N):
+        for i_t in range(part_time_steps):
+            x = iterator_func(x)
+            x_pert = iterator_func(x_pert)
+        dx = x_pert - x
+        norm_dx = np.linalg.norm(dx)
+        log_divergence[i_n] = np.log(norm_dx / deviation_scale)
+        x_pert = x + dx * (deviation_scale/norm_dx)
+
+    return np.average(log_divergence)/(dt*part_time_steps)
+
+    # return np.cumsum(log_divergence)/(np.arange(1, N+1)*dt*part_time_steps)
+    # # return np.average(log_divergence)/(dt*part_time_steps)
+
+
+def largest_lyapunov_exponent_distance(iterator_func: Callable[[np.ndarray], np.ndarray],
+                              starting_point: np.ndarray,
+                              deviation_scale: float = 1e-10,
+                              N: int = int(1e5),
+                              part_time_steps: int = 10,
+                              dt: float = 1.0,
+                              initial_perturbation: np.ndarray | None = None
+                              ) -> float:
+    """Numerically calculate the largest lyapunov exponent given an iterator function
+
+
+    Args:
+        iterator_func:
+        starting_point:
+        deviation_scale:
+        N:
+        part_time_steps:
+        dt:
+        initial_perturbation:
+
+    Returns:
+
+    """
+
+    x_dim = starting_point.size
+
+    if initial_perturbation is None:
+        initial_perturbation = np.ones(x_dim)
+
+    initial_perturbation *= deviation_scale/np.linalg.norm(initial_perturbation)
+
+    log_divergence = np.zeros(N)
+    distance = np.zeros((N, part_time_steps))
+
+    x = starting_point
+    x_pert = starting_point + initial_perturbation
+
+    for i_n in range(N):
+        for i_t in range(part_time_steps):
+            x = iterator_func(x)
+            x_pert = iterator_func(x_pert)
+
+            distance[i_n, i_t] = np.linalg.norm(x-x_pert)
+
+        dx = x_pert - x
+        norm_dx = np.linalg.norm(dx)
+        log_divergence[i_n] = np.log(norm_dx / deviation_scale)
+        x_pert = x + dx * (deviation_scale/norm_dx)
+
+    return distance, np.average(log_divergence)/(dt*part_time_steps)
+    # return np.cumsum(log_divergence)/np.arange(1, N+1)
+    # return np.average(log_divergence)/(dt*part_time_steps)
+
+
+def largest_lyapunov_exponent_skip(iterator_func: Callable[[np.ndarray], np.ndarray],
+                              starting_point: np.ndarray,
+                              deviation_scale: float = 1e-10,
+                              N: int = int(1e5),
+                              part_time_steps: int = 10,
+                              dt: float = 1.0,
+                              initial_perturbation: np.ndarray | None = None,
+                              N_skip: int = 0
+                              ) -> float | np.ndarray:
+    """Numerically calculate the largest lyapunov exponent given an iterator function.
+
+    See: Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series analysis. Vol. 69.
+    Oxford: Oxford university press, 2003.
+
+    Args:
+        iterator_func: Function to iterate the system to the next time step: x(i+1) = F(x(i))
+        starting_point: The starting_point of the main trajectory.
+        deviation_scale: The L2-norm of the initial perturbation.
+        N: Number of renormalization steps.
+        part_time_steps: Time steps between renormalization steps.
+        dt: Size of time step.
+        initial_perturbation:
+            - If np.ndarray: The direction of the initial perturbation.
+            - If None: The direction of the initial perturbation is assumed to be np.ones(..).
+        N_skip: Number of normalization steps to perform, before tracking the log divergence.
+                Avoid transients by using N_skip.
+
+
+    Returns:
+        The largest Lyapunov Exponent.
+    """
+
+    x_dim = starting_point.size
+
+    if initial_perturbation is None:
+        initial_perturbation = np.ones(x_dim)
+
+    initial_perturbation *= deviation_scale/np.linalg.norm(initial_perturbation)
+
+    log_divergence = np.zeros(N)
+
+    x = starting_point
+    x_pert = starting_point + initial_perturbation
+
+    for i_n in range(N + N_skip):
+        for i_t in range(part_time_steps):
+            x = iterator_func(x)
+            x_pert = iterator_func(x_pert)
+        dx = x_pert - x
+        norm_dx = np.linalg.norm(dx)
+        x_pert = x + dx * (deviation_scale/norm_dx)
+        if i_n >= N_skip:
+            log_divergence[i_n-N_skip] = np.log(norm_dx / deviation_scale)
+    return np.cumsum(log_divergence)/(np.arange(1, N+1)*dt*part_time_steps)
+    # return np.average(log_divergence)/(dt*part_time_steps)
