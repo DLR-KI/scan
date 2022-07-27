@@ -67,7 +67,7 @@ class Lorenz63:
     - Correlation dimension: 2.068 +- 0.086
     """
 
-    def __init__(self, sigma: float = 10, rho: float = 28, beta: float = 8 / 3, dt: float = 0.05) -> None:
+    def __init__(self, sigma: float = 10.0, rho: float = 28.0, beta: float = 8 / 3, dt: float = 0.05) -> None:
         """Define the system parameters.
 
         Args:
@@ -258,7 +258,7 @@ class Chen:
     - Correlation dimension: 2.147 +- 0.117
     """
 
-    def __init__(self, a: float = 35, b: float = 3, c: float = 28, dt: float = 0.01) -> None:
+    def __init__(self, a: float = 35.0, b: float = 3.0, c: float = 28.0, dt: float = 0.01) -> None:
         """Define the system parameters.
 
         Args:
@@ -330,7 +330,7 @@ class ChuaCircuit:
     """
 
     def __init__(
-        self, alpha: float = 9, beta: float = 100 / 7, a: float = 8 / 7, b: float = 5 / 7, dt: float = 0.05
+        self, alpha: float = 9.0, beta: float = 100 / 7, a: float = 8 / 7, b: float = 5 / 7, dt: float = 0.05
     ) -> None:
         """Define the system parameters
 
@@ -535,7 +535,7 @@ class Rucklidge:
     - Lyapunov Exponents: (0.1877, 0.0, -3.1893)
     """
 
-    def __init__(self, kappa: float = 2, lam: float = 6.7, dt: float = 0.05) -> None:
+    def __init__(self, kappa: float = 2.0, lam: float = 6.7, dt: float = 0.05) -> None:
         """Define the system parameters.
 
         Args:
@@ -897,7 +897,7 @@ class Logistic:
     - Correlation dimension: 1.0
     """
 
-    def __init__(self, r: float = 4) -> None:
+    def __init__(self, r: float = 4.0) -> None:
         """Define the system parameters.
 
         Args:
@@ -1021,7 +1021,7 @@ class UedaOscillator:
     - Correlation dimension: 2.675 +- 0.132
     """
 
-    def __init__(self, b: float = 0.05, A: float = 7.5, omega: float = 1, dt: float = 0.05) -> None:
+    def __init__(self, b: float = 0.05, A: float = 7.5, omega: float = 1.0, dt: float = 0.05) -> None:
         """Define the system parameters.
 
         Args:
@@ -1091,11 +1091,12 @@ class KuramotoSivashinsky:
 
     """
 
-    def __init__(self, dimensions: int = 50, system_size: float = 36, eps: float = 0, dt: float = 0.1) -> None:
+    def __init__(self, dimensions: int = 50, system_size: float = 36.0, eps: float = 0.0, dt: float = 0.1) -> None:
         """
 
         Args:
-            dimensions: The dimensions of the KS system.
+            dimensions: The dimensions of the KS system. Must be an even number.
+            #TODO: check if dimensions is an even number.
             system_size: The system size of the KS system.
             eps: A parameter in the KS system: y_t = -y*y_x - (1+eps)*y_xx - y_xxxx.
             dt: Size of time steps.
@@ -1169,6 +1170,7 @@ class KuramotoSivashinsky:
 
         """
         if starting_point is None:
+            # TODO: starting point is pretty far from attractor
             # Use the starting point from the Kassam_2005 paper
             x = self.system_size * np.transpose(np.conj(np.arange(1, self.dimensions + 1))) / self.dimensions
             starting_point = np.cos(2 * np.pi * x / self.system_size) * (1 + np.sin(2 * np.pi * x / self.system_size))
@@ -1196,7 +1198,7 @@ class KuramotoSivashinskyCustom:
     def __init__(
         self,
         dimensions: int = 50,
-        system_size: float = 36,
+        system_size: float = 36.0,
         dt: float = 0.01,
         precision: int | None = None,
         fft_type: str | None = None,
@@ -1204,7 +1206,8 @@ class KuramotoSivashinskyCustom:
         """
 
         Args:
-            dimensions: The dimensions of the KS system.
+            dimensions: The dimensions of the KS system. Must be an even number.
+            #TODO: check if dimensions is an even number.
             system_size: The system size of the KS system.
             dt: Size of time steps.
             precision: The numerical precision for the simulation:
@@ -1354,6 +1357,7 @@ class KuramotoSivashinskyCustom:
 
         """
         if starting_point is None:
+            # TODO: starting point is pretty far from attractor
             # Use the starting point from the Kassam_2005 paper
             x = self.system_size * np.transpose(np.conj(np.arange(1, self.dimensions + 1))) / self.dimensions
             starting_point = np.cos(2 * np.pi * x / self.system_size) * (1 + np.sin(2 * np.pi * x / self.system_size))
@@ -1370,13 +1374,15 @@ class KuramotoSivashinskyCustom:
 class Lorenz96:
     """Simulate the n-dimensional dynamical system: Lorenz 96 model."""
 
-    def __init__(self, force: float = 8, dt: float = 0.05) -> None:
+    def __init__(self, dimensions: int = 30, force: float = 8.0, dt: float = 0.05) -> None:
         """Define the system parameters.
 
         Args:
+            dimensions: number of dimensions in Lorenz96 equations.
             force: 'force' parameter in the Lorenz 96 equations.
             dt: Size of time steps.
         """
+        self.dimensions = dimensions
         self.force = force
         self.dt = dt
 
@@ -1433,7 +1439,12 @@ class Lorenz96:
 
         """
         if starting_point is None:
-            starting_point = np.sin(np.arange(30))
+            starting_point = np.sin(np.arange(self.dimensions))
+        else:
+            if starting_point.shape[0] != self.dimensions:
+                raise ValueError(
+                    f"starting_point wrong dimension: Expected {self.dimensions} but got {starting_point.shape[0]}"
+                )
 
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
@@ -1451,7 +1462,8 @@ class LinearSystem:
 
         if A is None:
             self.A = np.array([[-0.0, -1.0], [1.0, 0.0]])
-
+        else:
+            self.A = A
         self.dimension = self.A.shape[0]
         self.dt = dt
 

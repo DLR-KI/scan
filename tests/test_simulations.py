@@ -59,7 +59,7 @@ class TestSimulations(TestScanBase):
         self.set_seed()
         starting_point = lor_force * np.ones(lor_dim) + 1e-2 * np.random.rand(lor_dim)
 
-        sim_data = scan.simulations.Lorenz96(force=lor_force, dt=lor_dt).simulate(
+        sim_data = scan.simulations.Lorenz96(dimensions=lor_dim, force=lor_force, dt=lor_dt).simulate(
             time_steps=simulation_time_steps, starting_point=starting_point
         )
 
@@ -308,6 +308,8 @@ class TestSimulations(TestScanBase):
         sim_data_1 = isntance.simulate(time_steps=simulation_time_steps)
         sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
         assert_array_equal(sim_data_1, sim_data_2)
+
+    # TODO: test linear system with a non-default parameters
 
     def test_simulate_trajectory_henon_default_starting_point_single_step_trivial_test(self):
         sim_data = scan.simulations.Henon().simulate(time_steps=2)
