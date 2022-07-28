@@ -1,5 +1,14 @@
 ## Changelog
 
+### Scan 0.6.1 - Simulating dynamical systems: Enhancements, bugfix and new system
+* Fixed bug in `scan.simulations.LinearSystem` where every non-default matrix `A` would give an error. 
+* Added an abstract base class `scan.simulations.BaseSim` with the method `get_default_parameters()`, to get the default
+parameters specified in the `__init__` of the individual simulation class. 
+  * Example: `Lorenz63().get_default_parameters()` returns `{"sigma": 10.0, "rho": 28.0, "beta": 8 / 3, "dt": 0.05}`
+* Added a new method `get_default_starting_point()` for every simulation class to obtain the default starting point. 
+  * Example: `Lorenz63().get_default_starting_point()` returns `np.array([0.0, -0.01, 9.0])`
+* Added new 2-dimensional autonomous flow `LotkaVolterra` system.
+
 ### Scan 0.6.0 - Simulating dynamical systems: Refactoring and new systems
 * Removed the function `scan.simulations.simulate_trajectory`.
 * Instead of using `simulate_trajectory`, there is now a class for every dynamical system implemented.
