@@ -988,6 +988,77 @@ class DoubleScroll(SimBase):
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
+class LotkaVolterra(SimBase):
+    """Simulate the 2-dimensional autonomous flow: Lotka-Volterra
+
+    """
+
+    def __init__(self, a: float = 2.0, b: float = 0.4, c: float = 3.0, d: float = 0.6,
+                 dt: float = 0.05) -> None:
+        """Define the system parameters.
+
+        Args:
+            a: 'a' parameter in Double Scroll system.
+            dt: Size of time steps.
+        """
+        self.a = a
+        self.b = b
+        self.c = c
+        self.d = d
+        self.dt = dt
+
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        Returns:
+            The default starting point.
+
+        """
+        return np.array([1.0, 1.0])
+
+    def flow(self, x: np.ndarray) -> np.ndarray:
+        """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
+
+        Args:
+            x: (x,y,z) coordinates. Needs to have shape (3,).
+
+        Returns:
+            : (dx/dt, dy/dt, dz/dt) corresponding to input x.
+
+        """
+        return np.array([self.a * x[0] - self.b * x[0] * x[1], - self.c * x[1] + self.d * x[0] * x[1]])
+
+    def iterate(self, x: np.ndarray) -> np.ndarray:
+        """Calculates next timestep (x(i+1), y(i+1)) with given (x(i),y(i)).
+
+        Uses RK4 and time step dt.
+
+        Args:
+            x: (x,y) coordinates. Needs to have shape (2,).
+
+        Returns:
+            : (x(i+1), y(i+1)) corresponding to input x.
+
+        """
+        return _runge_kutta(self.flow, self.dt, x)
+
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
+        """Simulate the LotkaVolterra system trajectory.
+
+        Args:
+            time_steps: Number of time steps t to simulate.
+            starting_point: Starting point of the trajectory of shape (2,). If None, take the
+                            default starting point.
+
+        Returns:
+            Trajectory of shape (t, 2).
+
+        """
+        if starting_point is None:
+            starting_point = self.get_default_starting_point()
+        return _timestep_iterator(self.iterate, time_steps, starting_point)
+
+
 class Henon(SimBase):
     """Simulate the 2-dimensional dissipative map: Henon map.
 

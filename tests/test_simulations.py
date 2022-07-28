@@ -310,6 +310,21 @@ class TestSimulations(TestScanBase):
         sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
         assert_array_equal(sim_data_1, sim_data_2)
 
+    def test_simulate_trajectory_lotka_volterra_default_starting_point_single_step_trivial_test(self):
+        sim_data = scan.simulations.LotkaVolterra().simulate(time_steps=2)
+
+        exp_sim_data = np.array([[1.0, 1.0], [1.08452909181137, 0.88802549930702]])
+
+        assert_array_almost_equal(sim_data, exp_sim_data, decimal=DECIMALS)
+
+    def test_simulate_trajectory_lotka_volterra_simulate_instance_twice(self):
+        simulation_time_steps = 2
+
+        isntance = scan.simulations.LotkaVolterra()
+        sim_data_1 = isntance.simulate(time_steps=simulation_time_steps)
+        sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
+        assert_array_equal(sim_data_1, sim_data_2)
+
     def test_simulate_trajectory_linear_default_starting_point_single_step_trivial_test(self):
         sim_data = scan.simulations.LinearSystem().simulate(time_steps=2)
 
