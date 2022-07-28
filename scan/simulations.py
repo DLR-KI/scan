@@ -989,12 +989,9 @@ class DoubleScroll(SimBase):
 
 
 class LotkaVolterra(SimBase):
-    """Simulate the 2-dimensional autonomous flow: Lotka-Volterra
+    """Simulate the 2-dimensional autonomous flow: Lotka-Volterra"""
 
-    """
-
-    def __init__(self, a: float = 2.0, b: float = 0.4, c: float = 3.0, d: float = 0.6,
-                 dt: float = 0.05) -> None:
+    def __init__(self, a: float = 2.0, b: float = 0.4, c: float = 3.0, d: float = 0.6, dt: float = 0.05) -> None:
         """Define the system parameters.
 
         Args:
@@ -1026,7 +1023,7 @@ class LotkaVolterra(SimBase):
             : (dx/dt, dy/dt, dz/dt) corresponding to input x.
 
         """
-        return np.array([self.a * x[0] - self.b * x[0] * x[1], - self.c * x[1] + self.d * x[0] * x[1]])
+        return np.array([self.a * x[0] - self.b * x[0] * x[1], -self.c * x[1] + self.d * x[0] * x[1]])
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
         """Calculates next timestep (x(i+1), y(i+1)) with given (x(i),y(i)).
@@ -1412,7 +1409,7 @@ class KuramotoSivashinsky(SimBase):
 
         x = self.system_size * np.transpose(np.conj(np.arange(1, self.dimensions + 1))) / self.dimensions
         starting_point = np.cos(2 * np.pi * x / self.system_size) * (1 + np.sin(2 * np.pi * x / self.system_size))
-        return starting_point
+        return np.array(starting_point)
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
         """Calculates next timestep (x_0(i+1),x_1(i+1),..) with given (x_0(i),x_0(i),..) and dt.
@@ -1597,7 +1594,7 @@ class KuramotoSivashinskyCustom(SimBase):
 
         x = self.system_size * np.transpose(np.conj(np.arange(1, self.dimensions + 1))) / self.dimensions
         starting_point = np.cos(2 * np.pi * x / self.system_size) * (1 + np.sin(2 * np.pi * x / self.system_size))
-        return starting_point
+        return np.array(starting_point)
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
         """Calculates next timestep (x_0(i+1),x_1(i+1),..) with given (x_0(i),x_0(i),..) and dt.
