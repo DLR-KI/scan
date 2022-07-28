@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 from typing import Callable
+
 import numpy as np
 
 from scan import utilities
 
 
 def rmse_over_time(
-        pred_time_series: np.ndarray, meas_time_series: np.ndarray,
-        normalization: str | int | float | None = None
+    pred_time_series: np.ndarray, meas_time_series: np.ndarray, normalization: str | int | float | None = None
 ) -> np.ndarray:
     """Calculates the NRMSE over time.
 
@@ -51,14 +51,13 @@ def rmse_over_time(
     nrmse_over_time = np.empty(shape=(meas.shape[0]))
 
     for i in range(0, meas.shape[0]):
-        nrmse_over_time[i] = rmse(pred[i: i + 1], meas[i: i + 1], normalization)
+        nrmse_over_time[i] = rmse(pred[i : i + 1], meas[i : i + 1], normalization)
 
     return nrmse_over_time
 
 
 def rmse(
-        pred_time_series: np.ndarray, meas_time_series: np.ndarray,
-        normalization: str | int | float | None = None
+    pred_time_series: np.ndarray, meas_time_series: np.ndarray, normalization: str | int | float | None = None
 ) -> np.ndarray:
     """Calculates the root mean squared error between two time series.
 
@@ -120,15 +119,15 @@ def rmse(
 
 
 def largest_lyapunov_exponent(
-        iterator_func: Callable[[np.ndarray], np.ndarray],
-        starting_point: np.ndarray,
-        deviation_scale: float = 1e-10,
-        steps: int = int(1e4),
-        part_time_steps: int = 20,
-        steps_skip: int = 50,
-        dt: float = 1.0,
-        initial_pert_direction: np.ndarray | None = None,
-        return_convergence: bool = False,
+    iterator_func: Callable[[np.ndarray], np.ndarray],
+    starting_point: np.ndarray,
+    deviation_scale: float = 1e-10,
+    steps: int = int(1e4),
+    part_time_steps: int = 20,
+    steps_skip: int = 50,
+    dt: float = 1.0,
+    initial_pert_direction: np.ndarray | None = None,
+    return_convergence: bool = False,
 ) -> float | np.ndarray:
     """Numerically calculate the largest lyapunov exponent given an iterator function.
 
@@ -178,6 +177,6 @@ def largest_lyapunov_exponent(
             log_divergence[i_n - steps_skip] = np.log(norm_dx / deviation_scale)
 
     if return_convergence:
-        return np.cumsum(log_divergence) / (np.arange(1, steps + 1) * dt * part_time_steps)
+        return np.array(np.cumsum(log_divergence) / (np.arange(1, steps + 1) * dt * part_time_steps))
     else:
-        return np.average(log_divergence) / (dt * part_time_steps)
+        return float(np.average(log_divergence) / (dt * part_time_steps))

@@ -344,5 +344,10 @@ class TestLyapunovExponentCalculation(unittest.TestCase):
             part_time_steps=part_time_steps,
             dt=dt,
         )
-        desired = np.array([a, ]*steps)
+        desired = np.array(
+            [
+                a,
+            ]
+            * steps
+        )
         assert_array_almost_equal(actual, desired, 2)
