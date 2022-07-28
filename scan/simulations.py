@@ -7,7 +7,11 @@ trajectory = SystemClass(parameters=<default>).simulate(time_steps, starting_poi
 
 from __future__ import annotations
 
-from typing import Callable
+from typing import Callable, Any
+
+import inspect
+
+from abc import ABC, abstractmethod
 
 import numpy as np
 
@@ -55,8 +59,30 @@ def _timestep_iterator(
         traj[t] = f(traj[t - 1])
     return traj
 
+# TODO: Add SimBase with a function to return the default parameters (and default starting point?).
+# TODO: Add a "set_starting_point" method for all classes to create
 
-class Lorenz63:
+class SimBase(ABC):
+    """A base class for all the simulation classes.
+
+    """
+    @abstractmethod
+    def get_default_starting_point(self):
+        raise NotImplementedError("Must override get_default_starting_point")
+
+    def get_default_parameters(self) -> dict[str, Any]:
+        """ Get all default parameters used in __init__ as a dictionary.
+
+        Returns:
+            A dictionary including all the default system_parameters.
+
+        """
+        fullargspec = inspect.getfullargspec(self.__init__)
+        system_parameters = {x: y for x, y in zip(fullargspec[0][1:], fullargspec[3])}
+        return system_parameters
+
+
+class Lorenz63(SimBase):
     """Simulate the 3-dimensional autonomous flow: Lorenz-63 attractor.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -80,6 +106,15 @@ class Lorenz63:
         self.rho = rho
         self.beta = beta
         self.dt = dt
+
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        Returns:
+            The default starting point.
+
+        """
+        return np.array([0.0, -0.01, 9.0])
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -107,21 +142,24 @@ class Lorenz63:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([0.0, -0.01, 9.0])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
         """Simulate Lorenz63 trajectory.
 
         Args:
             time_steps: Number of time steps t to simulate.
-            starting_point: Starting point of the trajectory of shape (3,).
+            starting_point: Starting point of the trajectory of shape (3,). If None, take the
+                            default starting point.
 
         Returns:
             Trajectory of shape (t, 3).
 
         """
+        if starting_point is None:
+            starting_point = self.get_default_starting_point()
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class Roessler:
+class Roessler(SimBase):
     """Simulate the 3-dimensional autonomous flow: Roessler attractor.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -145,6 +183,15 @@ class Roessler:
         self.b = b
         self.c = c
         self.dt = dt
+
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        Returns:
+            The default starting point.
+
+        """
+        return np.array([-9.0, 0.0, 0.0])
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -172,21 +219,24 @@ class Roessler:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([-9.0, 0.0, 0.0])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
         """Simulate Roessler trajectory.
 
         Args:
             time_steps: Number of time steps t to simulate.
-            starting_point: Starting point of the trajectory of shape (3,).
+            starting_point: Starting point of the trajectory of shape (3,). If None, take the
+                default starting point.
 
         Returns:
             Trajectory of shape (t, 3).
 
         """
+        if starting_point is None:
+            starting_point = self.get_default_starting_point()
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class ComplexButterly:
+class ComplexButterly(SimBase):
     """Simulate the 3-dimensional autonomous flow: Complex butterfly.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -206,6 +256,15 @@ class ComplexButterly:
         """
         self.a = a
         self.dt = dt
+
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        Returns:
+            The default starting point.
+
+        """
+        return np.array([0.2, 0.0, 0.0])
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -233,21 +292,24 @@ class ComplexButterly:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([0.2, 0.0, 0.0])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
         """Simulate Complex butterfly trajectory.
 
         Args:
             time_steps: Number of time steps t to simulate.
-            starting_point: Starting point of the trajectory of shape (3,).
+            starting_point: Starting point of the trajectory of shape (3,). If None, take the
+                            default starting point.
 
         Returns:
             Trajectory of shape (t, 3).
 
         """
+        if starting_point is None:
+            starting_point = self.get_default_starting_point()
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class Chen:
+class Chen(SimBase):
     """Simulate the 3-dimensional autonomous flow: Chen's system.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -271,6 +333,15 @@ class Chen:
         self.b = b
         self.c = c
         self.dt = dt
+
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        Returns:
+            The default starting point.
+
+        """
+        return np.array([-10.0, 0.0, 37.0])
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -304,21 +375,24 @@ class Chen:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([-10.0, 0.0, 37.0])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
         """Simulate Chen's system trajectory.
 
         Args:
             time_steps: Number of time steps t to simulate.
-            starting_point: Starting point of the trajectory of shape (3,).
+            starting_point: Starting point of the trajectory of shape (3,). If None, take the
+                            default starting point.
 
         Returns:
             Trajectory of shape (t, 3).
 
         """
+        if starting_point is None:
+            starting_point = self.get_default_starting_point()
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class ChuaCircuit:
+class ChuaCircuit(SimBase):
     """Simulate the 3-dimensional autonomous flow: Chua's circuit.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -394,7 +468,7 @@ class ChuaCircuit:
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class Thomas:
+class Thomas(SimBase):
     """Simulate the 3-dimensional autonomous flow: Thomas' cyclically symmetric attractor.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -455,7 +529,7 @@ class Thomas:
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class WindmiAttractor:
+class WindmiAttractor(SimBase):
     """Simulate the 3-dimensional autonomous flow: WINDMI attractor.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -518,7 +592,7 @@ class WindmiAttractor:
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class Rucklidge:
+class Rucklidge(SimBase):
     """Simulate the 3-dimensional autonomous flow: Rucklidge attractor.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -586,7 +660,7 @@ class Rucklidge:
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class SimplestQuadraticChaotic:
+class SimplestQuadraticChaotic(SimBase):
     """Simulate the 3-dimensional autonomous flow: Simplest Quadratic Chaotic flow.
 
     See: Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -650,7 +724,7 @@ class SimplestQuadraticChaotic:
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class SimplestCubicChaotic:
+class SimplestCubicChaotic(SimBase):
     """Simulate the 3-dimensional autonomous flow: Simplest Cubic Chaotic flow.
 
     See: Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -714,7 +788,7 @@ class SimplestCubicChaotic:
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class SimplestPiecewiseLinearChaotic:
+class SimplestPiecewiseLinearChaotic(SimBase):
     """Simulate the 3-dimensional autonomous flow: Simplest Piecewise Linear Chaotic flow.
 
     See: Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -778,7 +852,7 @@ class SimplestPiecewiseLinearChaotic:
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class DoubleScroll:
+class DoubleScroll(SimBase):
     """Simulate the 3-dimensional autonomous flow: Double Scroll system
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -839,7 +913,7 @@ class DoubleScroll:
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class Henon:
+class Henon(SimBase):
     """Simulate the 2-dimensional dissipative map: Henon map.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -886,7 +960,7 @@ class Henon:
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class Logistic:
+class Logistic(SimBase):
     """Simulate the 1-dimensional noninvertable map: Logistic map.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -943,7 +1017,7 @@ class Logistic:
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class SimplestDrivenChaotic:
+class SimplestDrivenChaotic(SimBase):
     """Simulate the 2+1 dim (2 space, 1 time) conservative flow: Simplest Driven Chaotic flow.
 
     See: Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -1010,7 +1084,7 @@ class SimplestDrivenChaotic:
         return _timestep_iterator(self.iterate, time_steps, starting_point)[:, :-1]
 
 
-class UedaOscillator:
+class UedaOscillator(SimBase):
     """Simulate the 2+1 dim (2 space, 1 time) driven dissipative flow: Ueda oscillator.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -1078,7 +1152,7 @@ class UedaOscillator:
         return _timestep_iterator(self.iterate, time_steps, starting_point)[:, :-1]
 
 
-class KuramotoSivashinsky:
+class KuramotoSivashinsky(SimBase):
     """Simulate the n-dimensional Kuramoto-Sivashinsky PDE.
 
     PDE: y_t = -y*y_x - (1+eps)*y_xx - y_xxxx.
@@ -1183,7 +1257,7 @@ class KuramotoSivashinsky:
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class KuramotoSivashinskyCustom:
+class KuramotoSivashinskyCustom(SimBase):
     """Simulate the n-dimensional Kuramoto-Sivashinsky PDE with custom precision and fft backend.
     PDE: y_t = -y*y_x - y_xx - y_xxxx.
 
@@ -1371,7 +1445,7 @@ class KuramotoSivashinskyCustom:
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class Lorenz96:
+class Lorenz96(SimBase):
     """Simulate the n-dimensional dynamical system: Lorenz 96 model."""
 
     def __init__(self, dimensions: int = 30, force: float = 8.0, dt: float = 0.05) -> None:
@@ -1449,7 +1523,7 @@ class Lorenz96:
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class LinearSystem:
+class LinearSystem(SimBase):
     """Simulate a generic n-dimensional linear dynamical system x_t = A*x"""
 
     def __init__(self, A: np.ndarray | None = None, dt: float = 0.1) -> None:
