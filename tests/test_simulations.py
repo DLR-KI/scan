@@ -18,6 +18,11 @@ DECIMALS = 14
 # Use print(np.array_repr(np_array, max_line_width=120, precision=18)) in the debugger to easily get the copy-pastable
 # representation of a numpy array.
 class TestSimulations(TestScanBase):
+    def test_simulate_lorenz63_get_default_parameters(self):
+        actual = scan.simulations.Lorenz63().get_default_parameters()
+        desired = {"sigma": 10.0, "rho": 28.0, "beta": 8 / 3, "dt": 0.05}
+        unittest.TestCase().assertDictEqual(desired, actual)
+
     def test_simulate_trajectory_lorenz63_single_step_trivial_test(self):
         simulation_time_steps = 2
         starting_point = np.array([-14.03020521, -20.88693127, 25.53545])
@@ -126,6 +131,17 @@ class TestSimulations(TestScanBase):
         sim_data_1 = isntance.simulate(time_steps=simulation_time_steps)
         sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
         assert_array_equal(sim_data_1, sim_data_2)
+
+    def test_lorenz96_dimension_missmatch(self):
+        dimensions = 10
+        time_steps = 2
+        starting_point = np.ones(11)
+
+        with pytest.raises(ValueError):
+
+            scan.simulations.Lorenz96(
+                dimensions=dimensions,
+            ).simulate(time_steps=time_steps, starting_point=starting_point)
 
     def test_simulate_trajectory_roessler_default_starting_point_single_step_trivial_test(self):
         sim_data = scan.simulations.Roessler().simulate(time_steps=2)
@@ -294,6 +310,21 @@ class TestSimulations(TestScanBase):
         sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
         assert_array_equal(sim_data_1, sim_data_2)
 
+    def test_simulate_trajectory_lotka_volterra_default_starting_point_single_step_trivial_test(self):
+        sim_data = scan.simulations.LotkaVolterra().simulate(time_steps=2)
+
+        exp_sim_data = np.array([[1.0, 1.0], [1.08452909181137, 0.88802549930702]])
+
+        assert_array_almost_equal(sim_data, exp_sim_data, decimal=DECIMALS)
+
+    def test_simulate_trajectory_lotka_volterra_simulate_instance_twice(self):
+        simulation_time_steps = 2
+
+        isntance = scan.simulations.LotkaVolterra()
+        sim_data_1 = isntance.simulate(time_steps=simulation_time_steps)
+        sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
+        assert_array_equal(sim_data_1, sim_data_2)
+
     def test_simulate_trajectory_linear_default_starting_point_single_step_trivial_test(self):
         sim_data = scan.simulations.LinearSystem().simulate(time_steps=2)
 
@@ -309,7 +340,16 @@ class TestSimulations(TestScanBase):
         sim_data_2 = isntance.simulate(time_steps=simulation_time_steps)
         assert_array_equal(sim_data_1, sim_data_2)
 
-    # TODO: test linear system with a non-default parameters
+    def test_linear_dimension_missmatch(self):
+
+        A = np.ones((10, 10))
+        time_steps = 2
+        starting_point = np.ones(11)
+
+        with pytest.raises(ValueError):
+            scan.simulations.LinearSystem(
+                A=A,
+            ).simulate(time_steps=time_steps, starting_point=starting_point)
 
     def test_simulate_trajectory_henon_default_starting_point_single_step_trivial_test(self):
         sim_data = scan.simulations.Henon().simulate(time_steps=2)
@@ -353,7 +393,7 @@ class TestSimulations(TestScanBase):
     def test_simulate_trajectory_simple_driven_chaotic_default_starting_point_single_step_trivial_test(self):
         sim_data = scan.simulations.SimplestDrivenChaotic().simulate(time_steps=2)
 
-        exp_sim_data = np.array([[0.0, 0.0], [0.00031287210159712276, 0.009372350531852047]])
+        exp_sim_data = np.array([[0.0, 0.0, 0.0], [0.00031287210159712276, 0.009372350531852047, 0.1]])
 
         assert_array_almost_equal(sim_data, exp_sim_data, decimal=DECIMALS)
 
@@ -368,7 +408,7 @@ class TestSimulations(TestScanBase):
     def test_simulate_trajectory_ueda_default_starting_point_single_step_trivial_test(self):
         sim_data = scan.simulations.UedaOscillator().simulate(time_steps=2)
 
-        exp_sim_data = np.array([[2.5, 0.0], [2.4807171482576695, -0.7648847867534123]])
+        exp_sim_data = np.array([[2.5, 0.0, 0.0], [2.4807171482576695, -0.7648847867534123, 0.05]])
 
         assert_array_almost_equal(sim_data, exp_sim_data, decimal=DECIMALS)
 
@@ -508,6 +548,16 @@ class TestSimulations(TestScanBase):
             scan.simulations.KuramotoSivashinskyCustom(
                 dimensions=dimensions,
             ).simulate(time_steps=time_steps, starting_point=starting_point)
+
+    def test_kuramoto_sivashinski_odd_dimension_error(self):
+        dimension = 3
+        with pytest.raises(ValueError):
+            scan.simulations.KuramotoSivashinsky(dimensions=dimension)
+
+    def test_kuramoto_sivashinski_custom_odd_dimension_error(self):
+        dimension = 3
+        with pytest.raises(ValueError):
+            scan.simulations.KuramotoSivashinskyCustom(dimensions=dimension)
 
     def test_kuramoto_sivashinski_custom_40d_22l_05t_unknown_precision(self):
         dimensions = 40

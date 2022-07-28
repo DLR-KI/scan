@@ -7,7 +7,9 @@ trajectory = SystemClass(parameters=<default>).simulate(time_steps, starting_poi
 
 from __future__ import annotations
 
-from typing import Callable
+import inspect
+from abc import ABC, abstractmethod
+from typing import Any, Callable
 
 import numpy as np
 
@@ -56,7 +58,22 @@ def _timestep_iterator(
     return traj
 
 
-class Lorenz63:
+class SimBase(ABC):
+    """A base class for all the simulation classes."""
+
+    def get_default_parameters(self) -> dict[str, Any]:
+        """Get all default parameters used in __init__ as a dictionary.
+
+        Returns:
+            A dictionary including all the default system_parameters.
+
+        """
+        fullargspec = inspect.getfullargspec(self.__init__)
+        system_parameters = {x: y for x, y in zip(fullargspec[0][1:], fullargspec[3])}
+        return system_parameters
+
+
+class Lorenz63(SimBase):
     """Simulate the 3-dimensional autonomous flow: Lorenz-63 attractor.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -80,6 +97,15 @@ class Lorenz63:
         self.rho = rho
         self.beta = beta
         self.dt = dt
+
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        Returns:
+            The default starting point.
+
+        """
+        return np.array([0.0, -0.01, 9.0])
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -107,21 +133,24 @@ class Lorenz63:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([0.0, -0.01, 9.0])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
         """Simulate Lorenz63 trajectory.
 
         Args:
             time_steps: Number of time steps t to simulate.
-            starting_point: Starting point of the trajectory of shape (3,).
+            starting_point: Starting point of the trajectory of shape (3,). If None, take the
+                            default starting point.
 
         Returns:
             Trajectory of shape (t, 3).
 
         """
+        if starting_point is None:
+            starting_point = self.get_default_starting_point()
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class Roessler:
+class Roessler(SimBase):
     """Simulate the 3-dimensional autonomous flow: Roessler attractor.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -145,6 +174,15 @@ class Roessler:
         self.b = b
         self.c = c
         self.dt = dt
+
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        Returns:
+            The default starting point.
+
+        """
+        return np.array([-9.0, 0.0, 0.0])
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -172,21 +210,24 @@ class Roessler:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([-9.0, 0.0, 0.0])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
         """Simulate Roessler trajectory.
 
         Args:
             time_steps: Number of time steps t to simulate.
-            starting_point: Starting point of the trajectory of shape (3,).
+            starting_point: Starting point of the trajectory of shape (3,). If None, take the
+                default starting point.
 
         Returns:
             Trajectory of shape (t, 3).
 
         """
+        if starting_point is None:
+            starting_point = self.get_default_starting_point()
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class ComplexButterly:
+class ComplexButterly(SimBase):
     """Simulate the 3-dimensional autonomous flow: Complex butterfly.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -206,6 +247,15 @@ class ComplexButterly:
         """
         self.a = a
         self.dt = dt
+
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        Returns:
+            The default starting point.
+
+        """
+        return np.array([0.2, 0.0, 0.0])
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -233,21 +283,24 @@ class ComplexButterly:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([0.2, 0.0, 0.0])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
         """Simulate Complex butterfly trajectory.
 
         Args:
             time_steps: Number of time steps t to simulate.
-            starting_point: Starting point of the trajectory of shape (3,).
+            starting_point: Starting point of the trajectory of shape (3,). If None, take the
+                            default starting point.
 
         Returns:
             Trajectory of shape (t, 3).
 
         """
+        if starting_point is None:
+            starting_point = self.get_default_starting_point()
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class Chen:
+class Chen(SimBase):
     """Simulate the 3-dimensional autonomous flow: Chen's system.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -271,6 +324,15 @@ class Chen:
         self.b = b
         self.c = c
         self.dt = dt
+
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        Returns:
+            The default starting point.
+
+        """
+        return np.array([-10.0, 0.0, 37.0])
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -304,21 +366,24 @@ class Chen:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([-10.0, 0.0, 37.0])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
         """Simulate Chen's system trajectory.
 
         Args:
             time_steps: Number of time steps t to simulate.
-            starting_point: Starting point of the trajectory of shape (3,).
+            starting_point: Starting point of the trajectory of shape (3,). If None, take the
+                            default starting point.
 
         Returns:
             Trajectory of shape (t, 3).
 
         """
+        if starting_point is None:
+            starting_point = self.get_default_starting_point()
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class ChuaCircuit:
+class ChuaCircuit(SimBase):
     """Simulate the 3-dimensional autonomous flow: Chua's circuit.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -394,7 +459,7 @@ class ChuaCircuit:
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class Thomas:
+class Thomas(SimBase):
     """Simulate the 3-dimensional autonomous flow: Thomas' cyclically symmetric attractor.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -414,6 +479,15 @@ class Thomas:
         """
         self.b = b
         self.dt = dt
+
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        Returns:
+            The default starting point.
+
+        """
+        return np.array([0.1, 0.0, 0.0])
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -441,21 +515,24 @@ class Thomas:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([0.1, 0.0, 0.0])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
         """Simulate Thomas' cyclically symmetric attractor trajectory.
 
         Args:
             time_steps: Number of time steps t to simulate.
-            starting_point: Starting point of the trajectory of shape (3,).
+            starting_point: Starting point of the trajectory of shape (3,). If None, take the
+                            default starting point.
 
         Returns:
             Trajectory of shape (t, 3).
 
         """
+        if starting_point is None:
+            starting_point = self.get_default_starting_point()
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class WindmiAttractor:
+class WindmiAttractor(SimBase):
     """Simulate the 3-dimensional autonomous flow: WINDMI attractor.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -477,6 +554,15 @@ class WindmiAttractor:
         self.a = a
         self.b = b
         self.dt = dt
+
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        Returns:
+            The default starting point.
+
+        """
+        return np.array([0.0, 0.8, 0.0])
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -504,21 +590,24 @@ class WindmiAttractor:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([0.0, 0.8, 0.0])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
         """Simulate the WINDMI attractor trajectory.
 
         Args:
             time_steps: Number of time steps t to simulate.
-            starting_point: Starting point of the trajectory of shape (3,).
+            starting_point: Starting point of the trajectory of shape (3,). If None, take the
+                            default starting point.
 
         Returns:
             Trajectory of shape (t, 3).
 
         """
+        if starting_point is None:
+            starting_point = self.get_default_starting_point()
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class Rucklidge:
+class Rucklidge(SimBase):
     """Simulate the 3-dimensional autonomous flow: Rucklidge attractor.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -546,6 +635,15 @@ class Rucklidge:
         self.lam = lam
         self.dt = dt
 
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        Returns:
+            The default starting point.
+
+        """
+        return np.array([1.0, 0.0, 4.5])
+
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
 
@@ -572,21 +670,24 @@ class Rucklidge:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([1.0, 0.0, 4.5])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
         """Simulate the Rucklidge attractor trajectory.
 
         Args:
             time_steps: Number of time steps t to simulate.
-            starting_point: Starting point of the trajectory of shape (3,).
+            starting_point: Starting point of the trajectory of shape (3,). If None, take the
+                            default starting point.
 
         Returns:
             Trajectory of shape (t, 3).
 
         """
+        if starting_point is None:
+            starting_point = self.get_default_starting_point()
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class SimplestQuadraticChaotic:
+class SimplestQuadraticChaotic(SimBase):
     """Simulate the 3-dimensional autonomous flow: Simplest Quadratic Chaotic flow.
 
     See: Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -609,6 +710,15 @@ class SimplestQuadraticChaotic:
         """
         self.a = a
         self.dt = dt
+
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        Returns:
+            The default starting point.
+
+        """
+        return np.array([-0.9, 0.0, 0.5])
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -636,21 +746,24 @@ class SimplestQuadraticChaotic:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([-0.9, 0.0, 0.5])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
         """Simulate the Simplest Quadratic Chaotic flow trajectory.
 
         Args:
             time_steps: Number of time steps t to simulate.
-            starting_point: Starting point of the trajectory of shape (3,).
+            starting_point: Starting point of the trajectory of shape (3,). If None, take the
+                            default starting point.
 
         Returns:
             Trajectory of shape (t, 3).
 
         """
+        if starting_point is None:
+            starting_point = self.get_default_starting_point()
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class SimplestCubicChaotic:
+class SimplestCubicChaotic(SimBase):
     """Simulate the 3-dimensional autonomous flow: Simplest Cubic Chaotic flow.
 
     See: Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -673,6 +786,15 @@ class SimplestCubicChaotic:
         """
         self.a = a
         self.dt = dt
+
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        Returns:
+            The default starting point.
+
+        """
+        return np.array([0.0, 0.96, 0.0])
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -700,21 +822,24 @@ class SimplestCubicChaotic:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([0.0, 0.96, 0.0])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
         """Simulate the Simplest Cubic Chaotic flow trajectory.
 
         Args:
             time_steps: Number of time steps t to simulate.
-            starting_point: Starting point of the trajectory of shape (3,).
+            starting_point: Starting point of the trajectory of shape (3,). If None, take the
+                            default starting point.
 
         Returns:
             Trajectory of shape (t, 3).
 
         """
+        if starting_point is None:
+            starting_point = self.get_default_starting_point()
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class SimplestPiecewiseLinearChaotic:
+class SimplestPiecewiseLinearChaotic(SimBase):
     """Simulate the 3-dimensional autonomous flow: Simplest Piecewise Linear Chaotic flow.
 
     See: Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -737,6 +862,15 @@ class SimplestPiecewiseLinearChaotic:
         """
         self.a = a
         self.dt = dt
+
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        Returns:
+            The default starting point.
+
+        """
+        return np.array([0.0, -0.7, 0.0])
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -764,21 +898,24 @@ class SimplestPiecewiseLinearChaotic:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([0.0, -0.7, 0.0])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
         """Simulate the Simplest Piecewise Linear Chaotic flow trajectory.
 
         Args:
             time_steps: Number of time steps t to simulate.
-            starting_point: Starting point of the trajectory of shape (3,).
+            starting_point: Starting point of the trajectory of shape (3,). If None, take the
+                            default starting point.
 
         Returns:
             Trajectory of shape (t, 3).
 
         """
+        if starting_point is None:
+            starting_point = self.get_default_starting_point()
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class DoubleScroll:
+class DoubleScroll(SimBase):
     """Simulate the 3-dimensional autonomous flow: Double Scroll system
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -798,6 +935,15 @@ class DoubleScroll:
         """
         self.a = a
         self.dt = dt
+
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        Returns:
+            The default starting point.
+
+        """
+        return np.array([0.01, 0.01, 0.0])
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -825,21 +971,95 @@ class DoubleScroll:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([0.01, 0.01, 0.0])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
         """Simulate the Double Scroll system trajectory.
 
         Args:
             time_steps: Number of time steps t to simulate.
-            starting_point: Starting point of the trajectory of shape (3,).
+            starting_point: Starting point of the trajectory of shape (3,). If None, take the
+                            default starting point.
 
         Returns:
             Trajectory of shape (t, 3).
 
         """
+        if starting_point is None:
+            starting_point = self.get_default_starting_point()
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class Henon:
+class LotkaVolterra(SimBase):
+    """Simulate the 2-dimensional autonomous flow: Lotka-Volterra
+
+    """
+
+    def __init__(self, a: float = 2.0, b: float = 0.4, c: float = 3.0, d: float = 0.6,
+                 dt: float = 0.05) -> None:
+        """Define the system parameters.
+
+        Args:
+            a: 'a' parameter in Double Scroll system.
+            dt: Size of time steps.
+        """
+        self.a = a
+        self.b = b
+        self.c = c
+        self.d = d
+        self.dt = dt
+
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        Returns:
+            The default starting point.
+
+        """
+        return np.array([1.0, 1.0])
+
+    def flow(self, x: np.ndarray) -> np.ndarray:
+        """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
+
+        Args:
+            x: (x,y,z) coordinates. Needs to have shape (3,).
+
+        Returns:
+            : (dx/dt, dy/dt, dz/dt) corresponding to input x.
+
+        """
+        return np.array([self.a * x[0] - self.b * x[0] * x[1], - self.c * x[1] + self.d * x[0] * x[1]])
+
+    def iterate(self, x: np.ndarray) -> np.ndarray:
+        """Calculates next timestep (x(i+1), y(i+1)) with given (x(i),y(i)).
+
+        Uses RK4 and time step dt.
+
+        Args:
+            x: (x,y) coordinates. Needs to have shape (2,).
+
+        Returns:
+            : (x(i+1), y(i+1)) corresponding to input x.
+
+        """
+        return _runge_kutta(self.flow, self.dt, x)
+
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
+        """Simulate the LotkaVolterra system trajectory.
+
+        Args:
+            time_steps: Number of time steps t to simulate.
+            starting_point: Starting point of the trajectory of shape (2,). If None, take the
+                            default starting point.
+
+        Returns:
+            Trajectory of shape (t, 2).
+
+        """
+        if starting_point is None:
+            starting_point = self.get_default_starting_point()
+        return _timestep_iterator(self.iterate, time_steps, starting_point)
+
+
+class Henon(SimBase):
     """Simulate the 2-dimensional dissipative map: Henon map.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -860,6 +1080,15 @@ class Henon:
         self.a = a
         self.b = b
 
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        Returns:
+            The default starting point.
+
+        """
+        return np.array([0.0, 0.9])
+
     def iterate(self, x: np.ndarray) -> np.ndarray:
         """Calculates next timestep (x(i+1), y(i+1)) with given (x(i),y(i)).
 
@@ -872,21 +1101,24 @@ class Henon:
         """
         return np.array([1 - self.a * x[0] ** 2 + self.b * x[1], x[0]])
 
-    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([0.0, 0.9])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
         """Simulate Henon trajectory.
 
         Args:
             time_steps: Number of time steps t to simulate.
-            starting_point: Starting point of the trajectory of shape (2,).
+            starting_point: Starting point of the trajectory of shape (2,). If None, take the
+                            default starting point.
 
         Returns:
-            Trajectory of shape (t, 2).
+            Trajectory of shape (t, 3).
 
         """
+        if starting_point is None:
+            starting_point = self.get_default_starting_point()
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class Logistic:
+class Logistic(SimBase):
     """Simulate the 1-dimensional noninvertable map: Logistic map.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -905,6 +1137,15 @@ class Logistic:
         """
         self.r = r
 
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        Returns:
+            The default starting point.
+
+        """
+        return np.array([0.1])
+
     def iterate(self, x: np.ndarray) -> np.ndarray:
         """Calculates next timestep (x(i+1), ) with given (x(i), ).
 
@@ -921,30 +1162,28 @@ class Logistic:
             ]
         )
 
-    def simulate(
-        self,
-        time_steps: int,
-        starting_point: np.ndarray = np.array(
-            [
-                0.1,
-            ]
-        ),
-    ) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
         """Simulate Lorenz63 trajectory.
 
         Args:
             time_steps: Number of time steps t to simulate.
-            starting_point: Starting point of the trajectory of shape (1,).
+            starting_point: Starting point of the trajectory of shape (1,). If None, take the
+                            default starting point.
 
         Returns:
-            Trajectory of shape (t, 1).
+            Trajectory of shape (t, 3).
 
         """
+        if starting_point is None:
+            starting_point = self.get_default_starting_point()
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class SimplestDrivenChaotic:
+class SimplestDrivenChaotic(SimBase):
     """Simulate the 2+1 dim (2 space, 1 time) conservative flow: Simplest Driven Chaotic flow.
+
+    Note: The third dimension is the linear increasing time dimension. Remove that dimension before
+          plotting the trajectory.
 
     See: Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
     analysis. Vol. 69. Oxford: Oxford university press, 2003.
@@ -966,6 +1205,15 @@ class SimplestDrivenChaotic:
         """
         self.omega = omega
         self.dt = dt
+
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        Returns:
+            The default starting point.
+
+        """
+        return np.array([0.0, 0.0, 0.0])
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dt/dt) with given (x,y,t) for RK4.
@@ -994,24 +1242,28 @@ class SimplestDrivenChaotic:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([0.0, 0.0])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
         """Simulate Simplest Driven Chaotic flow trajectory.
 
         Args:
             time_steps: Number of time steps t to simulate.
-            starting_point: Starting point of the trajectory of shape (2,) (time dimension
-            excluded).
+            starting_point: Starting point of the trajectory of shape (3,). If None, take the
+                            default starting point.
 
         Returns:
-            Trajectory of shape (t, 2).
+            Trajectory of shape (t, 3).
 
         """
-        starting_point = np.hstack((starting_point, 0.0))
-        return _timestep_iterator(self.iterate, time_steps, starting_point)[:, :-1]
+        if starting_point is None:
+            starting_point = self.get_default_starting_point()
+        return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class UedaOscillator:
+class UedaOscillator(SimBase):
     """Simulate the 2+1 dim (2 space, 1 time) driven dissipative flow: Ueda oscillator.
+
+    Note: The third dimension is the linear increasing time dimension. Remove that dimension before
+          plotting the trajectory.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
     analysis. Vol. 69. Oxford: Oxford university press, 2003.) for default parameters and
@@ -1034,6 +1286,15 @@ class UedaOscillator:
         self.A = A
         self.omega = omega
         self.dt = dt
+
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        Returns:
+            The default starting point.
+
+        """
+        return np.array([2.5, 0.0, 0.0])
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dt/dt) with given (x,y,t) for RK4.
@@ -1062,24 +1323,27 @@ class UedaOscillator:
         """
         return _runge_kutta(self.flow, self.dt, x)
 
-    def simulate(self, time_steps: int, starting_point: np.ndarray = np.array([2.5, 0.0])) -> np.ndarray:
+    def simulate(self, time_steps: int, starting_point: np.ndarray | None = None) -> np.ndarray:
         """Simulate Ueda oscillator trajectory.
 
         Args:
             time_steps: Number of time steps t to simulate.
-            starting_point: Starting point of the trajectory of shape (2,) (time dimension
-            excluded).
+            starting_point: Starting point of the trajectory of shape (3,). If None, take the
+                            default starting point.
 
         Returns:
-            Trajectory of shape (t, 2).
+            Trajectory of shape (t, 3).
 
         """
-        starting_point = np.hstack((starting_point, 0.0))
-        return _timestep_iterator(self.iterate, time_steps, starting_point)[:, :-1]
+        if starting_point is None:
+            starting_point = self.get_default_starting_point()
+        return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class KuramotoSivashinsky:
+class KuramotoSivashinsky(SimBase):
     """Simulate the n-dimensional Kuramoto-Sivashinsky PDE.
+
+    Note: dimension must be an even number.
 
     PDE: y_t = -y*y_x - (1+eps)*y_xx - y_xxxx.
 
@@ -1096,11 +1360,12 @@ class KuramotoSivashinsky:
 
         Args:
             dimensions: The dimensions of the KS system. Must be an even number.
-            #TODO: check if dimensions is an even number.
             system_size: The system size of the KS system.
             eps: A parameter in the KS system: y_t = -y*y_x - (1+eps)*y_xx - y_xxxx.
             dt: Size of time steps.
         """
+        if dimensions % 2 != 0:  # check if even number.
+            raise ValueError("Parameter dimension must be an even number.")
         self.dimensions = dimensions
         self.system_size = system_size
         self.eps = eps
@@ -1136,6 +1401,19 @@ class KuramotoSivashinsky:
 
         self.g = -0.5j * k
 
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        The starting point is from Kassam_2005 paper.
+        Returns:
+            The default starting point.
+
+        """
+
+        x = self.system_size * np.transpose(np.conj(np.arange(1, self.dimensions + 1))) / self.dimensions
+        starting_point = np.cos(2 * np.pi * x / self.system_size) * (1 + np.sin(2 * np.pi * x / self.system_size))
+        return starting_point
+
     def iterate(self, x: np.ndarray) -> np.ndarray:
         """Calculates next timestep (x_0(i+1),x_1(i+1),..) with given (x_0(i),x_0(i),..) and dt.
 
@@ -1163,17 +1441,15 @@ class KuramotoSivashinsky:
 
         Args:
             time_steps: Number of time steps t to simulate.
-            starting_point: Starting point of the trajectory of shape (self.dimensions,).
+            starting_point: Starting point of the trajectory of shape (self.dimensions,). If None,
+                            take the default starting point.
 
         Returns:
             Trajectory of shape (t, self.dimensions).
 
         """
         if starting_point is None:
-            # TODO: starting point is pretty far from attractor
-            # Use the starting point from the Kassam_2005 paper
-            x = self.system_size * np.transpose(np.conj(np.arange(1, self.dimensions + 1))) / self.dimensions
-            starting_point = np.cos(2 * np.pi * x / self.system_size) * (1 + np.sin(2 * np.pi * x / self.system_size))
+            starting_point = self.get_default_starting_point()
         else:
             if starting_point.shape[0] != self.dimensions:
                 raise ValueError(
@@ -1183,9 +1459,11 @@ class KuramotoSivashinsky:
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class KuramotoSivashinskyCustom:
+class KuramotoSivashinskyCustom(SimBase):
     """Simulate the n-dimensional Kuramoto-Sivashinsky PDE with custom precision and fft backend.
     PDE: y_t = -y*y_x - y_xx - y_xxxx.
+
+    Note: dimension must be an even number.
 
     Reference for the numerical integration:
     "fourth order time stepping for stiff pde-kassam trefethen 2005" at
@@ -1207,7 +1485,6 @@ class KuramotoSivashinskyCustom:
 
         Args:
             dimensions: The dimensions of the KS system. Must be an even number.
-            #TODO: check if dimensions is an even number.
             system_size: The system size of the KS system.
             dt: Size of time steps.
             precision: The numerical precision for the simulation:
@@ -1215,6 +1492,8 @@ class KuramotoSivashinskyCustom:
                     - 16, 32, 64, or 128 for the corresponding precision
             fft_type: Either "numpy" or "scipy".
         """
+        if dimensions % 2 != 0:  # check if even number.
+            raise ValueError("Parameter dimension must be an even number.")
         self.dimensions = dimensions
         self.system_size = system_size
         self.dt = dt
@@ -1307,6 +1586,19 @@ class KuramotoSivashinskyCustom:
         if self.change_precision:
             self.g = self.g.astype(self.c_dtype)
 
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        The starting point is from Kassam_2005 paper.
+        Returns:
+            The default starting point.
+
+        """
+
+        x = self.system_size * np.transpose(np.conj(np.arange(1, self.dimensions + 1))) / self.dimensions
+        starting_point = np.cos(2 * np.pi * x / self.system_size) * (1 + np.sin(2 * np.pi * x / self.system_size))
+        return starting_point
+
     def iterate(self, x: np.ndarray) -> np.ndarray:
         """Calculates next timestep (x_0(i+1),x_1(i+1),..) with given (x_0(i),x_0(i),..) and dt.
 
@@ -1350,28 +1642,27 @@ class KuramotoSivashinskyCustom:
 
         Args:
             time_steps: Number of time steps t to simulate.
-            starting_point: Starting point of the trajectory of shape (self.dimensions,).
+            starting_point: Starting point of the trajectory of shape (self.dimensions,). If None,
+                            take the default starting point.
 
         Returns:
             Trajectory of shape (t, self.dimensions).
 
         """
         if starting_point is None:
-            # TODO: starting point is pretty far from attractor
-            # Use the starting point from the Kassam_2005 paper
-            x = self.system_size * np.transpose(np.conj(np.arange(1, self.dimensions + 1))) / self.dimensions
-            starting_point = np.cos(2 * np.pi * x / self.system_size) * (1 + np.sin(2 * np.pi * x / self.system_size))
+            starting_point = self.get_default_starting_point()
         else:
             if starting_point.shape[0] != self.dimensions:
                 raise ValueError(
                     f"starting_point wrong dimension: Expected {self.dimensions} but got {starting_point.shape[0]}"
                 )
+
         if self.change_precision:
             starting_point = starting_point.astype(self.f_dtype)
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class Lorenz96:
+class Lorenz96(SimBase):
     """Simulate the n-dimensional dynamical system: Lorenz 96 model."""
 
     def __init__(self, dimensions: int = 30, force: float = 8.0, dt: float = 0.05) -> None:
@@ -1385,6 +1676,16 @@ class Lorenz96:
         self.dimensions = dimensions
         self.force = force
         self.dt = dt
+
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        Returns:
+            The default starting point.
+
+        """
+
+        return np.sin(np.arange(self.dimensions))
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx_0/dt, dx_1/dt, ..) with given (x_0,x_1,..) for RK4.
@@ -1431,15 +1732,15 @@ class Lorenz96:
 
         Args:
             time_steps: Number of time steps t to simulate.
-            starting_point: Starting point of the trajectory. Automatically adapts to dimension of
-            input.
+            starting_point: Starting point of the trajectory. If None, take the default starting
+                            point.
 
         Returns:
             Trajectory of shape (t, input_dimension).
 
         """
         if starting_point is None:
-            starting_point = np.sin(np.arange(self.dimensions))
+            starting_point = self.get_default_starting_point()
         else:
             if starting_point.shape[0] != self.dimensions:
                 raise ValueError(
@@ -1449,7 +1750,7 @@ class Lorenz96:
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class LinearSystem:
+class LinearSystem(SimBase):
     """Simulate a generic n-dimensional linear dynamical system x_t = A*x"""
 
     def __init__(self, A: np.ndarray | None = None, dt: float = 0.1) -> None:
@@ -1464,8 +1765,18 @@ class LinearSystem:
             self.A = np.array([[-0.0, -1.0], [1.0, 0.0]])
         else:
             self.A = A
-        self.dimension = self.A.shape[0]
+        self.dimensions = self.A.shape[0]
         self.dt = dt
+
+    def get_default_starting_point(self) -> np.ndarray:
+        """Get the default starting_point of the simulation.
+
+        Returns:
+            The default starting point.
+
+        """
+
+        return np.ones(self.dimensions)
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx_0/dt, dx_1/dt, ..) with given (x_0,x_1,..) for RK4.
@@ -1499,14 +1810,19 @@ class LinearSystem:
 
         Args:
             time_steps: Number of time steps t to simulate.
-            starting_point: Starting point of the trajectory. Automatically adapts to dimension of
-            input.
+            starting_point: Starting point of the trajectory. If None, take the default starting
+                            point.
 
         Returns:
             Trajectory of shape (t, input_dimension).
 
         """
         if starting_point is None:
-            starting_point = np.ones(self.dimension)
+            starting_point = self.get_default_starting_point()
+        else:
+            if starting_point.shape[0] != self.dimensions:
+                raise ValueError(
+                    f"starting_point wrong dimension: Expected {self.dimensions} but got {starting_point.shape[0]}"
+                )
 
         return _timestep_iterator(self.iterate, time_steps, starting_point)
