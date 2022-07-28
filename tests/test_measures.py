@@ -293,11 +293,6 @@ class TestMeasures(unittest.TestCase):
 
 
 class TestLyapunovExponentCalculation(unittest.TestCase):
-    def setUp(self):
-
-        self.one_d_iterator: lambda x: 4.0 * x * (1 - x)  # logistic map
-        self.two_d_iterator: lambda x: np.array([1 - 1.4 * x[0] ** 2 + 0.3 * x[1], x[0]])  # henon map
-
     def test_largest_lyapunov_one_d_linear_time_dependent(self):
         dt = 0.1
         a = -0.1
@@ -308,8 +303,8 @@ class TestLyapunovExponentCalculation(unittest.TestCase):
         return_convergence = False
         starting_point = np.array(1)
         deviation_scale = 1e-10
-        N = 10
-        N_skip = 1
+        steps = 10
+        steps_skip = 1
         part_time_steps = 5
 
         actual = measures.largest_lyapunov_exponent(
@@ -317,10 +312,37 @@ class TestLyapunovExponentCalculation(unittest.TestCase):
             starting_point,
             return_convergence=return_convergence,
             deviation_scale=deviation_scale,
-            N=N,
-            N_skip=N_skip,
+            steps=steps,
+            steps_skip=steps_skip,
             part_time_steps=part_time_steps,
             dt=dt,
         )
         desired = np.array(a)
+        assert_array_almost_equal(actual, desired, 2)
+
+    def test_largest_lyapunov_one_d_linear_time_dependent_return_conv(self):
+        dt = 0.1
+        a = -0.1
+
+        def iterator_func(x):
+            return x + dt * a * x
+
+        return_convergence = True
+        starting_point = np.array(1)
+        deviation_scale = 1e-10
+        steps = 10
+        steps_skip = 1
+        part_time_steps = 5
+
+        actual = measures.largest_lyapunov_exponent(
+            iterator_func,
+            starting_point,
+            return_convergence=return_convergence,
+            deviation_scale=deviation_scale,
+            steps=steps,
+            steps_skip=steps_skip,
+            part_time_steps=part_time_steps,
+            dt=dt,
+        )
+        desired = np.array([a, ]*steps)
         assert_array_almost_equal(actual, desired, 2)
