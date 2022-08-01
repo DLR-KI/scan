@@ -1,5 +1,30 @@
 ## Changelog
 
+### Scan 0.6.1 - Simulating dynamical systems: Enhancements, bugfix and new system
+* Fixed bug in `scan.simulations.LinearSystem` where every non-default matrix `A` would give an error. 
+* Changed how the simulation classes are build up: 
+  * Every simulation class is a subclass of the abstract base class `SimBase`. 
+  * `SimBase` takes care of the basic structure of a simulation class: 
+    * Every system must implement the `iterate` method, since `iterate` is now an `@abstractmethod`
+    in `SimBase`.
+    * `SimBase` defines the `simulate` function, which can be used in all child classes. 
+    * `SimBase` assumes that every child simulation class defines a `default_starting_point`and the 
+    `sys_dim` (system dimension) of the system. 
+  * If the system is simulated with RungeKutta, it is based on the subclass `SimBaseRungeKutta`, 
+  which is already a subclass of `SimBase`.
+    * Every subclass of `SimBaseRungeKutta` is required to have the `flow` method (using `@abstractmethod`). 
+    * The `iterate` method is defined in `SimBaseRungeKutta` by applying runge kutta on the flow. 
+  * Every simulation class now has the default parameters saved in `self.default_parameters`.
+  * Every simulation class now has the default starting point saved in `self.default_starting_point`.
+    * Note: In KuramotoSivashinsky, KuramotoSivashinskyCustom, Lorenz96 and LinearSystem the default starting point is dependent
+    on the parameters, since the dimension of the system is also a parameter. Thus, one can only access the `default_starting_point`
+    after initializing the class-instance. E.g. `KuramotoSivashinsky.default_starting_point` does not exist, but `KuramotoSivashinsky().default_starting_point` does
+  * **Examples**: 
+    * `Lorenz63().default_parameters` gives: `{"sigma": 10.0, "rho": 28.0, "beta": 8 / 3, "dt": 0.05}`
+    * `Lorenz63().default_starting_point` gives: `np.array([0.0, -0.01, 9.0])`
+* Added new 2-dimensional autonomous flow `LotkaVolterra` system.
+* Added `sys_dim` parameter to Lorenz96 (instead of indireclty specifying the dimension in `simulate`)
+
 ### Scan 0.6.0 - Simulating dynamical systems: Refactoring and new systems
 * Removed the function `scan.simulations.simulate_trajectory`.
 * Instead of using `simulate_trajectory`, there is now a class for every dynamical system implemented.

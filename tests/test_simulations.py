@@ -18,11 +18,6 @@ DECIMALS = 14
 # Use print(np.array_repr(np_array, max_line_width=120, precision=18)) in the debugger to easily get the copy-pastable
 # representation of a numpy array.
 class TestSimulations(TestScanBase):
-    def test_simulate_lorenz63_get_default_parameters(self):
-        actual = scan.simulations.Lorenz63().get_default_parameters()
-        desired = {"sigma": 10.0, "rho": 28.0, "beta": 8 / 3, "dt": 0.05}
-        unittest.TestCase().assertDictEqual(desired, actual)
-
     def test_simulate_trajectory_lorenz63_single_step_trivial_test(self):
         simulation_time_steps = 2
         starting_point = np.array([-14.03020521, -20.88693127, 25.53545])
@@ -64,7 +59,7 @@ class TestSimulations(TestScanBase):
         self.set_seed()
         starting_point = lor_force * np.ones(lor_dim) + 1e-2 * np.random.rand(lor_dim)
 
-        sim_data = scan.simulations.Lorenz96(dimensions=lor_dim, force=lor_force, dt=lor_dt).simulate(
+        sim_data = scan.simulations.Lorenz96(sys_dim=lor_dim, force=lor_force, dt=lor_dt).simulate(
             time_steps=simulation_time_steps, starting_point=starting_point
         )
 
@@ -133,14 +128,14 @@ class TestSimulations(TestScanBase):
         assert_array_equal(sim_data_1, sim_data_2)
 
     def test_lorenz96_dimension_missmatch(self):
-        dimensions = 10
+        sys_dim = 10
         time_steps = 2
         starting_point = np.ones(11)
 
         with pytest.raises(ValueError):
 
             scan.simulations.Lorenz96(
-                dimensions=dimensions,
+                sys_dim=sys_dim,
             ).simulate(time_steps=time_steps, starting_point=starting_point)
 
     def test_simulate_trajectory_roessler_default_starting_point_single_step_trivial_test(self):
@@ -421,11 +416,11 @@ class TestSimulations(TestScanBase):
         assert_array_equal(sim_data_1, sim_data_2)
 
     def test_kuramoto_sivashinski_6d_2l_05t_custom_starting_point_single_step(self):
-        dimensions = 6
-        system_size = 2
+        sys_dim = 6
+        sys_length = 2
         dt = 0.5
 
-        sim_data = scan.simulations.KuramotoSivashinsky(dimensions=dimensions, system_size=system_size, dt=dt).simulate(
+        sim_data = scan.simulations.KuramotoSivashinsky(sys_dim=sys_dim, sys_length=sys_length, dt=dt).simulate(
             time_steps=3
         )
 
@@ -433,9 +428,9 @@ class TestSimulations(TestScanBase):
         # first point of the prediction, so we have to take that into account here.
         starting_point = sim_data[1]
 
-        exp_sim_data = scan.simulations.KuramotoSivashinsky(
-            dimensions=dimensions, system_size=system_size, dt=dt
-        ).simulate(time_steps=2, starting_point=starting_point)
+        exp_sim_data = scan.simulations.KuramotoSivashinsky(sys_dim=sys_dim, sys_length=sys_length, dt=dt).simulate(
+            time_steps=2, starting_point=starting_point
+        )
 
         # Due to the FFT parts of the KS algorithm, putting in the same real space point as corresponds to some in
         # point in Fourier Space, actually results in a fairly large simulation difference, even after a single
@@ -451,19 +446,19 @@ class TestSimulations(TestScanBase):
         assert_array_equal(sim_data_1, sim_data_2)
 
     def test_kuramoto_sivashinski_custom_6d_2l_05t_custom_starting_point_single_step(self):
-        dimensions = 6
-        system_size = 2
+        sys_dim = 6
+        sys_length = 2
         dt = 0.5
-        sim_data = scan.simulations.KuramotoSivashinskyCustom(
-            dimensions=dimensions, system_size=system_size, dt=dt
-        ).simulate(time_steps=3)
+        sim_data = scan.simulations.KuramotoSivashinskyCustom(sys_dim=sys_dim, sys_length=sys_length, dt=dt).simulate(
+            time_steps=3
+        )
 
         # Note that, right now, the KS simulation is the only simulation function that returns the starting point as
         # first point of the prediction, so we have to take that into account here.
         starting_point = sim_data[1]
 
         exp_sim_data = scan.simulations.KuramotoSivashinskyCustom(
-            dimensions=dimensions, system_size=system_size, dt=dt
+            sys_dim=sys_dim, sys_length=sys_length, dt=dt
         ).simulate(time_steps=2, starting_point=starting_point)
 
         # Due to the FFT parts of the KS algorithm, putting in the same real space point as corresponds to some in
@@ -481,19 +476,19 @@ class TestSimulations(TestScanBase):
 
     def test_kuramoto_sivashinski_custom_40d_22l_05t_npfft_no_precision_change(self):
         # ks_sys_flag = "kuramoto_sivashinsky_custom"
-        dimensions = 40
-        system_size = 22
+        sys_dim = 40
+        sys_length = 22
         dt = 0.5
         time_steps = 10
         fft_type = "numpy"
 
         sim_data = scan.simulations.KuramotoSivashinskyCustom(
-            dimensions=dimensions, system_size=system_size, dt=dt, fft_type=fft_type
+            sys_dim=sys_dim, sys_length=sys_length, dt=dt, fft_type=fft_type
         ).simulate(time_steps=time_steps)
 
         exp_sim_data = scan.simulations.KuramotoSivashinskyCustom(
-            dimensions=dimensions,
-            system_size=system_size,
+            sys_dim=sys_dim,
+            sys_length=sys_length,
             dt=dt,
             precision=64,
             fft_type=fft_type,
@@ -503,23 +498,23 @@ class TestSimulations(TestScanBase):
 
     @pytest.mark.xfail(reason="Datatype does not exist on all systems.")
     def test_kuramoto_sivashinski_custom_40d_22l_05t_npfft_128_precision(self):
-        dimensions = 40
-        system_size = 22
+        sys_dim = 40
+        sys_length = 22
         dt = 0.5
         time_steps = 10
         fft_type = "numpy"
 
         sim_data = scan.simulations.KuramotoSivashinskyCustom(
-            dimensions=dimensions,
-            system_size=system_size,
+            sys_dim=sys_dim,
+            sys_length=sys_length,
             dt=dt,
             precision=128,
             fft_type=fft_type,
         ).simulate(time_steps=time_steps)
 
         exp_sim_data = scan.simulations.KuramotoSivashinskyCustom(
-            dimensions=dimensions,
-            system_size=system_size,
+            sys_dim=sys_dim,
+            sys_length=sys_length,
             dt=dt,
             precision=64,
             fft_type=fft_type,
@@ -528,40 +523,40 @@ class TestSimulations(TestScanBase):
         assert_array_not_equal(sim_data, exp_sim_data)
 
     def test_kuramoto_sivashinski_dimension_missmatch(self):
-        dimensions = 10
+        sys_dim = 10
         time_steps = 10
         starting_point = np.ones(11)
 
         with pytest.raises(ValueError):
 
             scan.simulations.KuramotoSivashinsky(
-                dimensions=dimensions,
+                sys_dim=sys_dim,
             ).simulate(time_steps=time_steps, starting_point=starting_point)
 
     def test_kuramoto_sivashinski_custom_dimension_missmatch(self):
-        dimensions = 10
+        sys_dim = 10
         time_steps = 10
         starting_point = np.ones(11)
 
         with pytest.raises(ValueError):
 
             scan.simulations.KuramotoSivashinskyCustom(
-                dimensions=dimensions,
+                sys_dim=sys_dim,
             ).simulate(time_steps=time_steps, starting_point=starting_point)
 
     def test_kuramoto_sivashinski_odd_dimension_error(self):
         dimension = 3
         with pytest.raises(ValueError):
-            scan.simulations.KuramotoSivashinsky(dimensions=dimension)
+            scan.simulations.KuramotoSivashinsky(sys_dim=dimension)
 
     def test_kuramoto_sivashinski_custom_odd_dimension_error(self):
         dimension = 3
         with pytest.raises(ValueError):
-            scan.simulations.KuramotoSivashinskyCustom(dimensions=dimension)
+            scan.simulations.KuramotoSivashinskyCustom(sys_dim=dimension)
 
     def test_kuramoto_sivashinski_custom_40d_22l_05t_unknown_precision(self):
-        dimensions = 40
-        system_size = 22
+        sys_dim = 40
+        sys_length = 22
         dt = 0.5
         time_steps = 10
         fft_type = "numpy"
@@ -569,24 +564,24 @@ class TestSimulations(TestScanBase):
         with pytest.raises(ValueError):
 
             scan.simulations.KuramotoSivashinskyCustom(
-                dimensions=dimensions,
-                system_size=system_size,
+                sys_dim=sys_dim,
+                sys_length=sys_length,
                 dt=dt,
                 precision="this_precision_does_not_exist",
                 fft_type=fft_type,
             ).simulate(time_steps=time_steps)
 
     def test_kuramoto_sivashinski_custom_40d_22l_05t_unknown_fft_type(self):
-        dimensions = 40
-        system_size = 22
+        sys_dim = 40
+        sys_length = 22
         dt = 0.5
         time_steps = 10
 
         with pytest.raises(ValueError):
 
             scan.simulations.KuramotoSivashinskyCustom(
-                dimensions=dimensions,
-                system_size=system_size,
+                sys_dim=sys_dim,
+                sys_length=sys_length,
                 dt=dt,
                 precision=None,
                 fft_type="this_ffttype_does_not_exist",
@@ -596,8 +591,8 @@ class TestSimulations(TestScanBase):
 class TestKuramotSivashinskiVariantsDivergence40d22l05t(unittest.TestCase):
     def setUp(self):
         # self.ks_sys_flag = "kuramoto_sivashinsky_custom"
-        self.dimensions = 40
-        self.system_size = 22
+        self.sys_dim = 40
+        self.sys_length = 22
         self.dt = 0.5
         self.time_steps = 1000
 
@@ -606,14 +601,14 @@ class TestKuramotSivashinskiVariantsDivergence40d22l05t(unittest.TestCase):
         # NOTE: This isn't actually all that great of a test, as it doesn't really test for the actual logic/algorithm
         #  we implemented and only checks if it diverges or not. Refactor by usinge e.g. a more sophisticated Lyapunov
         #  exponent test.
-        dimensions = 40
-        system_size = 22
+        sys_dim = 40
+        sys_length = 22
         dt = 0.5
         time_steps = 1000
 
         sim_data = scan.simulations.KuramotoSivashinsky(
-            dimensions=dimensions,
-            system_size=system_size,
+            sys_dim=sys_dim,
+            sys_length=sys_length,
             dt=dt,
         ).simulate(time_steps=time_steps)
 
@@ -629,8 +624,8 @@ class TestKuramotSivashinskiVariantsDivergence40d22l05t(unittest.TestCase):
         fft_type = "numpy"
 
         sim_data = scan.simulations.KuramotoSivashinskyCustom(
-            dimensions=self.dimensions,
-            system_size=self.system_size,
+            sys_dim=self.sys_dim,
+            sys_length=self.sys_length,
             dt=self.dt,
             precision=precision,
             fft_type=fft_type,
@@ -648,8 +643,8 @@ class TestKuramotSivashinskiVariantsDivergence40d22l05t(unittest.TestCase):
         fft_type = "numpy"
 
         sim_data = scan.simulations.KuramotoSivashinskyCustom(
-            dimensions=self.dimensions,
-            system_size=self.system_size,
+            sys_dim=self.sys_dim,
+            sys_length=self.sys_length,
             dt=self.dt,
             precision=precision,
             fft_type=fft_type,
@@ -667,8 +662,8 @@ class TestKuramotSivashinskiVariantsDivergence40d22l05t(unittest.TestCase):
         fft_type = "numpy"
 
         sim_data = scan.simulations.KuramotoSivashinskyCustom(
-            dimensions=self.dimensions,
-            system_size=self.system_size,
+            sys_dim=self.sys_dim,
+            sys_length=self.sys_length,
             dt=self.dt,
             precision=precision,
             fft_type=fft_type,
@@ -686,8 +681,8 @@ class TestKuramotSivashinskiVariantsDivergence40d22l05t(unittest.TestCase):
         fft_type = "numpy"
 
         sim_data = scan.simulations.KuramotoSivashinskyCustom(
-            dimensions=self.dimensions,
-            system_size=self.system_size,
+            sys_dim=self.sys_dim,
+            sys_length=self.sys_length,
             dt=self.dt,
             precision=precision,
             fft_type=fft_type,
@@ -705,8 +700,8 @@ class TestKuramotSivashinskiVariantsDivergence40d22l05t(unittest.TestCase):
         fft_type = "scipy"
 
         sim_data = scan.simulations.KuramotoSivashinskyCustom(
-            dimensions=self.dimensions,
-            system_size=self.system_size,
+            sys_dim=self.sys_dim,
+            sys_length=self.sys_length,
             dt=self.dt,
             precision=precision,
             fft_type=fft_type,

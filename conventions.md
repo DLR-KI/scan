@@ -9,12 +9,13 @@ The scan package follows the InRe code style.
 
 ### Naming Conventions
 
-* (t, d, s) = (time_steps, x_dim, slice_nr): np.array shape of the input/output data
+* (t, d, s) = (time_steps, x_dim/y_dim/sys_dim, slice_nr): np.array shape of the input/output/simulation data
 * r = r(t): the reservoir state over time with shape (t, n_dim) or, for some internal functions, shape (n_dim,)
 * "n_" prefix relates to network attributes, e.g. "n_dim" is the network dimension
 * w_in: input matrix and prefix for input matrix related parameters
 * "x_" prefix means input
 * "y_" prefix means output/prediction
+* *sys_" prefix means simulation data
 
 ### Package Conventions
 * MPI is, and should stay, entirely optional
