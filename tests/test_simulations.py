@@ -18,10 +18,6 @@ DECIMALS = 14
 # Use print(np.array_repr(np_array, max_line_width=120, precision=18)) in the debugger to easily get the copy-pastable
 # representation of a numpy array.
 class TestSimulations(TestScanBase):
-    def test_simulate_lorenz63_get_default_parameters(self):
-        actual = scan.simulations.Lorenz63().get_default_parameters()
-        desired = {"sigma": 10.0, "rho": 28.0, "beta": 8 / 3, "dt": 0.05}
-        unittest.TestCase().assertDictEqual(desired, actual)
 
     def test_simulate_trajectory_lorenz63_single_step_trivial_test(self):
         simulation_time_steps = 2
