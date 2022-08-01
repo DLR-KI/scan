@@ -120,6 +120,9 @@ class Lorenz63(SimBaseRungeKutta):
     - Lyapunov exponents: (0.9059, 0.0, -14.5723)
     - Kaplan-Yorke dimension: 2.06215
     - Correlation dimension: 2.068 +- 0.086
+    They refer to:
+    - Parameters: {"sigma": 10.0, "rho": 28.0, "beta": 8 / 3}
+    - Starting point: [0.0, -0.01, 9.0]
     """
 
     default_parameters = {"sigma": 10.0, "rho": 28.0, "beta": 8 / 3, "dt": 0.05}
@@ -165,6 +168,9 @@ class Roessler(SimBaseRungeKutta):
     - Lyapunov exponents: (0.0714, 0, -5.3943)
     - Kaplan-Yorke dimension: 2.0132
     - Correlation dimension: 1.991 +- 0.065
+    They refer to:
+    - Parameters: {"a": 0.2, "b": 0.2, "c": 5.7}
+    - Starting point: [-9.0, 0.0, 0.0]
     """
 
     default_parameters = {"a": 0.2, "b": 0.2, "c": 5.7, "dt": 0.1}
@@ -210,6 +216,9 @@ class ComplexButterly(SimBaseRungeKutta):
     - Lyapunov exponents: (0.1690, 0.0, -0.7190)
     - Kaplan-Yorke dimension: 2.2350
     - Correlation dimension: 2.491 +- 0.131
+    They refer to:
+    - Parameters: {"a": 0.55}
+    - Starting point: [0.2, 0.0, 0.0]
     """
 
     default_parameters = {"a": 0.55, "dt": 0.05}
@@ -248,6 +257,9 @@ class Chen(SimBaseRungeKutta):
     - Lyapunov exponents: (2.0272, 0, -12.0272)
     - Kaplan-Yorke dimension: 2.1686
     - Correlation dimension: 2.147 +- 0.117
+    They refer to:
+    - Parameters: {"a": 35.0, "b": 3.0, "c": 28.0}
+    - Starting point: [-10.0, 0.0, 37.0]
     """
 
     default_parameters = {"a": 35.0, "b": 3.0, "c": 28.0, "dt": 0.01}
@@ -298,6 +310,9 @@ class ChuaCircuit(SimBaseRungeKutta):
     - Lyapunov exponents: (0.3271, 0.0, -2.5197)
     - Kaplan-Yorke dimension: 2.1298
     - Correlation dimension: 2.215 +- 0.098
+    They refer to:
+    - Parameters: {"alpha": 9.0, "beta": 100 / 7, "a": 8 / 7, "b": 5 / 7}
+    - Starting point: [0.0, 0.0, 0.6]
     """
 
     default_parameters = {"alpha": 9.0, "beta": 100 / 7, "a": 8 / 7, "b": 5 / 7, "dt": 0.05}
@@ -356,6 +371,9 @@ class Thomas(SimBaseRungeKutta):
     - Lyapunov exponents: (0.0349, 0.0, -0.5749)
     - Kaplan-Yorke dimension: 2.0607
     - Correlation dimension: 1.843 +- 0.075
+    They refer to:
+    - Parameters: {"b": 0.18}
+    - Starting point: [0.1, 0.0, 0.0]
     """
 
     default_parameters = {"b": 0.18, "dt": 0.2}
@@ -394,6 +412,9 @@ class WindmiAttractor(SimBaseRungeKutta):
     - Lyapunov exponents: (0.0755, 0, -0.7755)
     - Kaplan-Yorke dimension: 2.0974
     - Correlation dimension: 2.035 +- 0.095
+    They refer to:
+    - Parameters: {"a": 0.7, "b": 2.5}
+    - Starting point: [0.0, 0.8, 0.0]
     """
 
     default_parameters = {"a": 0.7, "b": 2.5, "dt": 0.1}
@@ -434,12 +455,19 @@ class Rucklidge(SimBaseRungeKutta):
     - Lyapunov exponents: (0.0643, 0.0, -3.0643)
     - Kaplan-Yorke dimension: 2.0210
     - Correlation dimension: 2.108 +- 0.095
+    They refer to:
+    - Parameters: {"kappa": 2.0, "lam": 6.7}
+    - Starting point: [1.0, 0.0, 4.5]
 
     Literature values for LLE according to different study (Rusyn, V. "Modeling, analysis and
     control of chaotic Rucklidge system." Journal of Telecommunication, Electronic and Computer
     Engineering (JTEC) 11.1 (2019): 43-47.). Same parameters are used but starting_point is
     (1.2, 0.8, 1.4).
     - Lyapunov Exponents: (0.1877, 0.0, -3.1893)
+    They refer to:
+    - Parameters: {"kappa": 2.0, "lam": 6.7}
+    - Starting point: [1.2, 0.8, 1.4]
+
     """
 
     default_parameters = {"kappa": 2.0, "lam": 6.7, "dt": 0.05}
@@ -483,6 +511,9 @@ class SimplestQuadraticChaotic(SimBaseRungeKutta):
     - Lyapunov exponents: (0.0551, 0.0, -2.0721)
     - Kaplan-Yorke dimension: 2.0266
     - Correlation dimension: 2.187 +- 0.075
+    They refer to:
+    - Parameters: {"a": 2.017}
+    - Starting point: [-0.9, 0.0, 0.5]
     """
 
     default_parameters = {"a": 2.017, "dt": 0.1}
@@ -524,6 +555,9 @@ class SimplestCubicChaotic(SimBaseRungeKutta):
     - Lyapunov exponents: (0.0837, 0.0, -2.1117)
     - Kaplan-Yorke dimension: 2.0396
     - Correlation dimension: 2.174 +- 0.083
+    They refer to:
+    - Parameters: {"a": 2.028}
+    - Starting point: [0.0, 0.96, 0.0]
     """
 
     default_parameters = {"a": 2.028, "dt": 0.1}
@@ -565,6 +599,9 @@ class SimplestPiecewiseLinearChaotic(SimBaseRungeKutta):
     - Lyapunov exponents: (0.0362, 0.0, -0.6362)
     - Kaplan-Yorke dimension: 2.0569
     - Correlation dimension: 2.131 +- 0.072
+    They refer to:
+    - Parameters: {"a": 0.6}
+    - Starting point: [0.0, -0.7, 0.0]
     """
 
     default_parameters = {"a": 0.6, "dt": 0.1}
@@ -603,6 +640,9 @@ class DoubleScroll(SimBaseRungeKutta):
     - Lyapunov exponents: (0.0497, 0.0, -0.8497)
     - Kaplan-Yorke dimension: 2.0585
     - Correlation dimension: 2.184 +- 0.107
+    They refer to:
+    - Parameters: {"a": 0.8}
+    - Starting point: [0.01, 0.01, 0.0]
     """
 
     default_parameters = {"a": 0.8, "dt": 0.1}
@@ -684,6 +724,10 @@ class Henon(SimBase):
     - Lyapunov exponents: (0.41922, -1.62319)
     - Kaplan-Yorke dimension: 1.25827
     - Correlation dimension: 1.220 +- 0.036
+
+    They refer to:
+    - Parameters: {"a": 1.4, "b": 0.3}
+    - Starting point: [0.0, 0.9]
     """
 
     default_parameters = {"a": 1.4, "b": 0.3}
@@ -722,6 +766,10 @@ class Logistic(SimBase):
     - Lyapunov exponents: ln(2) = 0.6931147..
     - Kaplan-Yorke dimension: 1.0
     - Correlation dimension: 1.0
+
+    They refer to:
+    - Parameters: {"r": 4.0}
+    - Starting point: [0.1]
     """
 
     default_parameters = {"r": 4.0}
@@ -768,6 +816,9 @@ class SimplestDrivenChaotic(SimBaseRungeKutta):
     - Lyapunov exponents: (0.0971, 0, -0.0971)
     - Kaplan-Yorke dimension: 3.0
     - Correlation dimension: 2.634 +- 0.160
+    They refer to:
+    - Parameters: {"omega": 1.88}
+    - Starting point: [0.0, 0.0, 0.0]
     """
 
     default_parameters = {"omega": 1.88, "dt": 0.1}
@@ -809,6 +860,9 @@ class UedaOscillator(SimBaseRungeKutta):
     - Lyapunov exponents: (0.1034, 0, -0.1534)
     - Kaplan-Yorke dimension: 2.6741
     - Correlation dimension: 2.675 +- 0.132
+    They refer to:
+    - Parameters: {"b": 0.05, "A": 7.5, "omega": 1.0}
+    - Starting point: [2.5, 0.0, 0.0]
     """
 
     default_parameters = {"b": 0.05, "A": 7.5, "omega": 1.0, "dt": 0.05}
