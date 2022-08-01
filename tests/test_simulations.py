@@ -18,7 +18,6 @@ DECIMALS = 14
 # Use print(np.array_repr(np_array, max_line_width=120, precision=18)) in the debugger to easily get the copy-pastable
 # representation of a numpy array.
 class TestSimulations(TestScanBase):
-
     def test_simulate_trajectory_lorenz63_single_step_trivial_test(self):
         simulation_time_steps = 2
         starting_point = np.array([-14.03020521, -20.88693127, 25.53545])
