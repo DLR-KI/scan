@@ -909,6 +909,12 @@ class KuramotoSivashinsky(SimBase):
 
     Python implementation at: https://github.com/E-Renshaw/kuramoto-sivashinsky
 
+    Literature values (EDSON, R., BUNDER, J., MATTNER, T., & ROBERTS, A. (2019). LYAPUNOV EXPONENTS
+    OF THE KURAMOTO–SIVASHINSKY PDE. The ANZIAM Journal, 61(3),
+    270-285. doi:10.1017/S1446181119000105) for Lyapunov Exponents:
+    - lyapunov exponents: (0.080, 0.056, 0.014, 0.003, -0.003 ...)
+    They refer to:
+    - Parameters: {"sys_length": 36.0, "eps": 0.0}
     """
 
     class DefaultParameters(TypedDict):

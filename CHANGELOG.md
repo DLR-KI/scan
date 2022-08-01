@@ -1,4 +1,22 @@
 ## Changelog
+### Scan 0.6.2 - Added simple Lyapunov exponent calculation function
+- Added a simple measure function to calculate the largest Lyapunov exponent of a dynamical system:
+`scan.measures.largest_lyapunov_exponent`
+- The positional arguments are:
+  - `iterator_func`: A function to iterate the system from one to the next time-step: x(i+1) = F(x(i))
+  - `starting_point`: The starting point for iterating the system. 
+
+**Outline of Algorithm**: 
+- The algorithm simulates two trajectories (the _base_ and the _perturbed_ trajectory) for some 
+initially very close points, for some time steps (given by `part_time_steps`).
+- The largest lyapunov exponent corresponding to this particular trajectory divergence is extracted and saved.
+- The last point of the perturbed trajectory is "pulled" to the last point of the base trajectory by
+keeping the direction between both points constant, but renormalizing the distance to a small value (given by `deviation_scale`). 
+This new perturbed point serves as the initial point for the next trajectory simulation as explained in the first bulletpoint. 
+- Thus, one repeats this scheme for `steps` renormalization steps and calculates the largest lyapunov exponent as the average of all renormalization steps.
+
+See: _Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series analysis. Vol. 69.
+    Oxford: Oxford university press, 2003._ for an explanation of the algorithm. 
 
 ### Scan 0.6.1 - Simulating dynamical systems: Enhancements, bugfix and new system
 * Fixed bug in `scan.simulations.LinearSystem` where every non-default matrix `A` would give an error. 
