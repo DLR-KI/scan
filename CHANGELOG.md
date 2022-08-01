@@ -9,7 +9,7 @@
     in `SimBase`.
     * `SimBase` defines the `simulate` function, which can be used in all child classes. 
     * `SimBase` assumes that every child simulation class defines a `default_starting_point`and the 
-    `dimensions` of the system. 
+    `sys_dim` (system dimension) of the system. 
   * If the system is simulated with RungeKutta, it is based on the subclass `SimBaseRungeKutta`, 
   which is already a subclass of `SimBase`.
     * Every subclass of `SimBaseRungeKutta` is required to have the `flow` method (using `@abstractmethod`). 
@@ -23,7 +23,7 @@
     * `Lorenz63().default_parameters` gives: `{"sigma": 10.0, "rho": 28.0, "beta": 8 / 3, "dt": 0.05}`
     * `Lorenz63().default_starting_point` gives: `np.array([0.0, -0.01, 9.0])`
 * Added new 2-dimensional autonomous flow `LotkaVolterra` system.
-* Added `dimensions` parameter to Lorenz96 (instead of indireclty specifying the dimension in `simulate`)
+* Added `sys_dim` parameter to Lorenz96 (instead of indireclty specifying the dimension in `simulate`)
 
 ### Scan 0.6.0 - Simulating dynamical systems: Refactoring and new systems
 * Removed the function `scan.simulations.simulate_trajectory`.

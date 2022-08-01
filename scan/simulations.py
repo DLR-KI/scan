@@ -61,7 +61,7 @@ class SimBase(ABC):
     """A base class for all the simulation classes."""
 
     default_starting_point: np.ndarray
-    dimensions: int
+    sys_dim: int
 
     @abstractmethod
     def iterate(self, x: np.ndarray) -> np.ndarray:
@@ -72,20 +72,20 @@ class SimBase(ABC):
 
         Args:
             time_steps: Number of time steps t to simulate.
-            starting_point: Starting point of the trajectory shape (dimensions,). If None, take the
+            starting_point: Starting point of the trajectory shape (sys_dim,). If None, take the
                             default starting point.
 
         Returns:
-            Trajectory of shape (t, dimensions).
+            Trajectory of shape (t, sys_dim).
 
         """
         if starting_point is None:
             starting_point = self.default_starting_point
         else:
-            if starting_point.size != self.dimensions:
+            if starting_point.size != self.sys_dim:
                 raise ValueError(
                     "Provided starting_point has the wrong dimension. "
-                    f"{self.dimensions} was expected and {starting_point.size} "
+                    f"{self.sys_dim} was expected and {starting_point.size} "
                     "was given"
                 )
         return _timestep_iterator(self.iterate, time_steps, starting_point)
@@ -127,7 +127,7 @@ class Lorenz63(SimBaseRungeKutta):
 
     default_parameters = {"sigma": 10.0, "rho": 28.0, "beta": 8 / 3, "dt": 0.05}
     default_starting_point = np.array([0.0, -0.01, 9.0])
-    dimensions = 3
+    sys_dim = 3
 
     def __init__(
         self, sigma: float | None = None, rho: float | None = None, beta: float | None = None, dt: float | None = None
@@ -175,7 +175,7 @@ class Roessler(SimBaseRungeKutta):
 
     default_parameters = {"a": 0.2, "b": 0.2, "c": 5.7, "dt": 0.1}
     default_starting_point = np.array([-9.0, 0.0, 0.0])
-    dimensions = 3
+    sys_dim = 3
 
     def __init__(
         self, a: float | None = None, b: float | None = None, c: float | None = None, dt: float | None = None
@@ -223,7 +223,7 @@ class ComplexButterly(SimBaseRungeKutta):
 
     default_parameters = {"a": 0.55, "dt": 0.05}
     default_starting_point = np.array([0.2, 0.0, 0.0])
-    dimensions = 3
+    sys_dim = 3
 
     def __init__(self, a: float | None = None, dt: float | None = None) -> None:
         """Define the system parameters.
@@ -264,7 +264,7 @@ class Chen(SimBaseRungeKutta):
 
     default_parameters = {"a": 35.0, "b": 3.0, "c": 28.0, "dt": 0.01}
     default_starting_point = np.array([-10.0, 0.0, 37.0])
-    dimensions = 3
+    sys_dim = 3
 
     def __init__(
         self, a: float | None = None, b: float | None = None, c: float | None = None, dt: float | None = None
@@ -317,7 +317,7 @@ class ChuaCircuit(SimBaseRungeKutta):
 
     default_parameters = {"alpha": 9.0, "beta": 100 / 7, "a": 8 / 7, "b": 5 / 7, "dt": 0.05}
     default_starting_point = np.array([0.0, 0.0, 0.6])
-    dimensions = 3
+    sys_dim = 3
 
     def __init__(
         self,
@@ -378,7 +378,7 @@ class Thomas(SimBaseRungeKutta):
 
     default_parameters = {"b": 0.18, "dt": 0.2}
     default_starting_point = np.array([0.1, 0.0, 0.0])
-    dimensions = 3
+    sys_dim = 3
 
     def __init__(self, b: float | None = None, dt: float | None = None) -> None:
         """Define the system parameters.
@@ -419,7 +419,7 @@ class WindmiAttractor(SimBaseRungeKutta):
 
     default_parameters = {"a": 0.7, "b": 2.5, "dt": 0.1}
     default_starting_point = np.array([0.0, 0.8, 0.0])
-    dimensions = 3
+    sys_dim = 3
 
     def __init__(self, a: float | None = None, b: float | None = None, dt: float | None = None) -> None:
         """Define the system parameters.
@@ -449,6 +449,15 @@ class WindmiAttractor(SimBaseRungeKutta):
 class Rucklidge(SimBaseRungeKutta):
     """Simulate the 3-dimensional autonomous flow: Rucklidge attractor.
 
+    Literature values for LLE according to (Rusyn, V. "Modeling, analysis and
+    control of chaotic Rucklidge system." Journal of Telecommunication, Electronic and Computer
+    Engineering (JTEC) 11.1 (2019): 43-47.).
+    - Lyapunov Exponents: (0.1877, 0.0, -3.1893)
+    They refer to:
+    - Parameters: {"kappa": 2.0, "lam": 6.7}
+    - Starting point: [1.2, 0.8, 1.4]
+
+    Sprott Literature values are not the same for the same parameters:
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
     analysis. Vol. 69. Oxford: Oxford university press, 2003.) for default parameters and
     starting_point:
@@ -458,21 +467,11 @@ class Rucklidge(SimBaseRungeKutta):
     They refer to:
     - Parameters: {"kappa": 2.0, "lam": 6.7}
     - Starting point: [1.0, 0.0, 4.5]
-
-    Literature values for LLE according to different study (Rusyn, V. "Modeling, analysis and
-    control of chaotic Rucklidge system." Journal of Telecommunication, Electronic and Computer
-    Engineering (JTEC) 11.1 (2019): 43-47.). Same parameters are used but starting_point is
-    (1.2, 0.8, 1.4).
-    - Lyapunov Exponents: (0.1877, 0.0, -3.1893)
-    They refer to:
-    - Parameters: {"kappa": 2.0, "lam": 6.7}
-    - Starting point: [1.2, 0.8, 1.4]
-
     """
 
     default_parameters = {"kappa": 2.0, "lam": 6.7, "dt": 0.05}
     default_starting_point = np.array([1.0, 0.0, 4.5])
-    dimensions = 3
+    sys_dim = 3
 
     def __init__(self, kappa: float | None = None, lam: float | None = None, dt: float | None = None) -> None:
         """Define the system parameters.
@@ -518,7 +517,7 @@ class SimplestQuadraticChaotic(SimBaseRungeKutta):
 
     default_parameters = {"a": 2.017, "dt": 0.1}
     default_starting_point = np.array([-0.9, 0.0, 0.5])
-    dimensions = 3
+    sys_dim = 3
 
     def __init__(self, a: float | None = None, dt: float | None = None) -> None:
         """Define the system parameters.
@@ -562,7 +561,7 @@ class SimplestCubicChaotic(SimBaseRungeKutta):
 
     default_parameters = {"a": 2.028, "dt": 0.1}
     default_starting_point = np.array([0.0, 0.96, 0.0])
-    dimensions = 3
+    sys_dim = 3
 
     def __init__(self, a: float | None = None, dt: float | None = None) -> None:
         """Define the system parameters.
@@ -606,7 +605,7 @@ class SimplestPiecewiseLinearChaotic(SimBaseRungeKutta):
 
     default_parameters = {"a": 0.6, "dt": 0.1}
     default_starting_point = np.array([0.0, -0.7, 0.0])
-    dimensions = 3
+    sys_dim = 3
 
     def __init__(self, a: float | None = None, dt: float | None = None) -> None:
         """Define the system parameters.
@@ -647,7 +646,7 @@ class DoubleScroll(SimBaseRungeKutta):
 
     default_parameters = {"a": 0.8, "dt": 0.1}
     default_starting_point = np.array([0.01, 0.01, 0.0])
-    dimensions = 3
+    sys_dim = 3
 
     def __init__(self, a: float | None = None, dt: float | None = None) -> None:
         """Define the system parameters.
@@ -677,7 +676,7 @@ class LotkaVolterra(SimBaseRungeKutta):
 
     default_parameters = {"a": 2.0, "b": 0.4, "c": 3.0, "d": 0.6, "dt": 0.05}
     default_starting_point = np.array([1.0, 1.0])
-    dimensions = 2
+    sys_dim = 2
 
     def __init__(
         self,
@@ -732,7 +731,7 @@ class Henon(SimBase):
 
     default_parameters = {"a": 1.4, "b": 0.3}
     default_starting_point = np.array([0.0, 0.9])
-    dimensions = 2
+    sys_dim = 2
 
     def __init__(self, a: float | None = None, b: float | None = None) -> None:
         """Define the system parameters.
@@ -766,7 +765,6 @@ class Logistic(SimBase):
     - Lyapunov exponents: ln(2) = 0.6931147..
     - Kaplan-Yorke dimension: 1.0
     - Correlation dimension: 1.0
-
     They refer to:
     - Parameters: {"r": 4.0}
     - Starting point: [0.1]
@@ -774,7 +772,7 @@ class Logistic(SimBase):
 
     default_parameters = {"r": 4.0}
     default_starting_point = np.array([0.1])
-    dimensions = 1
+    sys_dim = 1
 
     def __init__(self, r: float | None = None) -> None:
         """Define the system parameters.
@@ -823,7 +821,7 @@ class SimplestDrivenChaotic(SimBaseRungeKutta):
 
     default_parameters = {"omega": 1.88, "dt": 0.1}
     default_starting_point = np.array([0.0, 0.0, 0.0])
-    dimensions = 3
+    sys_dim = 3
 
     def __init__(self, omega: float | None = None, dt: float | None = None) -> None:
         """Define the system parameters.
@@ -867,7 +865,7 @@ class UedaOscillator(SimBaseRungeKutta):
 
     default_parameters = {"b": 0.05, "A": 7.5, "omega": 1.0, "dt": 0.05}
     default_starting_point = np.array([2.5, 0.0, 0.0])
-    dimensions = 3
+    sys_dim = 3
 
     def __init__(
         self, b: float | None = None, A: float | None = None, omega: float | None = None, dt: float | None = None
@@ -914,34 +912,33 @@ class KuramotoSivashinsky(SimBase):
     """
 
     class DefaultParameters(TypedDict):
-        dimensions: int
-        system_size: float
+        sys_dim: int
+        sys_length: float
         eps: float
         dt: float
 
-    default_parameters: DefaultParameters = {"dimensions": 50, "system_size": 36.0, "eps": 0.0, "dt": 0.1}
+    default_parameters: DefaultParameters = {"sys_dim": 50, "sys_length": 36.0, "eps": 0.0, "dt": 0.1}
 
     def __init__(
         self,
-        dimensions: int | None = None,
-        system_size: float | None = None,
+        sys_dim: int | None = None,
+        sys_length: float | None = None,
         eps: float | None = None,
         dt: float | None = None,
     ) -> None:
         """
 
         Args:
-            dimensions: The dimensions of the KS system. Must be an even number.
-            system_size: The system size of the KS system.
+            sys_dim: The sys_dim of the KS system. Must be an even number.
+            sys_length: The system length of the KS system.
             eps: A parameter in the KS system: y_t = -y*y_x - (1+eps)*y_xx - y_xxxx.
             dt: Size of time steps.
         """
-        if dimensions is not None:
-            if dimensions % 2 != 0:  # check if even number.
+        if sys_dim is not None:
+            if sys_dim % 2 != 0:  # check if even number.
                 raise ValueError("Parameter dimension must be an even number.")
-
-        self.dimensions = dimensions or int(self.default_parameters["dimensions"])
-        self.system_size = system_size or self.default_parameters["system_size"]
+        self.sys_dim = sys_dim or self.default_parameters["sys_dim"]
+        self.sys_length = sys_length or self.default_parameters["sys_length"]
         self.eps = eps or self.default_parameters["eps"]
         self.dt = dt or self.default_parameters["dt"]
         self.set_default_starting_point()
@@ -952,14 +949,12 @@ class KuramotoSivashinsky(SimBase):
         k = (
             np.transpose(
                 np.conj(
-                    np.concatenate(
-                        (np.arange(0, self.dimensions / 2), np.array([0]), np.arange(-self.dimensions / 2 + 1, 0))
-                    )
+                    np.concatenate((np.arange(0, self.sys_dim / 2), np.array([0]), np.arange(-self.sys_dim / 2 + 1, 0)))
                 )
             )
             * 2
             * np.pi
-            / self.system_size
+            / self.sys_length
         )
 
         L = (1 + self.eps) * k**2 - k**4
@@ -968,7 +963,7 @@ class KuramotoSivashinsky(SimBase):
         self.E_2 = np.exp(self.dt * L / 2)
         M = 64
         r = np.exp(1j * np.pi * (np.arange(1, M + 1) - 0.5) / M)
-        LR = self.dt * np.transpose(np.repeat([L], M, axis=0)) + np.repeat([r], self.dimensions, axis=0)
+        LR = self.dt * np.transpose(np.repeat([L], M, axis=0)) + np.repeat([r], self.sys_dim, axis=0)
         self.Q = self.dt * np.real(np.mean((np.exp(LR / 2) - 1) / LR, axis=1))
         self.f1 = self.dt * np.real(np.mean((-4 - LR + np.exp(LR) * (4 - 3 * LR + LR**2)) / LR**3, axis=1))
         self.f2 = self.dt * np.real(np.mean((2 + LR + np.exp(LR) * (-2 + LR)) / LR**3, axis=1))
@@ -981,16 +976,16 @@ class KuramotoSivashinsky(SimBase):
 
         The starting point is from Kassam_2005 paper.
         """
-        x = self.system_size * np.transpose(np.conj(np.arange(1, self.dimensions + 1))) / self.dimensions
+        x = self.sys_length * np.transpose(np.conj(np.arange(1, self.sys_dim + 1))) / self.sys_dim
         self.default_starting_point = np.array(
-            np.cos(2 * np.pi * x / self.system_size) * (1 + np.sin(2 * np.pi * x / self.system_size))
+            np.cos(2 * np.pi * x / self.sys_length) * (1 + np.sin(2 * np.pi * x / self.sys_length))
         )
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
         """Calculates next timestep (x_0(i+1),x_1(i+1),..) with given (x_0(i),x_0(i),..) and dt.
 
         Args:
-            x: (x_0(i),x_1(i),..) coordinates. Needs to have shape (self.dimensions,).
+            x: (x_0(i),x_1(i),..) coordinates. Needs to have shape (self.sys_dim,).
 
         Returns:
             : (x_0(i+1),x_1(i+1),..) corresponding to input x.
@@ -1024,15 +1019,15 @@ class KuramotoSivashinskyCustom(SimBase):
     """
 
     class DefaultParameters(TypedDict):
-        dimensions: int
-        system_size: float
+        sys_dim: int
+        sys_length: float
         dt: float
         precision: None
         fft_type: None
 
     default_parameters: DefaultParameters = {
-        "dimensions": 50,
-        "system_size": 36.0,
+        "sys_dim": 50,
+        "sys_length": 36.0,
         "dt": 0.1,
         "precision": None,
         "fft_type": None,
@@ -1040,8 +1035,8 @@ class KuramotoSivashinskyCustom(SimBase):
 
     def __init__(
         self,
-        dimensions: int | None = None,
-        system_size: float | None = None,
+        sys_dim: int | None = None,
+        sys_length: float | None = None,
         dt: float | None = None,
         precision: int | None = None,
         fft_type: str | None = None,
@@ -1049,20 +1044,20 @@ class KuramotoSivashinskyCustom(SimBase):
         """
 
         Args:
-            dimensions: The dimensions of the KS system. Must be an even number.
-            system_size: The system size of the KS system.
+            sys_dim: The sys_dim of the KS system. Must be an even number.
+            sys_length: The system length of the KS system.
             dt: Size of time steps.
             precision: The numerical precision for the simulation:
                     - None: no precision change
                     - 16, 32, 64, or 128 for the corresponding precision
             fft_type: Either "numpy" or "scipy".
         """
-        if dimensions is not None:
-            if dimensions % 2 != 0:  # check if even number.
+        if sys_dim is not None:
+            if sys_dim % 2 != 0:  # check if even number.
                 raise ValueError("Parameter dimension must be an even number.")
 
-        self.dimensions = dimensions or int(self.default_parameters["dimensions"])
-        self.system_size = system_size or self.default_parameters["system_size"]
+        self.sys_dim = sys_dim or self.default_parameters["sys_dim"]
+        self.sys_length = sys_length or self.default_parameters["sys_length"]
         self.dt = dt or self.default_parameters["dt"]
         self.precision = precision or self.default_parameters["precision"]
         self.fft_type = fft_type or self.default_parameters["fft_type"]
@@ -1113,14 +1108,12 @@ class KuramotoSivashinskyCustom(SimBase):
         k = (
             np.transpose(
                 np.conj(
-                    np.concatenate(
-                        (np.arange(0, self.dimensions / 2), np.array([0]), np.arange(-self.dimensions / 2 + 1, 0))
-                    )
+                    np.concatenate((np.arange(0, self.sys_dim / 2), np.array([0]), np.arange(-self.sys_dim / 2 + 1, 0)))
                 )
             )
             * 2
             * np.pi
-            / self.system_size
+            / self.sys_length
         )
 
         if self.change_precision:
@@ -1138,7 +1131,7 @@ class KuramotoSivashinskyCustom(SimBase):
         r = np.exp(1j * np.pi * (np.arange(1, M + 1) - 0.5) / M)
         if self.change_precision:
             r = r.astype(self.c_dtype)
-        LR = self.dt * np.transpose(np.repeat([L], M, axis=0)) + np.repeat([r], self.dimensions, axis=0)
+        LR = self.dt * np.transpose(np.repeat([L], M, axis=0)) + np.repeat([r], self.sys_dim, axis=0)
         if self.change_precision:
             LR = LR.astype(self.c_dtype)
         self.Q = self.dt * np.real(np.mean((np.exp(LR / 2) - 1) / LR, axis=1))
@@ -1163,16 +1156,16 @@ class KuramotoSivashinskyCustom(SimBase):
 
         The starting point is from Kassam_2005 paper.
         """
-        x = self.system_size * np.transpose(np.conj(np.arange(1, self.dimensions + 1))) / self.dimensions
+        x = self.sys_length * np.transpose(np.conj(np.arange(1, self.sys_dim + 1))) / self.sys_dim
         self.default_starting_point = np.array(
-            np.cos(2 * np.pi * x / self.system_size) * (1 + np.sin(2 * np.pi * x / self.system_size))
+            np.cos(2 * np.pi * x / self.sys_length) * (1 + np.sin(2 * np.pi * x / self.sys_length))
         )
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
         """Calculates next timestep (x_0(i+1),x_1(i+1),..) with given (x_0(i),x_0(i),..) and dt.
 
         Args:
-            x: (x_0(i),x_1(i),..) coordinates. Needs to have shape (self.dimensions,).
+            x: (x_0(i),x_1(i),..) coordinates. Needs to have shape (self.sys_dim,).
 
         Returns:
             : (x_0(i+1),x_1(i+1),..) corresponding to input x.
@@ -1214,31 +1207,31 @@ class Lorenz96(SimBaseRungeKutta):
     """Simulate the n-dimensional dynamical system: Lorenz 96 model."""
 
     class DefaultParameters(TypedDict):
-        dimensions: int
+        sys_dim: int
         force: float
         dt: float
 
-    default_parameters: DefaultParameters = {"dimensions": 30, "force": 8.0, "dt": 0.05}
+    default_parameters: DefaultParameters = {"sys_dim": 30, "force": 8.0, "dt": 0.05}
 
-    def __init__(self, dimensions: int | None = None, force: float | None = None, dt: float | None = None) -> None:
+    def __init__(self, sys_dim: int | None = None, force: float | None = None, dt: float | None = None) -> None:
         """Define the system parameters.
 
         Args:
-            dimensions: number of dimensions in Lorenz96 equations.
+            sys_dim: number of sys_dim in Lorenz96 equations.
             force: 'force' parameter in the Lorenz 96 equations.
             dt: Size of time steps.
         """
-        self.dimensions = dimensions or int(self.default_parameters["dimensions"])
+        self.sys_dim = sys_dim or int(self.default_parameters["sys_dim"])
         self.force = force or self.default_parameters["force"]
         self.dt = dt or self.default_parameters["dt"]
 
-        self.default_starting_point = np.sin(np.arange(self.dimensions))
+        self.default_starting_point = np.sin(np.arange(self.sys_dim))
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx_0/dt, dx_1/dt, ..) with given (x_0,x_1,..) for RK4.
 
         Args:
-            x: (x_0,x_1,..) coordinates. Adapts automatically to shape (dimensions, ).
+            x: (x_0,x_1,..) coordinates. Adapts automatically to shape (sys_dim, ).
 
         Returns:
             : (dx_0/dt, dx_1/dt, ..) corresponding to input x.
@@ -1281,14 +1274,14 @@ class LinearSystem(SimBaseRungeKutta):
         self.A = A or np.array(self.default_parameters["A"])
         self.dt = dt or float(self.default_parameters["dt"])
 
-        self.dimensions = self.A.shape[0]
-        self.default_starting_point = np.ones(self.dimensions)
+        self.sys_dim = self.A.shape[0]
+        self.default_starting_point = np.ones(self.sys_dim)
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx_0/dt, dx_1/dt, ..) with given (x_0,x_1,..) for RK4.
 
         Args:
-            x: (x_0,x_1,..) coordinates. Adapts automatically to shape (dimensions, ).
+            x: (x_0,x_1,..) coordinates. Adapts automatically to shape (sys_dim, ).
 
         Returns:
             : (dx_0/dt, dx_1/dt, ..) corresponding to input x.
