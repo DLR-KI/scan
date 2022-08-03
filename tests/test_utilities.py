@@ -20,25 +20,21 @@ class TestUtilities(unittest.TestCase):
         pass
 
     def test_train_and_predict_input_setup(self):
-        disc_steps = 3
         train_sync_steps = 2
         train_steps = 4
         pred_sync_steps = 5
         pred_steps = 6
         some_steps_at_the_end = 13
-        total_time_steps = (
-            disc_steps + train_sync_steps + train_steps + pred_sync_steps + pred_steps + some_steps_at_the_end
-        )
+        total_time_steps = train_sync_steps + train_steps + pred_sync_steps + pred_steps + some_steps_at_the_end
 
         x_dim = 3
         data = np.random.random((total_time_steps, x_dim))
 
-        x_train_desired = data[disc_steps : disc_steps + train_sync_steps + train_steps]
-        x_pred_desired = data[disc_steps + train_sync_steps + train_steps - 1 : -some_steps_at_the_end]
+        x_train_desired = data[: train_sync_steps + train_steps]
+        x_pred_desired = data[train_sync_steps + train_steps - 1 : -some_steps_at_the_end]
 
         x_train, x_pred = utilities.train_and_predict_input_setup(
             data,
-            disc_steps=disc_steps,
             train_sync_steps=train_sync_steps,
             train_steps=train_steps,
             pred_sync_steps=pred_sync_steps,

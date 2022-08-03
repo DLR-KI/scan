@@ -950,18 +950,16 @@ class TestESNWrapper(TestScanBase):
         np.random.seed(None)
 
     def test_train_and_predict(self):
-        disc_steps = 3
         train_sync_steps = 2
         train_steps = 5
         pred_steps = 4
-        total_time_steps = disc_steps + train_sync_steps + train_steps + pred_steps
+        total_time_steps = train_sync_steps + train_steps + pred_steps
 
         x_dim = 3
         data = np.random.random((total_time_steps, x_dim))
 
         x_train, x_pred = scan.utilities.train_and_predict_input_setup(
             data,
-            disc_steps=disc_steps,
             train_sync_steps=train_sync_steps,
             train_steps=train_steps,
             pred_steps=pred_steps,
@@ -980,7 +978,6 @@ class TestESNWrapper(TestScanBase):
 
         y_pred, y_test = self.esn.train_and_predict(
             data,
-            disc_steps=disc_steps,
             train_sync_steps=train_sync_steps,
             train_steps=train_steps,
             pred_steps=pred_steps,
@@ -990,18 +987,16 @@ class TestESNWrapper(TestScanBase):
         assert_array_equal(y_pred, y_pred_desired)
 
     def test_train_and_predict_pred_steps_none(self):
-        disc_steps = 3
         train_sync_steps = 2
         train_steps = 5
         pred_steps = None
-        total_time_steps = disc_steps + train_sync_steps + train_steps + 6
+        total_time_steps = train_sync_steps + train_steps + 6
 
         x_dim = 3
         data = np.random.random((total_time_steps, x_dim))
 
         x_train, x_pred = scan.utilities.train_and_predict_input_setup(
             data,
-            disc_steps=disc_steps,
             train_sync_steps=train_sync_steps,
             train_steps=train_steps,
             pred_steps=pred_steps,
@@ -1020,7 +1015,6 @@ class TestESNWrapper(TestScanBase):
 
         y_pred, y_test = self.esn.train_and_predict(
             data,
-            disc_steps=disc_steps,
             train_sync_steps=train_sync_steps,
             train_steps=train_steps,
             pred_steps=pred_steps,
@@ -1060,18 +1054,16 @@ class TestESNWrapper(TestScanBase):
         assert_array_almost_equal(exp_y_pred, y_pred)
 
     def test_create_input_matrix(self):
-        disc_steps = 3
         train_sync_steps = 2
         train_steps = 5
         pred_steps = 4
-        total_time_steps = disc_steps + train_sync_steps + train_steps + pred_steps
+        total_time_steps = train_sync_steps + train_steps + pred_steps
 
         x_dim = 3
         data = np.random.random((total_time_steps, x_dim))
 
         x_train, x_pred = scan.utilities.train_and_predict_input_setup(
             data,
-            disc_steps=disc_steps,
             train_sync_steps=train_sync_steps,
             train_steps=train_steps,
             pred_steps=pred_steps,

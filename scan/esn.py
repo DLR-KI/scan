@@ -725,7 +725,6 @@ class ESNWrapper(ESN):
     def train_and_predict(
         self,
         x_data: np.ndarray,
-        disc_steps: int,
         train_sync_steps: int,
         train_steps: int,
         pred_sync_steps: int = 0,
@@ -737,7 +736,6 @@ class ESNWrapper(ESN):
 
         Args:
             x_data: Data used for synchronization, training and prediction.
-            disc_steps: Nr. of steps to discard completely before training begins.
             train_sync_steps: Nr. of steps to synchronize the reservoir with before the 'real' training begins.
             train_steps: Nr. of steps to use for training and fitting w_in pred_sync_steps: steps to sync the reservoir
                 with before prediction.
@@ -758,7 +756,6 @@ class ESNWrapper(ESN):
         """
         x_train, x_pred = utilities.train_and_predict_input_setup(
             x_data,
-            disc_steps=disc_steps,
             train_sync_steps=train_sync_steps,
             train_steps=train_steps,
             pred_sync_steps=pred_sync_steps,

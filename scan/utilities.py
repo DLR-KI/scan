@@ -131,7 +131,6 @@ def remove_invalid_args(func: Callable, args_dict: dict[str, Any]) -> dict:
 
 def train_and_predict_input_setup(
     x_data: np.ndarray,
-    disc_steps: int,
     train_sync_steps: int,
     train_steps: int,
     pred_sync_steps: int = 0,
@@ -144,7 +143,6 @@ def train_and_predict_input_setup(
 
     Args:
         x_data: data to be split/setup
-        disc_steps: steps to discard completely before training begins
         train_sync_steps: steps to sync the reservoir with before training
         train_steps: steps to use for training and fitting w_in
         pred_sync_steps: steps to sync the reservoir with before prediction
@@ -157,20 +155,13 @@ def train_and_predict_input_setup(
         - **x_pred**: input data for the prediction
 
     """
-    x_train = x_data[disc_steps : disc_steps + train_sync_steps + train_steps]
+    x_train = x_data[: train_sync_steps + train_steps]
 
     if pred_steps is None:
-        x_pred = x_data[disc_steps + train_sync_steps + train_steps - 1 :]
+        x_pred = x_data[train_sync_steps + train_steps - 1 :]
     else:
         x_pred = x_data[
-            disc_steps
-            + train_sync_steps
-            + train_steps
-            - 1 : disc_steps
-            + train_sync_steps
-            + train_steps
-            + pred_sync_steps
-            + pred_steps
+            train_sync_steps + train_steps - 1 : train_sync_steps + train_steps + pred_sync_steps + pred_steps
         ]
 
     return x_train, x_pred
