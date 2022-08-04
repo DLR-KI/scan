@@ -1,4 +1,11 @@
 ## Changelog
+
+### Scan 0.7.0 - Removed disc_steps parameter everywhere
+- Removed disc\_steps paramter from train\_and\_predict function in ESNWrapper class and 
+in utilities.train\_and\_predict\_input\_setup.
+
+
+
 ### Scan 0.6.2 - Added simple Lyapunov exponent calculation function
 - Added a simple measure function to calculate the largest Lyapunov exponent of a dynamical system:
 `scan.measures.largest_lyapunov_exponent`
