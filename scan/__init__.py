@@ -15,7 +15,7 @@ from . import (
     utilities,
 )
 from ._version import __version__
-from .data_processing import downsampling, embedding
+from .data_processing import downsampling, embedding, smooth
 from .esn import ESN, ESNGenLoc, ESNWrapper
 from .file_handling import load_pkl, save_pkl
 from .logging import set_logger

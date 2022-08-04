@@ -225,7 +225,6 @@ class TestUtilities(TestScanBase):
         slices = 2
 
         x_train_3d = np.arange(0, time_steps * x_dim * slices, 1).reshape((time_steps, x_dim, slices), order="F")
-
         x_train_3d_downsampled = data_processing.downsampling(x_train_3d, downsampling_size=downsampling_size)
 
         exp_x_train_3d_downsampled = np.arange(0.5, time_steps * x_dim * slices - 0.5, 2).reshape(
@@ -245,3 +244,76 @@ class TestUtilities(TestScanBase):
 
         with pytest.raises(ValueError):
             data_processing.downsampling(x_train_3d, downsampling_size=downsampling_size)
+
+    def test_smooth_shape_preservation(self):
+        data_shape = (17, 2)
+        kernel_length = 5
+        number_iterations = 2
+        x_data = np.zeros(shape=data_shape)
+
+        smooth_data = data_processing.smooth(
+            x_data=x_data, kernel_length=kernel_length, append=False, number_iterations=number_iterations
+        )
+        assert smooth_data.shape == data_shape
+
+    def test_smooth_append_True(self):
+        x_data_shape = (17, 2)
+        kernel_length = 5
+        number_iterations = 2
+        x_data = np.random.random(size=x_data_shape)
+
+        smooth_data = data_processing.smooth(
+            x_data=x_data, kernel_length=kernel_length, append=True, number_iterations=number_iterations
+        )
+        assert smooth_data.shape == (x_data_shape[0], 2 * x_data_shape[1])
+        # Test whether the smoothed data got properly attached
+        assert_array_equal(actual=smooth_data[:, : x_data_shape[1]], desired=x_data)
+
+    def test_smooth_reduces_noise_from_sinus(self):
+        kernel_length = 5
+        number_iterations = 4
+
+        time = np.arange(0, 10, 0.1)
+        time = time.reshape((time.shape[0], 1))
+        x_data = np.sin(time)
+        x_data_noisy = x_data + np.random.random(size=x_data.shape) - 0.5
+        new_data = data_processing.smooth(
+            x_data=x_data_noisy, kernel_length=kernel_length, number_iterations=number_iterations
+        )
+
+        assert (new_data <= x_data.max()).all()
+
+    def test_smooth_of_3_values_with_kernel_length_of_3(self):
+        kernel_length = 3
+        number_iterations = 1
+
+        x_data = np.array([1, 2, 3])
+        new_data = data_processing.smooth(
+            x_data=x_data, kernel_length=kernel_length, number_iterations=number_iterations
+        )
+
+        assert (new_data == np.array([[2], [2], [2]])).all()
+
+    def test_smooth_of_5_values_with_kernel_length_of_3(self):
+        kernel_length = 3
+        number_iterations = 1
+
+        x_data = np.array([[1], [2], [3], [4], [5]])
+        new_data = data_processing.smooth(
+            x_data=x_data, kernel_length=kernel_length, number_iterations=number_iterations
+        )
+
+        assert new_data == np.array([[2], [2], [3], [4], [4]])
+
+    def test_smooth_of_5_valuers_with_kernel_length_of_3_with_2_iterations(self):
+        kernel_length = 3
+        number_iterations = 2
+
+        x_data = np.array([[1], [2], [3], [4], [5]])
+        new_data = data_processing.smooth(
+            x_data=x_data, kernel_length=kernel_length, number_iterations=number_iterations
+        )
+
+        assert (new_data.round(4) == np.array([[7 / 3], [7 / 3], [3], [11 / 3], [11 / 3]]).round(4)).all()
+
+    # TODO Test for (t,) shape
