@@ -1,5 +1,88 @@
 ## Changelog
+### Scan 0.6.2 - Added simple Lyapunov exponent calculation function
+- Added a simple measure function to calculate the largest Lyapunov exponent of a dynamical system:
+`scan.measures.largest_lyapunov_exponent`
+- The positional arguments are:
+  - `iterator_func`: A function to iterate the system from one to the next time-step: x(i+1) = F(x(i))
+  - `starting_point`: The starting point for iterating the system. 
 
+**Outline of Algorithm**: 
+- The algorithm simulates two trajectories (the _base_ and the _perturbed_ trajectory) for some 
+initially very close points, for some time steps (given by `part_time_steps`).
+- The largest lyapunov exponent corresponding to this particular trajectory divergence is extracted and saved.
+- The last point of the perturbed trajectory is "pulled" to the last point of the base trajectory by
+keeping the direction between both points constant, but renormalizing the distance to a small value (given by `deviation_scale`). 
+This new perturbed point serves as the initial point for the next trajectory simulation as explained in the first bulletpoint. 
+- Thus, one repeats this scheme for `steps` renormalization steps and calculates the largest lyapunov exponent as the average of all renormalization steps.
+
+See: _Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series analysis. Vol. 69.
+    Oxford: Oxford university press, 2003._ for an explanation of the algorithm. 
+
+### Scan 0.6.1 - Simulating dynamical systems: Enhancements, bugfix and new system
+* Fixed bug in `scan.simulations.LinearSystem` where every non-default matrix `A` would give an error. 
+* Changed how the simulation classes are build up: 
+  * Every simulation class is a subclass of the abstract base class `SimBase`. 
+  * `SimBase` takes care of the basic structure of a simulation class: 
+    * Every system must implement the `iterate` method, since `iterate` is now an `@abstractmethod`
+    in `SimBase`.
+    * `SimBase` defines the `simulate` function, which can be used in all child classes. 
+    * `SimBase` assumes that every child simulation class defines a `default_starting_point`and the 
+    `sys_dim` (system dimension) of the system. 
+  * If the system is simulated with RungeKutta, it is based on the subclass `SimBaseRungeKutta`, 
+  which is already a subclass of `SimBase`.
+    * Every subclass of `SimBaseRungeKutta` is required to have the `flow` method (using `@abstractmethod`). 
+    * The `iterate` method is defined in `SimBaseRungeKutta` by applying runge kutta on the flow. 
+  * Every simulation class now has the default parameters saved in `self.default_parameters`.
+  * Every simulation class now has the default starting point saved in `self.default_starting_point`.
+    * Note: In KuramotoSivashinsky, KuramotoSivashinskyCustom, Lorenz96 and LinearSystem the default starting point is dependent
+    on the parameters, since the dimension of the system is also a parameter. Thus, one can only access the `default_starting_point`
+    after initializing the class-instance. E.g. `KuramotoSivashinsky.default_starting_point` does not exist, but `KuramotoSivashinsky().default_starting_point` does
+  * **Examples**: 
+    * `Lorenz63().default_parameters` gives: `{"sigma": 10.0, "rho": 28.0, "beta": 8 / 3, "dt": 0.05}`
+    * `Lorenz63().default_starting_point` gives: `np.array([0.0, -0.01, 9.0])`
+* Added new 2-dimensional autonomous flow `LotkaVolterra` system.
+* Added `sys_dim` parameter to Lorenz96 (instead of indireclty specifying the dimension in `simulate`)
+
+### Scan 0.6.0 - Simulating dynamical systems: Refactoring and new systems
+* Removed the function `scan.simulations.simulate_trajectory`.
+* Instead of using `simulate_trajectory`, there is now a class for every dynamical system implemented.
+  * The dynamical-system classes have a common structure: 
+    * The system parameters (including time step `dt`, if the system is a flow) are specified in 
+    the class constructor (i.e. when calling `__init__`).
+    * Every class has the method `simulate` which can be used to simulate the whole trajectory. 
+    It takes the positional argument `time_steps` and the keyword argument `starting_point`.
+    * If you simulate for _n_ `time_steps`, the returned trajectory has exactly _n_ elements, where 
+    the first element is the starting point. So actually one only simulates _n-1_ new time steps.
+    * All system classes have a method `iterate`, that iterates the system to the next time step. Some 
+    systems also have the method `flow`, which calculates the time derivative at a given point. 
+  * Example to simulate a trajectory of the _Lorenz63_ system with 1000 time steps:
+    * `trajectory = Lorenz63(sigma=10, rho=28, beta=8/3, dt=0.05).simulate(1000, starting_point=np.array([0, 1, 2]))` 
+    or just `Lorenz63().simulate(1000)` with default parameters and default starting_point.
+* Added more dynamical Systems, with default parameters and starting_points from _Sprott, Julien 
+Clinton, and Julien C. Sprott. Chaos and time-series
+    analysis. Vol. 69. Oxford: Oxford university press, 2003._
+* List of supported dynamical systems: 
+  - Lorenz63 
+  - Roessler
+  - ComplexButterfly (see _Sprott_)
+  - Chen
+  - ChuaCircuit
+  - Thomas
+  - WindmiAttractor (see _Sprott_)
+  - Rucklidge
+  - SimplestQuadraticChaotic (see _Sprott_)
+  - SimplestCubicChaotic (see _Sprott_)
+  - SimplestPiecewiseLinearChaotic (see _Sprott_)
+  - DoubleScroll
+  - Henon
+  - Logistic
+  - SimplestDrivenChaotic (see _Sprott_)
+  - UedaOscillator
+  - KuramotoSivashinsky
+  - KuramotoSivashinskyCustom
+  - Lorenz96
+  - LinearSystem (A general n_dimensional linear system: x_t = A*x with matrix A)
+  
 ### Scan 0.5.0 - Compared to Rescomp 0.3.2
 
 #### Non-Breaking Changes

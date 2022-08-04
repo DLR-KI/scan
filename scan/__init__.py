@@ -20,7 +20,6 @@ from .esn import ESN, ESNGenLoc, ESNWrapper
 from .file_handling import load_pkl, save_pkl
 from .logging import set_logger
 from .mpi import MPIScheduler
-from .simulations import simulate_trajectory
 
 set_logger("WARNING")  # Activate our own MPI-save logging handler
 
