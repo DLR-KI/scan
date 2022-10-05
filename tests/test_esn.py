@@ -435,6 +435,18 @@ class TestESN(TestScanBase):
         with pytest.raises(ValueError):
             self.esn.train(x_train=x_train, sync_steps=sync_steps, w_out_fit_flag="this_flag_doesnt_exist")
 
+    def test_predict_unknown_w_out_fit_flag(self):
+        # NOTE: The situation tested here really should never come up in normal usage as we manually change the
+        #  w_out_fit_flag between the train and predict steps, which is very much not intended. We test it anyway, as
+        #  we can test the ValueError raised in r_to_generalized_r for an unknown w_out_fit_flag that way.
+        self.create_network_3x3_rand_simple()
+        self.train_simple_3x3_x_train()
+
+        x_pred = np.array([[-0.7, 1, 0.2], [-0.2, 0.3, 0.06], [0.3, -0.5, 0], [-0.6, 0.7, 0.3]])
+        with pytest.raises(ValueError):
+            self.esn.w_out_fit_flag = "this_flag_doesnt_exit"
+            self.esn.predict(x_pred, sync_steps=0)
+
     def test_train_unknown_act_fct_flag(self):
         self.create_network_3x3_rand_simple()
 

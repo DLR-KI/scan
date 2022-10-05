@@ -143,8 +143,8 @@ class _ESNCore:
             return r
         elif self.w_out_fit_flag == 1:
             return np.hstack((r, r**2))
-        # else:
-        #     raise ValueError(f"self.w_out_fit_flag {self.w_out_fit_flag} unknown!")
+        else:
+            raise ValueError(f"self.w_out_fit_flag {self.w_out_fit_flag} unknown!")
 
     def _fit_w_out(self, y_train: np.ndarray, r_gen: np.ndarray) -> None:
         """Fit the output matrix self.w_out after training.
