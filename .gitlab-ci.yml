@@ -1,0 +1,15 @@
+image: busybox
+
+pages:
+  stage: deploy
+  only:
+    - gl-pages
+  script:
+  - echo 'Nothing to do...'
+  artifacts:
+    paths:
+    - gl_pages 
+    expire_in: 7 day
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+
