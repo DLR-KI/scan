@@ -48,7 +48,6 @@ class _ESNCore:
     """
 
     def __init__(self) -> None:
-
         logger.debug("Create _ESNCore instance")
 
         self.w_in: np.ndarray | None = None
@@ -234,7 +233,6 @@ class ESN(_ESNCore):
     """
 
     def __init__(self) -> None:
-
         logger.debug("Create ESN instance")
 
         super().__init__()

@@ -133,7 +133,6 @@ class TestSimulations(TestScanBase):
         starting_point = np.ones(11)
 
         with pytest.raises(ValueError):
-
             scan.simulations.Lorenz96(
                 sys_dim=sys_dim,
             ).simulate(time_steps=time_steps, starting_point=starting_point)
@@ -336,7 +335,6 @@ class TestSimulations(TestScanBase):
         assert_array_equal(sim_data_1, sim_data_2)
 
     def test_linear_dimension_missmatch(self):
-
         A = np.ones((10, 10))
         time_steps = 2
         starting_point = np.ones(11)
@@ -528,7 +526,6 @@ class TestSimulations(TestScanBase):
         starting_point = np.ones(11)
 
         with pytest.raises(ValueError):
-
             scan.simulations.KuramotoSivashinsky(
                 sys_dim=sys_dim,
             ).simulate(time_steps=time_steps, starting_point=starting_point)
@@ -539,7 +536,6 @@ class TestSimulations(TestScanBase):
         starting_point = np.ones(11)
 
         with pytest.raises(ValueError):
-
             scan.simulations.KuramotoSivashinskyCustom(
                 sys_dim=sys_dim,
             ).simulate(time_steps=time_steps, starting_point=starting_point)
@@ -562,7 +558,6 @@ class TestSimulations(TestScanBase):
         fft_type = "numpy"
 
         with pytest.raises(ValueError):
-
             scan.simulations.KuramotoSivashinskyCustom(
                 sys_dim=sys_dim,
                 sys_length=sys_length,
@@ -578,7 +573,6 @@ class TestSimulations(TestScanBase):
         time_steps = 10
 
         with pytest.raises(ValueError):
-
             scan.simulations.KuramotoSivashinskyCustom(
                 sys_dim=sys_dim,
                 sys_length=sys_length,
