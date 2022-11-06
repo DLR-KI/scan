@@ -10,7 +10,7 @@ dist/
 scan.egg-info/
 
 # Compiled doc files
-doc/_build/
+docs/_build/
 
 # IDE specific files
 .idea/

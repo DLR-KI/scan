@@ -1,23 +1,9 @@
-## Scan 
+## Installation
 
-This repository contains the python 3 package _scan_, implementing the machine learning technique Reservoir 
-Computing (RC) and related methods.
+The following is a guide detailing how to install the scan package the way it "should" be done, i.e. as safely as possible.  
+If you already know what you are doing, you can just install this package like any other locally installed package.
 
-SCAN stands for some combination of: {'science', 'simulation', 'system', 'solution', 'software'}, {'chaos', 'control', 
-'complex', 'computing'}, {'analysis, analytic'}, {'neural', 'net/network'}.  
-At some point we should probably choose what it actually stands for.
-
-### License
-The code in this repository is proprietary property of the DLR and subject to confidentiality.
-The usual NDA clauses apply, so unless you have explicit permission to do so:
-* Do not upload this package to non-DLR servers (especially not GitHub).
-* Do not share this package with anyone outside the DLR.
-
-### Documentation Website
-
-The PDF-Docuemntation has not yet been transferred to this GitLab repository, mostly due to the necessary CI/CD-Pipeline 
-not yet being available. Until then, please see the code docstrings, tests and the related
-[Rescomp documentation website](https://glsrc.github.io/rescomp/).
+These instructions are for unix systems, but do work with at most minor modifications on Windows too.
 
 ### Installation
 #### Prerequisites
@@ -27,16 +13,15 @@ not yet being available. Until then, please see the code docstrings, tests and t
 
 #### The Basics
 
-First, clone the scan repository to a folder of your choice. 
-
-Once you have done this, enter the cloned folder, and tell git who you are:
+First, clone the scan repository to a folder of your choice. Once you have done this, enter the cloned folder, and 
+tell git who you are:
 ```
 git config user.name "Lastname, Firstname"
 git config user.email "Firstname.Lastname@dlr.de"
 ```
 From here, follow either the conda or pip installation instructions below. If you don't know which one to choose, 
 [install miniforge](https://github.com/conda-forge/miniforge) as conda distribution and then follow the conda 
-installation instructions.
+instructions.
 
 #### Installation using Conda
 Create a new python 3.9 environment named scan and install the scan package requirements as well as the packages used 
@@ -108,29 +93,54 @@ pytest
 ```
 If no errors pop up, you have installed the scan package successfully. 
 
+After the installation, check out our [examples](examples.rst) to familiarize yourself with the package.  
 
-### Push and Merge Request Steps
+### Common Installation Problems
+####  The installation seems to have worked without error, but the package is not found when I try to import it. 
 
-Before any push or merge request do the following from inside the scan repository main folder within an active 
-development environment.
-following:  
-1. Use black and isort the format the code:
-    ```
-    black . && isort .
-    ```
-2. Run mypy to check for type hint coverage and type related problems:
-    ```
-    mypy
-    ```
-3. Run the testing suite in your active environment to check for bugs and code coverage:
-    ```
-    pytest --cov-report term-missing --cov=scan tests/
-    ```
-4. Run the testing suite in all tox-conda environments:
-    ```
-    tox --develop -c tox-conda.ini
-    ```
-5. Once all of the above run without error, push the code to your personal GitLab repository and then open a merge 
-request using the website interface.
+Make sure that pip is installed and active in the environment you want to install the package to:
 
-Once we have a CI/CD Pipeline setup, all of this will run automatically. Until then, we'll need to do it manually.
+    which pip
+
+The output of the above should include the active environment name. For the environment _scan_ from above it should be something like
+
+  > "/Users/<username>/anaconda3/envs/scan/bin/pip"
+
+If it doesn't include the environment name, you installed the scan package in what ever environment the above specifies.   
+To undo this, first uninstall the package,
+
+    pip uninstall scan
+
+then deactivate and activate your anaconda environment 
+
+    conda deactivate
+    conda activate scan
+
+and then, should pip still not be located in the active environment by "which pip", install pip explicitly:
+
+    conda install pip
+
+#### Nothing works, please help me!  
+
+If you can't install or use the package despite following the above instructions, [write us][maintainer mail adresses]. For a package as new as this one, such problems are to be expected and we will try to help as soon as possible.
+
+### Updating
+
+To keep the scan package up to date with the most current version in the repository, enter your local repository folder (the same folder we cloned during the installation) and run
+
+    git pull
+    
+This updates your local copy of the package to be up to date with the one on the GitLab website.  
+If you installed the package as an editable install during installation, you are done, the update is complete.
+If you installed it as a regular package, you can finish the update by running
+
+    pip install --upgrade .
+
+
+### Uninstalling 
+
+To uninstall the scan package, simply activate the respective environment and then type:
+
+    pip uninstall scan
+
+[maintainer mail adresses]: mailto:Sebastian.Baur@dlr.de?cc=Christoph.Raeth@dlr.de
