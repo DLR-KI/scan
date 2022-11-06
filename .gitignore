@@ -16,7 +16,7 @@ doc/_build/
 .idea/
 
 # jupyter checkpoint files:
-bin/.ipynb_checkpoints/
+.ipynb_checkpoints/
 
 # Temporary swap files
 *.swp
