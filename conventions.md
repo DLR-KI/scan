@@ -15,7 +15,7 @@ The scan package follows the InRe code style.
 * w_in: input matrix and prefix for input matrix related parameters
 * "x_" prefix means input
 * "y_" prefix means output/prediction
-* *sys_" prefix means simulation data
+* "sys_" prefix means simulation data
 
 ### Package Conventions
 * MPI is, and should stay, entirely optional
