@@ -57,7 +57,7 @@ def _timestep_iterator(
     return traj
 
 
-class SimBase(ABC):
+class _SimBase(ABC):
     """A base class for all the simulation classes."""
 
     default_starting_point: np.ndarray
@@ -91,7 +91,7 @@ class SimBase(ABC):
         return _timestep_iterator(self.iterate, time_steps, starting_point)
 
 
-class SimBaseRungeKutta(SimBase):
+class _SimBaseRungeKutta(_SimBase):
     dt: float
 
     @abstractmethod
@@ -111,7 +111,7 @@ class SimBaseRungeKutta(SimBase):
         return _runge_kutta(self.flow, self.dt, x)
 
 
-class Lorenz63(SimBaseRungeKutta):
+class Lorenz63(_SimBaseRungeKutta):
     """Simulate the 3-dimensional autonomous flow: Lorenz-63 attractor.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -159,7 +159,7 @@ class Lorenz63(SimBaseRungeKutta):
         return np.array([self.sigma * (x[1] - x[0]), x[0] * (self.rho - x[2]) - x[1], x[0] * x[1] - self.beta * x[2]])
 
 
-class Roessler(SimBaseRungeKutta):
+class Roessler(_SimBaseRungeKutta):
     """Simulate the 3-dimensional autonomous flow: Roessler attractor.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -207,7 +207,7 @@ class Roessler(SimBaseRungeKutta):
         return np.array([-x[1] - x[2], x[0] + self.a * x[1], self.b + x[2] * (x[0] - self.c)])
 
 
-class ComplexButterly(SimBaseRungeKutta):
+class ComplexButterly(_SimBaseRungeKutta):
     """Simulate the 3-dimensional autonomous flow: Complex butterfly.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -248,7 +248,7 @@ class ComplexButterly(SimBaseRungeKutta):
         return np.array([self.a * (x[1] - x[0]), -x[2] * np.sign(x[0]), np.abs(x[0]) - 1])
 
 
-class Chen(SimBaseRungeKutta):
+class Chen(_SimBaseRungeKutta):
     """Simulate the 3-dimensional autonomous flow: Chen's system.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -301,7 +301,7 @@ class Chen(SimBaseRungeKutta):
         )
 
 
-class ChuaCircuit(SimBaseRungeKutta):
+class ChuaCircuit(_SimBaseRungeKutta):
     """Simulate the 3-dimensional autonomous flow: Chua's circuit.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -362,7 +362,7 @@ class ChuaCircuit(SimBaseRungeKutta):
         )
 
 
-class Thomas(SimBaseRungeKutta):
+class Thomas(_SimBaseRungeKutta):
     """Simulate the 3-dimensional autonomous flow: Thomas' cyclically symmetric attractor.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -403,7 +403,7 @@ class Thomas(SimBaseRungeKutta):
         return np.array([-self.b * x[0] + np.sin(x[1]), -self.b * x[1] + np.sin(x[2]), -self.b * x[2] + np.sin(x[0])])
 
 
-class WindmiAttractor(SimBaseRungeKutta):
+class WindmiAttractor(_SimBaseRungeKutta):
     """Simulate the 3-dimensional autonomous flow: WINDMI attractor.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -446,7 +446,7 @@ class WindmiAttractor(SimBaseRungeKutta):
         return np.array([x[1], x[2], -self.a * x[2] - x[1] + self.b - np.exp(x[0])])
 
 
-class Rucklidge(SimBaseRungeKutta):
+class Rucklidge(_SimBaseRungeKutta):
     """Simulate the 3-dimensional autonomous flow: Rucklidge attractor.
 
     Literature values for LLE according to (Rusyn, V. "Modeling, analysis and
@@ -498,7 +498,7 @@ class Rucklidge(SimBaseRungeKutta):
         return np.array([-self.kappa * x[0] + self.lam * x[1] - x[1] * x[2], x[0], -x[2] + x[1] ** 2])
 
 
-class SimplestQuadraticChaotic(SimBaseRungeKutta):
+class SimplestQuadraticChaotic(_SimBaseRungeKutta):
     """Simulate the 3-dimensional autonomous flow: Simplest Quadratic Chaotic flow.
 
     See: Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -542,7 +542,7 @@ class SimplestQuadraticChaotic(SimBaseRungeKutta):
         return np.array([x[1], x[2], -self.a * x[2] + x[1] ** 2 - x[0]])
 
 
-class SimplestCubicChaotic(SimBaseRungeKutta):
+class SimplestCubicChaotic(_SimBaseRungeKutta):
     """Simulate the 3-dimensional autonomous flow: Simplest Cubic Chaotic flow.
 
     See: Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -586,7 +586,7 @@ class SimplestCubicChaotic(SimBaseRungeKutta):
         return np.array([x[1], x[2], -self.a * x[2] + x[1] ** 2 * x[0] - x[0]])
 
 
-class SimplestPiecewiseLinearChaotic(SimBaseRungeKutta):
+class SimplestPiecewiseLinearChaotic(_SimBaseRungeKutta):
     """Simulate the 3-dimensional autonomous flow: Simplest Piecewise Linear Chaotic flow.
 
     See: Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -630,7 +630,7 @@ class SimplestPiecewiseLinearChaotic(SimBaseRungeKutta):
         return np.array([x[1], x[2], -self.a * x[2] - x[1] + np.abs(x[0]) - 1])
 
 
-class DoubleScroll(SimBaseRungeKutta):
+class DoubleScroll(_SimBaseRungeKutta):
     """Simulate the 3-dimensional autonomous flow: Double Scroll system
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -671,7 +671,7 @@ class DoubleScroll(SimBaseRungeKutta):
         return np.array([x[1], x[2], -self.a * (x[2] + x[1] + x[0] - np.sign(x[0]))])
 
 
-class LotkaVolterra(SimBaseRungeKutta):
+class LotkaVolterra(_SimBaseRungeKutta):
     """Simulate the 2-dimensional autonomous flow: Lotka-Volterra"""
 
     default_parameters = {"a": 2.0, "b": 0.4, "c": 3.0, "d": 0.6, "dt": 0.05}
@@ -714,7 +714,7 @@ class LotkaVolterra(SimBaseRungeKutta):
         return np.array([self.a * x[0] - self.b * x[0] * x[1], -self.c * x[1] + self.d * x[0] * x[1]])
 
 
-class Henon(SimBase):
+class Henon(_SimBase):
     """Simulate the 2-dimensional dissipative map: Henon map.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -756,7 +756,7 @@ class Henon(SimBase):
         return np.array([1 - self.a * x[0] ** 2 + self.b * x[1], x[0]])
 
 
-class Logistic(SimBase):
+class Logistic(_SimBase):
     """Simulate the 1-dimensional noninvertable map: Logistic map.
 
     Literature values (Sprott, Julien Clinton, and Julien C. Sprott. Chaos and time-series
@@ -799,7 +799,7 @@ class Logistic(SimBase):
         )
 
 
-class SimplestDrivenChaotic(SimBaseRungeKutta):
+class SimplestDrivenChaotic(_SimBaseRungeKutta):
     """Simulate the 2+1 dim (2 space, 1 time) conservative flow: Simplest Driven Chaotic flow.
 
     Note: The third dimension is the linear increasing time dimension. Remove that dimension before
@@ -846,7 +846,7 @@ class SimplestDrivenChaotic(SimBaseRungeKutta):
         return np.array([x[1], -(x[0] ** 3) + np.sin(self.omega * x[2]), 1])
 
 
-class UedaOscillator(SimBaseRungeKutta):
+class UedaOscillator(_SimBaseRungeKutta):
     """Simulate the 2+1 dim (2 space, 1 time) driven dissipative flow: Ueda oscillator.
 
     Note: The third dimension is the linear increasing time dimension. Remove that dimension before
@@ -896,7 +896,7 @@ class UedaOscillator(SimBaseRungeKutta):
         return np.array([x[1], -(x[0] ** 3) - self.b * x[1] + self.A * np.sin(self.omega * x[2]), 1])
 
 
-class KuramotoSivashinsky(SimBase):
+class KuramotoSivashinsky(_SimBase):
     """Simulate the n-dimensional Kuramoto-Sivashinsky PDE.
 
     Note: dimension must be an even number.
@@ -1010,7 +1010,7 @@ class KuramotoSivashinsky(SimBase):
         return np.real(np.fft.ifft(v))
 
 
-class KuramotoSivashinskyCustom(SimBase):
+class KuramotoSivashinskyCustom(_SimBase):
     """Simulate the n-dimensional Kuramoto-Sivashinsky PDE with custom precision and fft backend.
     PDE: y_t = -y*y_x - y_xx - y_xxxx.
 
@@ -1209,7 +1209,7 @@ class KuramotoSivashinskyCustom(SimBase):
         return np.real(self.custom_ifft(v))
 
 
-class Lorenz96(SimBaseRungeKutta):
+class Lorenz96(_SimBaseRungeKutta):
     """Simulate the n-dimensional dynamical system: Lorenz 96 model."""
 
     class DefaultParameters(TypedDict):
@@ -1260,7 +1260,7 @@ class Lorenz96(SimBaseRungeKutta):
         return derivative
 
 
-class LinearSystem(SimBaseRungeKutta):
+class LinearSystem(_SimBaseRungeKutta):
     """Simulate a generic n-dimensional linear dynamical system x_t = A*x"""
 
     class DefaultParameters(TypedDict):
