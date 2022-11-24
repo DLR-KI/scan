@@ -14,6 +14,7 @@ docs/_build/
 
 # IDE specific files
 .idea/
+.vscode/
 
 # jupyter checkpoint files:
 .ipynb_checkpoints/
