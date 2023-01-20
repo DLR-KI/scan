@@ -169,116 +169,43 @@ def smooth(
     elif smoothed.ndim == 2:
         smoothed = smoothed[:,:,None]
 
-    for _ in range(number_iterations):
-        if kernel_type == "mean":
+    if kernel_type == 'mean':
             lkl = kernel_length//2    # left_kernel_length
             rkl = kernel_length - lkl # right_kernel_length
-            for slice in range(smoothed.shape[2]):
-                # smooth for each slice of data separately
-                for dim in range(smoothed.shape[1]):
-                    # smooth for each dimension of data separately
-                    # smoothed_old is needed to avoid using already
-                    # smoothed values within the neighborhood of others
-                    smoothed_old = smoothed[:, dim, slice].copy()
-                    for pos_kernel in range(lkl):
-                        # for the inital boundary problem the values
-                        # will be smoothed separately
-                        total = 0
-                        for pos_in_kernel in range(kernel_length):
-                            total += smoothed_old[pos_in_kernel]
-                        smoothed[pos_kernel, dim, slice] = total/kernel_length
-                    for pos_kernel in range(lkl, smoothed.shape[0]-rkl):
-                        # smoothing with values around current position
-                        total = 0
-                        for pos_in_kernel in range(lkl):
-                            # the -1 extra value is used in the
-                            # first kernel length because if the
-                            # kernel_length is an odd number, the
-                            # second kernel length will be +1 bigger
-                            # than the first kernel length
-                            total += smoothed_old[pos_kernel-1-pos_in_kernel]
-                        for pos_in_kernel in range(rkl):
-                            total += smoothed_old[pos_kernel + pos_in_kernel]
-                        smoothed[pos_kernel, dim, slice] = total/kernel_length
-                    for pos_kernel in range(smoothed.shape[0]-rkl, smoothed.shape[0]):
-                        # for the end boundary problem the values will
-                        # be smoothed separately
-                        total = 0
-                        for pos_in_kernel in range(kernel_length):
-                            total += smoothed_old[-1-pos_in_kernel]
-                        smoothed[pos_kernel, dim, slice] = total/kernel_length
+    for _ in range(number_iterations):
+        for slice in range(smoothed.shape[2]):
+            # smooth for each slice of data separately
+            for dim in range(smoothed.shape[1]):
+                # smooth for each dimension of data separately
+                # smoothed_old is needed to avoid using already
+                # smoothed values within the neighborhood of others
+                smoothed_old = smoothed[:, dim, slice].copy()
+                for pos_kernel in range(lkl):
+                    # for the inital boundary problem the values
+                    # will be smoothed separately
+                    total = 0
+                    for pos_in_kernel in range(kernel_length):
+                        total += smoothed_old[pos_in_kernel]
+                    smoothed[pos_kernel, dim, slice] = total/kernel_length
+                for pos_kernel in range(lkl, smoothed.shape[0]-rkl):
+                    # smoothing with values around current position
+                    total = 0
+                    for pos_in_kernel in range(lkl):
+                        # the -1 extra value is used in the
+                        # first kernel length because if the
+                        # kernel_length is an odd number, the
+                        # second kernel length will be +1 bigger
+                        # than the first kernel length
+                        total += smoothed_old[pos_kernel-1-pos_in_kernel]
+                    for pos_in_kernel in range(rkl):
+                        total += smoothed_old[pos_kernel + pos_in_kernel]
+                    smoothed[pos_kernel, dim, slice] = total/kernel_length
+                for pos_kernel in range(smoothed.shape[0]-rkl, smoothed.shape[0]):
+                    # for the end boundary problem the values will
+                    # be smoothed separately
+                    total = 0
+                    for pos_in_kernel in range(kernel_length):
+                        total += smoothed_old[-1-pos_in_kernel]
+                    smoothed[pos_kernel, dim, slice] = total/kernel_length
     smoothed = smoothed.reshape(x_data_shape)
     return smoothed
-    '''
-    # initialize
-    smoothed_data = x_data.copy()
-    for num_slice, slice in enumerate(x_data[:,:,]):
-        # WRONG!!! first dont use x_data but smoothed_data and secondly
-        # ensure that it is propertly used within the smooth iterations
-        # initialize
-        smoothed = slice.copy()  # x_data.copy()
-        for _ in range(number_iterations):
-            if kernel_type == "mean":
-                lkl = kernel_length // 2  #left_kernel_length
-                rkl = kernel_length - lkl #right_kernel_length
-                for dim in range(x_data.shape[1]):
-                    # loop for each dim of data separately
-                    for pos_kernel in range(lkl):
-                        # for the inital boundary problem the values
-                        # will be smoothed separately
-                        total = 0
-                        for pos_in_kernel in range(kernel_length):
-                            total += smoothed[pos_in_kernel, dim]
-                        smoothed[pos_kernel, dim] = total / kernel_length
-                    for pos_kernel in range(lkl, smoothed.shape[0] - rkl):
-                        # ordinary smoothing with values around current pos
-                        total = 0
-                        for pos_in_kernel in range(lkl):
-                            # the -1 extra value is used in the
-                            # first kernel length because if the
-                            # kernel_length is an odd number, the
-                            # second kernel length will be +1 bigger
-                            # than the first kernel length
-                            total += smoothed[pos_kernel - 1 - pos_in_kernel, dim]
-                        for pos_in_kernel in range(rkl):
-                            total += smoothed[pos_kernel + pos_in_kernel, dim]
-                        smoothed[pos_kernel, dim] = total / kernel_length
-                    for pos_kernel in range(smoothed.shape[0] - rkl, smoothed.shape[0]):
-                        # for the end boundary problem the values will
-                        # be smoothed separately
-                        total = 0
-                        for pos_in_kernel in range(kernel_length):
-                            total += smoothed[-1 - pos_in_kernel, dim]
-                        smoothed[pos_kernel, dim] = total / kernel_length
-        # ignores the fact that slices
-        if data_is_time_shape:
-            smoothed = smoothed.flatten()
-        return smoothed
-    '''
-
-
-########################################################################
-
-if __name__ == '__main__':
-    if True: # TEST 2 smooth()
-        data = np.array([1,2,3,4,5,6,7,8,9], dtype=float)
-        # desired result calculated by hand
-        result = np.array([10/4,10/4,10/4,14/4,18/4,22/4,26/4,30/4,30/4], dtype=float)
-        smoothed = smooth(data,
-                        kernel_length=4,
-                        kernel_type='mean',
-                        number_iterations=1)
-        print('smoothed', smoothed)
-        print('result', result)
-        assert np.all(smoothed == result)
-    
-    if True: # TEST 1 smooth()
-        data = np.array([[1,2],[2,3],[3,4],[4,5],[5,6]])
-        # desired result calculated by hand
-        result = np.array([[2,3],[2,3],[3,4],[4,5],[4,5]])
-        smoothed = smooth(data,
-                        kernel_length=3,
-                        kernel_type='mean',
-                        number_iterations=1)
-        print('smoothed', smoothed)
-        assert np.all(smoothed == result)
