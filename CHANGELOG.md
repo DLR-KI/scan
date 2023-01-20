@@ -1,5 +1,10 @@
 ## Changelog
 
+### Scan 0.8.0 - Implemented smooth function to data_processing
+- The smooth-function, in its current state, evaluates iteratively the mean of the neighborhood
+within a certain range for each value and it has a specially handling of the boundaries.
+It can therefore be used to reduce noise.
+
 ### Scan 0.7.0 - Removed disc_steps parameter everywhere
 - Removed disc\_steps paramter from train\_and\_predict function in ESNWrapper class and 
 in utilities.train\_and\_predict\_input\_setup.
