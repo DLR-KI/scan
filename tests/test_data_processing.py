@@ -257,18 +257,20 @@ class TestUtilities(TestScanBase):
             x_data=x_data_noisy, kernel_length=kernel_length, number_iterations=number_iterations
         )
 
-        assert (new_data <= x_data.max()).all()
+        assert np.all(new_data <= x_data_noisy.max())
 
     def test_smooth_of_5_values_with_kernel_length_of_3_with_2_iterations(self):
         kernel_length = 3
         number_iterations = 2
 
-        x_data = np.array([[1], [2], [3], [4], [5]])
-        new_data = data_processing.smooth(
+        x_data = np.array([[1], [2], [3], [4], [5]], dtype=float)
+        # desired result calculated by hand
+        result = np.array([[7/3], [7/3], [3], [11/3], [11/3]], dtype=float)
+        smoothed = data_processing.smooth(
             x_data=x_data, kernel_length=kernel_length, number_iterations=number_iterations
         )
 
-        assert (new_data.round(4) == np.array([[7 / 3], [7 / 3], [3], [11 / 3], [11 / 3]]).round(4)).all()
+        assert_array_equal(smoothed, result)
 
     def test_smooth_kernel_length_4_with_t_shape_data(self):
         kernel_length = 4
