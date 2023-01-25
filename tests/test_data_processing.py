@@ -263,9 +263,9 @@ class TestUtilities(TestScanBase):
         kernel_length = 3
         number_iterations = 2
 
-        x_data = np.array([[1], [2], [3], [4], [5]], dtype=float)
+        x_data = np.array([[1], [2], [3], [4], [5]])
         # desired result calculated by hand
-        result = np.array([[7 / 3], [7 / 3], [3], [11 / 3], [11 / 3]], dtype=float)
+        result = np.array([[7 / 3], [7 / 3], [3], [11 / 3], [11 / 3]])
         smoothed = data_processing.smooth(
             x_data=x_data, kernel_length=kernel_length, number_iterations=number_iterations
         )
@@ -277,9 +277,9 @@ class TestUtilities(TestScanBase):
         kernel_type = "mean"
         number_iterations = 1
 
-        data = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9], dtype=float)
+        data = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9])
         # desired result calculated by hand
-        result = np.array([10 / 4, 10 / 4, 10 / 4, 14 / 4, 18 / 4, 22 / 4, 26 / 4, 30 / 4, 30 / 4], dtype=float)
+        result = np.array([10 / 4, 10 / 4, 10 / 4, 14 / 4, 18 / 4, 22 / 4, 26 / 4, 30 / 4, 30 / 4])
         smoothed = data_processing.smooth(
             x_data=data, kernel_length=kernel_length, kernel_type=kernel_type, number_iterations=number_iterations
         )

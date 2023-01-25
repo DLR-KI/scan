@@ -160,7 +160,7 @@ def smooth(
 
     # ensure array is (t,d,s) shaped for the algorithm
     x_data_shape = x_data.shape
-    smoothed = x_data.copy()
+    smoothed = x_data.copy().astype(float)
     if smoothed.ndim == 1:
         smoothed = smoothed[:, None, None]
     elif smoothed.ndim == 2:
