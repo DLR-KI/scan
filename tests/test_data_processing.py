@@ -265,7 +265,7 @@ class TestUtilities(TestScanBase):
 
         x_data = np.array([[1], [2], [3], [4], [5]], dtype=float)
         # desired result calculated by hand
-        result = np.array([[7/3], [7/3], [3], [11/3], [11/3]], dtype=float)
+        result = np.array([[7 / 3], [7 / 3], [3], [11 / 3], [11 / 3]], dtype=float)
         smoothed = data_processing.smooth(
             x_data=x_data, kernel_length=kernel_length, number_iterations=number_iterations
         )
@@ -274,42 +274,39 @@ class TestUtilities(TestScanBase):
 
     def test_smooth_kernel_length_4_with_t_shape_data(self):
         kernel_length = 4
-        kernel_type = 'mean'
+        kernel_type = "mean"
         number_iterations = 1
-        
-        data = np.array([1,2,3,4,5,6,7,8,9], dtype=float)
+
+        data = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9], dtype=float)
         # desired result calculated by hand
-        result = np.array([10/4,10/4,10/4,14/4,18/4,22/4,26/4,30/4,30/4], dtype=float)
-        smoothed = data_processing.smooth(x_data=data,
-                        kernel_length=kernel_length,
-                        kernel_type=kernel_type,
-                        number_iterations=number_iterations)
+        result = np.array([10 / 4, 10 / 4, 10 / 4, 14 / 4, 18 / 4, 22 / 4, 26 / 4, 30 / 4, 30 / 4], dtype=float)
+        smoothed = data_processing.smooth(
+            x_data=data, kernel_length=kernel_length, kernel_type=kernel_type, number_iterations=number_iterations
+        )
         assert_array_equal(smoothed, result)
-    
+
     def test_smooth_kernel_length_3_with_td_shape_data(self):
         kernel_length = 3
-        kernel_type = 'mean'
+        kernel_type = "mean"
         number_iterations = 1
-        
-        data = np.array([[1,2],[2,3],[3,4],[4,5],[5,6]])
+
+        data = np.array([[1, 2], [2, 3], [3, 4], [4, 5], [5, 6]])
         # desired result calculated by hand
-        result = np.array([[2,3],[2,3],[3,4],[4,5],[4,5]])
-        smoothed = data_processing.smooth(x_data=data,
-                        kernel_length=kernel_length,
-                        kernel_type=kernel_type,
-                        number_iterations=number_iterations)
+        result = np.array([[2, 3], [2, 3], [3, 4], [4, 5], [4, 5]])
+        smoothed = data_processing.smooth(
+            x_data=data, kernel_length=kernel_length, kernel_type=kernel_type, number_iterations=number_iterations
+        )
         assert_array_equal(smoothed, result)
-    
+
     def test_smooth_kernel_length_3_with_tds_shape_data(self):
         kernel_length = 3
-        kernel_type = 'mean'
+        kernel_type = "mean"
         number_iterations = 1
-        
-        data = np.array([[[1],[2]],[[2],[3]],[[3],[4]],[[4],[5]],[[5],[6]]])
+
+        data = np.array([[[1], [2]], [[2], [3]], [[3], [4]], [[4], [5]], [[5], [6]]])
         # desired result calculated by hand
-        result = np.array([[[2],[3]],[[2],[3]],[[3],[4]],[[4],[5]],[[4],[5]]])
-        smoothed = data_processing.smooth(x_data=data,
-                        kernel_length=kernel_length,
-                        kernel_type=kernel_type,
-                        number_iterations=number_iterations)
+        result = np.array([[[2], [3]], [[2], [3]], [[3], [4]], [[4], [5]], [[4], [5]]])
+        smoothed = data_processing.smooth(
+            x_data=data, kernel_length=kernel_length, kernel_type=kernel_type, number_iterations=number_iterations
+        )
         assert_array_equal(smoothed, result)

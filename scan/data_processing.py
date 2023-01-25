@@ -110,44 +110,44 @@ def downsampling(x_data: np.ndarray, downsampling_size: int) -> np.ndarray:
 
 
 def smooth(
-    x_data: np.array,
-    kernel_length: int=3,
-    kernel_type: str="mean",
-    number_iterations: int=5,
-) -> np.array:
+    x_data: np.ndarray,
+    kernel_length: int = 3,
+    kernel_type: str = "mean",
+    number_iterations: int = 5,
+) -> np.ndarray:
     """This smoothing preserves the shape of original data array.
 
     The way the boundaries are handeled has shown to have so far the
-    best results, i.e. 
+    best results, i.e.
         - it prevents shifts of the resulting curve
         - it minimizes value overshooting at the boundaries
-        - it does not pull NaN, zero or similar numerical artifacts 
+        - it does not pull NaN, zero or similar numerical artifacts
         into the boundaries.
-    It is recommended to increase the number_iterations parameter 
+    It is recommended to increase the number_iterations parameter
     instead to increase the kernel_length to high values, to not smooth
     out artifacs of the underlying signal but just the noise.
 
     WARNING: Both ends of the new smoothed data array will nevertheless
-    be probably not of good quality. So it may be convenient to cut 
+    be probably not of good quality. So it may be convenient to cut
     them off afterwards.
-    
+
     Example:
         smooth_data = scan.data_processing.smooth(x_data)
 
     Args:
-        x_data (np.array): Data to smooth with shape (t,), (t, d) or 
+        x_data: Data to smooth with shape (t,), (t, d) or
         (t, d, s).
-        kernel_length (int): Number of adjacent values which are taken
+        kernel_length: Number of adjacent values which are taken
             into account for calculating so to speak "a smoothed value".
             Defaults to 3.
-        kernel_type (str, optional): Defaults to 'mean'.
+        kernel_type: Defaults to 'mean'.
             - 'mean' means mean value of the value and its neigbours
               within the range of attr. kernel_length, i.e. boxed shaped
               kernel in the language of convolutions.
-        number_iterations (int, optional): Number of times the smoothing
+        number_iterations: Number of times the smoothing
             is applied. A high number of iterations ensures that the
-            underlying signal and its frequencies are preserved from 
-            getting smoothed out since noise usualy as no fixed time 
+            underlying signal and its frequencies are preserved from
+            getting smoothed out since noise usualy as no fixed time
             scale but a signal has. Defaults to 5.
 
     Returns:
@@ -157,7 +157,7 @@ def smooth(
         ValueError: The user must choose from the currently implemented
                     types of kernels.
     """
-    POSSIBLE_KERNELS = {'mean'}
+    POSSIBLE_KERNELS = {"mean"}
     if not kernel_type in POSSIBLE_KERNELS:
         raise ValueError(f"argument kernel_type {kernel_type} is not known")
 
@@ -165,13 +165,13 @@ def smooth(
     x_data_shape = x_data.shape
     smoothed = x_data.copy()
     if smoothed.ndim == 1:
-        smoothed = smoothed[:,None,None]
+        smoothed = smoothed[:, None, None]
     elif smoothed.ndim == 2:
-        smoothed = smoothed[:,:,None]
+        smoothed = smoothed[:, :, None]
 
-    if kernel_type == 'mean':
-            lkl = kernel_length//2    # left_kernel_length
-            rkl = kernel_length - lkl # right_kernel_length
+    if kernel_type == "mean":
+        lkl = kernel_length // 2  # left_kernel_length
+        rkl = kernel_length - lkl  # right_kernel_length
     for _ in range(number_iterations):
         for slice in range(smoothed.shape[2]):
             # smooth for each slice of data separately
@@ -186,8 +186,8 @@ def smooth(
                     total = 0
                     for pos_in_kernel in range(kernel_length):
                         total += smoothed_old[pos_in_kernel]
-                    smoothed[pos_kernel, dim, slice] = total/kernel_length
-                for pos_kernel in range(lkl, smoothed.shape[0]-rkl):
+                    smoothed[pos_kernel, dim, slice] = total / kernel_length
+                for pos_kernel in range(lkl, smoothed.shape[0] - rkl):
                     # smoothing with values around current position
                     total = 0
                     for pos_in_kernel in range(lkl):
@@ -196,16 +196,16 @@ def smooth(
                         # kernel_length is an odd number, the
                         # second kernel length will be +1 bigger
                         # than the first kernel length
-                        total += smoothed_old[pos_kernel-1-pos_in_kernel]
+                        total += smoothed_old[pos_kernel - 1 - pos_in_kernel]
                     for pos_in_kernel in range(rkl):
                         total += smoothed_old[pos_kernel + pos_in_kernel]
-                    smoothed[pos_kernel, dim, slice] = total/kernel_length
-                for pos_kernel in range(smoothed.shape[0]-rkl, smoothed.shape[0]):
+                    smoothed[pos_kernel, dim, slice] = total / kernel_length
+                for pos_kernel in range(smoothed.shape[0] - rkl, smoothed.shape[0]):
                     # for the end boundary problem the values will
                     # be smoothed separately
                     total = 0
                     for pos_in_kernel in range(kernel_length):
-                        total += smoothed_old[-1-pos_in_kernel]
-                    smoothed[pos_kernel, dim, slice] = total/kernel_length
+                        total += smoothed_old[-1 - pos_in_kernel]
+                    smoothed[pos_kernel, dim, slice] = total / kernel_length
     smoothed = smoothed.reshape(x_data_shape)
     return smoothed
