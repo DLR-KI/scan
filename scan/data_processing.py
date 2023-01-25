@@ -157,9 +157,6 @@ def smooth(
         ValueError: The user must choose from the currently implemented
                     types of kernels.
     """
-    POSSIBLE_KERNELS = {"mean"}
-    if not kernel_type in POSSIBLE_KERNELS:
-        raise ValueError(f"argument kernel_type {kernel_type} is not known")
 
     # ensure array is (t,d,s) shaped for the algorithm
     x_data_shape = x_data.shape
@@ -172,6 +169,8 @@ def smooth(
     if kernel_type == "mean":
         lkl = kernel_length // 2  # left_kernel_length
         rkl = kernel_length - lkl  # right_kernel_length
+    else:
+        raise ValueError(f"argument kernel_type {kernel_type} is not known")
     for _ in range(number_iterations):
         for slice in range(smoothed.shape[2]):
             # smooth for each slice of data separately
