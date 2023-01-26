@@ -310,11 +310,11 @@ class TestUtilities(TestScanBase):
             x_data=data, kernel_length=kernel_length, kernel_type=kernel_type, number_iterations=number_iterations
         )
         assert_array_equal(smoothed, result)
-        
+
     def test_smooth_value_error_kernel_type(self):
-        kernel_type = 'false_kernel'
-        
+        kernel_type = "false_kernel"
+
         data = np.array([[[1], [2]], [[2], [3]], [[3], [4]], [[4], [5]], [[5], [6]]])
-        
+
         with pytest.raises(ValueError):
             data_processing.smooth(x_data=data, kernel_type=kernel_type)
