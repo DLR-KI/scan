@@ -115,20 +115,20 @@ def smooth(
     kernel_type: str = "mean",
     number_iterations: int = 5,
 ) -> np.ndarray:
-    """This smoothing preserves the shape of original data array.
+    """Smooth the input data via convolution, preserving data array shape.
 
-    The way the boundaries are handeled has shown to have so far the
-    best results, i.e.
-        - it prevents shifts of the resulting curve
-        - it minimizes value overshooting at the boundaries
-        - it does not pull NaN, zero or similar numerical artifacts
-        into the boundaries.
-    It is recommended to increase the number_iterations parameter
-    instead to increase the kernel_length to high values, to not smooth
-    out artifacs of the underlying signal but just the noise.
+    Boundaries are handled to
+        - prevent shifts of the resulting curve.
+        - minimize value overshooting at the boundaries.
+        - not add any NANs, zeros or similar numerical artifacts.
 
-    WARNING: Both ends of the new smoothed data array will nevertheless
-    be probably not of good quality. So it may be convenient to cut
+    For highly noisy data increasing the number of iterations instead of the
+    kernel length, seems to result in superior results in most cases, due to
+    preserving distinct non-noisy features of the signal better.
+
+    WARNING: Even though this method aims to reduce the impact of boundary
+    effects, both ends of the new smoothed data array will nevertheless
+    be probably of suboptimal quality. So it may be convenient to cut
     them off afterwards.
 
     Example:
@@ -139,16 +139,16 @@ def smooth(
         (t, d, s).
         kernel_length: Number of adjacent values which are taken
             into account for calculating so to speak "a smoothed value".
-            Defaults to 3.
-        kernel_type: Defaults to 'mean'.
-            - 'mean' means mean value of the value and its neigbours
-              within the range of attr. kernel_length, i.e. boxed shaped
-              kernel in the language of convolutions.
-        number_iterations: Number of times the smoothing
-            is applied. A high number of iterations ensures that the
-            underlying signal and its frequencies are preserved from
-            getting smoothed out since noise usualy as no fixed time
-            scale but a signal has. Defaults to 5.
+        kernel_type: The type of convultion kernel to be used.
+            Possible types are:
+
+            - 'mean' means mean value of the value and its neigbours in time
+              within the range of the kernel_length parameter, i.e. a boxed
+              shaped kernel in the language of convolutions.
+        number_iterations: Number of times the smoothing is applied.
+            A high number of iterations ensures that the underlying signal
+            and its frequencies are preserved from getting smoothed out since
+            noise usualy as no fixed timescale but a signal has.
 
     Returns:
         Numpy array with the same shape as the x_data input array, but
@@ -180,7 +180,7 @@ def smooth(
                 # smoothed values within the neighborhood of others
                 smoothed_old = smoothed[:, dim, slice].copy()
                 for pos_kernel in range(lkl):
-                    # for the inital boundary problem the values
+                    # for the initial boundary problem the values
                     # will be smoothed separately
                     total = 0
                     for pos_in_kernel in range(kernel_length):
