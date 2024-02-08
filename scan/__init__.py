@@ -6,12 +6,12 @@ from . import (
     _version,
     data_processing,
     esn,
-    ngrc,
     file_handling,
     locality_measures,
     logging,
     measures,
     mpi,
+    ngrc,
     simulations,
     utilities,
 )
