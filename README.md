@@ -7,12 +7,6 @@ SCAN stands for some combination of: {'science', 'simulation', 'system', 'soluti
 'complex', 'computing'}, {'analysis, analytic'}, {'neural', 'net/network'}.  
 At some point we should probably choose what it actually stands for.
 
-### License
-The code in this repository is proprietary property of the DLR and subject to confidentiality.
-The usual NDA clauses apply, so unless you have explicit permission to do so:
-* Do not upload this package to non-DLR servers (especially not GitHub).
-* Do not share this package with anyone outside the DLR.
-
 ### Documentation Website
 
 The PDF-Docuemntation has not yet been transferred to this GitLab repository, mostly due to the necessary CI/CD-Pipeline 
