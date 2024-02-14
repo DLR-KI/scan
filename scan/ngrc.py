@@ -1,3 +1,5 @@
+"""Implements Next-Generation Reservoir Computing."""
+
 from copy import deepcopy
 from itertools import combinations, combinations_with_replacement
 from typing import Optional, Union
@@ -15,7 +17,7 @@ class NG_RC:
         mode: Optional[str] = "coordinates",
         order_type: Optional[str] = "all",
         bias: Optional[int] = None,
-        regression_parameter = None,
+        regression_parameter: float = 0.01,
         index: Optional[int] = None,
         features: Optional[int] = None,
         save_states: Optional[bool] = True,

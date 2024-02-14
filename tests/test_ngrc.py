@@ -23,9 +23,6 @@ class TestNGRC(TestScanBase):
         np.set_printoptions()
 
     def test_initiate_ngrc_base_class_instance(self):
-        ngrc = scan.ngrc.NG_RC(
-            k=2,
-            s=1
-        )
-        
-        assert isinstance(ngrc,scan.ngrc.NG_RC)
+        ngrc = scan.ngrc.NG_RC(k=2, s=1)
+
+        assert isinstance(ngrc, scan.ngrc.NG_RC)
