@@ -26,3 +26,14 @@ class TestNGRC(TestScanBase):
         ngrc = scan.ngrc.NG_RC(k=2, s=1)
 
         assert isinstance(ngrc, scan.ngrc.NG_RC)
+        
+    def test_apply_ngrc_base_one_dimensional_data(self):
+        ngrc = scan.ngrc.NG_RC(k=2, s=1)
+        data = np.ones(10)
+        ngrc.fit(data)
+        return
+        
+    def test_bias(self):
+        return
+        
+        
