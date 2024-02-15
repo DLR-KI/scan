@@ -195,8 +195,8 @@ class TestNGRC(TestScanBase):
         assert type(ngrc._w_out) != type(None)
         assert ngrc._w_out.shape[0] == ngrc_no_expanding_orders._w_out.shape[0]
         assert len(ngrc._expanding_orders) * ngrc_no_expanding_orders._w_out.shape[1] + 1 == ngrc._w_out.shape[1]
-        
-        ### orders = [1] 
+
+        ### orders = [1]
         data = np.ones((10, 3))
 
         ngrc_no_expanding_orders = scan.ngrc.NG_RC(k=3, s=2, bias=False)
@@ -224,22 +224,22 @@ class TestNGRC(TestScanBase):
         ngrc_interactions.fit(data)
 
         assert len(ngrc_interactions._dictionary) == 15
-        
+
     def test_create_states_ngrc_base(self):
-        
-        data = np.ones((10,2))
-        target_data = np.zeros((10,5))
-        ngrc = scan.ngrc.NG_RC(k=3, s=2,orders=[1,2],bias=True,expanding_orders=[1,2],mode='inference')
-        ngrc.fit(data,target_data)
+
+        data = np.ones((10, 2))
+        target_data = np.zeros((10, 5))
+        ngrc = scan.ngrc.NG_RC(k=3, s=2, orders=[1, 2], bias=True, expanding_orders=[1, 2], mode="inference")
+        ngrc.fit(data, target_data)
         assert np.array_equal(ngrc._states, ngrc.create_states(data))
-        
-        data = np.ones((10,2))
-        ngrc = scan.ngrc.NG_RC(k=3, s=2,orders=[1,2],bias=True,expanding_orders=[1,2],mode='coordinates')
+
+        data = np.ones((10, 2))
+        ngrc = scan.ngrc.NG_RC(k=3, s=2, orders=[1, 2], bias=True, expanding_orders=[1, 2], mode="coordinates")
         ngrc.fit(data)
         assert np.array_equal(ngrc._states, ngrc.create_states(data))
-        
-        data = np.ones((10,2))
-        ngrc = scan.ngrc.NG_RC(k=3, s=2,orders=[1,2],bias=True,expanding_orders=[1,2],mode='differences')
+
+        data = np.ones((10, 2))
+        ngrc = scan.ngrc.NG_RC(k=3, s=2, orders=[1, 2], bias=True, expanding_orders=[1, 2], mode="differences")
         ngrc.fit(data)
         assert np.array_equal(ngrc._states, ngrc.create_states(data))
 
@@ -253,11 +253,10 @@ class TestNGRC(TestScanBase):
         assert type(ngrc._linear_states) == type(None)
         assert type(ngrc._nonlinear_states) == type(None)
         assert type(ngrc._expanded_states) == type(None)
-        
+
         ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 2], save_states=False)
         ngrc.fit(data)
         assert type(ngrc._expanded_states) == type(None)
-
 
     def test_prediction_ngrc_base_coordinates(self):
         #### Max Expansion
@@ -531,15 +530,15 @@ class TestNGRC(TestScanBase):
         prediction = ngrc.predict(prediction_steps)
 
         assert prediction.shape == (data.shape[1], prediction_steps)
-        
+
         # VAR - Max Expansion orders=[1]
-        ngrc = scan.ngrc.NG_RC(k=3, s=2, orders=[1],expanding_orders=[1, 2], bias=True, mode="differences")
+        ngrc = scan.ngrc.NG_RC(k=3, s=2, orders=[1], expanding_orders=[1, 2], bias=True, mode="differences")
         ngrc.fit(data)
 
         prediction_steps = 2
         prediction = ngrc.predict(prediction_steps)
 
-        assert prediction.shape == (data.shape[1], prediction_steps)       
+        assert prediction.shape == (data.shape[1], prediction_steps)
 
         ### Expansion - No bias
         # NGRC - Expansion - No bias
@@ -741,15 +740,16 @@ class TestNGRC(TestScanBase):
         inference = ngrc.inference(data)
 
         assert inference.shape == (data.shape[0] - (ngrc._k - 1) * ngrc._s, target_data.shape[1])
-        
+
+
 def test_prediction_starting_series_ngrc_base(self):
-    
-        data = np.ones((10, 2))
 
-        ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 3, 5], expanding_orders=[1, 2], bias=True)
-        ngrc.fit(data)
+    data = np.ones((10, 2))
 
-        prediction_steps = 2
-        prediction = ngrc.predict(prediction_steps,starting_series=data[-2:])
-        
-        assert prediction.shape == (data.shape[1], prediction_steps)
+    ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 3, 5], expanding_orders=[1, 2], bias=True)
+    ngrc.fit(data)
+
+    prediction_steps = 2
+    prediction = ngrc.predict(prediction_steps, starting_series=data[-2:])
+
+    assert prediction.shape == (data.shape[1], prediction_steps)

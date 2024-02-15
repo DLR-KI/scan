@@ -8,6 +8,7 @@ from typing import Literal
 
 import numpy as np
 
+
 class NG_RC:
     def __init__(
         self,
@@ -384,8 +385,9 @@ class NG_RC:
 
         if starting_series is not None and starting_series.shape[0] < (self._k - 1) * self._s:
             raise ValueError(
-                "Starting series not correctly specified, make sure that it has a least (k-1)*s={} data points."
-                .format((self._k - 1) * self._s)
+                "Starting series not correctly specified, make sure that it has a least (k-1)*s={} data points.".format(
+                    (self._k - 1) * self._s
+                )
             )
 
         if starting_series is not None:
