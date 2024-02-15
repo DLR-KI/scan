@@ -1,28 +1,27 @@
 """Implements Next-Generation Reservoir Computing."""
 
 from __future__ import annotations
+
 from copy import deepcopy
 from itertools import combinations, combinations_with_replacement
 from typing import Literal
 
 import numpy as np
 
-
 class NG_RC:
-    
     def __init__(
         self,
         k: int,
         s: int,
-        orders: list | None = None,
-        expanding_orders: list | None = None,
-        mode: Literal["coordinates","differences","inference"] = "coordinates",
-        order_type: Literal["all","interactions"] = "all",
+        orders: list[int] | None = None,
+        expanding_orders: list[int] | None = None,
+        mode: Literal["coordinates", "differences", "inference"] = "coordinates",
+        order_type: Literal["all", "interactions"] = "all",
         bias: bool = False,
         regression_parameter: float = 0.01,
-        index: int | None = None,
-        features: int | None = None,
-        save_states: bool = True
+        index: int = None,
+        features: int = None,
+        save_states: bool = True,
     ):
 
         self._k = k  # number of data points used for ngrc.
@@ -47,12 +46,13 @@ class NG_RC:
 
         self._initial_prediction_data = None
 
-        self._save_states = save_states  # if save_states is True, saves the intermediate states of the ngrc feature space.
-        
+        self._save_states = (
+            save_states  # if save_states is True, saves the intermediate states of the ngrc feature space.
+        )
         self._index = index  # used for indexing the hyperparameter setup, no functionality.
         self._features = features  # used for book keeping feature dimension, no functionality.
 
-    def create_train_X_y(self, input_data: np.ndarray, target_data: np.ndarray | None = None) -> None:
+    def create_train_X_y(self, input_data: np.ndarray, target_data: np.ndarray | None = None):
 
         """Creates and/or assigns the training and target data given the chosen ngrc 'mode'= {'coordinates','differences','inference'}.
         Further the last part of the data is saved to self._initial_prediction_data such that predictions automatically starts at the end of the
@@ -62,10 +62,10 @@ class NG_RC:
 
         Args:
 
-                mode: 'coordinates' -> Predicts the next coordinate of the data, given the current input.
-                mode: 'differences' -> Predicts the difference between the current input and the next coordinate of the data.
+                mode: "coordinates" -> Predicts the next coordinate of the data, given the current input.
+                mode: "differences" -> Predicts the difference between the current input and the next coordinate of the data.
                                                            In predict() the prediction is automatically added to current input, to predict the next coordinate of the data.
-                mode: 'inference'   -> Allows to define a custom target data on which the ngrc is trained on.
+                mode: "inference"   -> Allows to define a custom target data on which the ngrc is trained on.
 
         Returns:
 
@@ -79,25 +79,21 @@ class NG_RC:
             self._target_data = np.array(X[(self._k - 1) * self._s + 1 :])
             self._initial_prediction_data = np.array(X[-(self._k - 1) * self._s - 1 :])
             self._input_data = np.array(X[:-1])
-            self._system_states_dimensions = [len(X[(self._k - 1) * self._s + 1 :])]
 
         elif self._mode == "differences":
             self._target_data = np.array(X[(self._k - 1) * self._s + 1 :]) - np.array(X[(self._k - 1) * self._s : -1])
             self._initial_prediction_data = np.array(X[-(self._k - 1) * self._s - 1 :])
             self._input_data = np.array(X[:-1])
-            self._system_states_dimensions = [len(X[(self._k - 1) * self._s + 1 :])]
 
         elif self._mode == "inference":
             if target_data is None:
                 raise ValueError("Target data for inference mode is not specified")
             else:
-
-                self._target_data = np.array(deepcopy(target_data)[(self._k - 1) * self._s + 1 :])
+                self._target_data = np.array(deepcopy(target_data)[(self._k - 1) * self._s :])
                 self._input_data = np.array(X)
-                self._system_states_dimensions = [len(X[(self._k - 1) * self._s + 1 :])]
 
         else:
-            raise ValueError("Mode configuration Error: choose between \"coordinates\" , \"differences\" and \"inference\".")
+            raise ValueError('Mode configuration Error: choose between "coordinates" , "differences" and "inference".')
 
     def linear_expansion(self, functional: bool = False, input_data: np.ndarray | None = None) -> None | np.ndarray:
 
@@ -120,10 +116,7 @@ class NG_RC:
 
         if functional is False:
 
-            num_slices = len(self._input_data) - (self._k - 1) * self._s - 1
-
-            if self._mode == "coordinates" or self._mode == "differences":
-                num_slices += 1
+            num_slices = len(self._input_data) - (self._k - 1) * self._s
 
             indices = np.arange(0, self._k * self._s, self._s) + np.arange(num_slices)[:, np.newaxis]
             pre_expanded_states = self._input_data[indices]
@@ -131,9 +124,9 @@ class NG_RC:
                 pre_expanded_states.shape[0], pre_expanded_states.shape[1] * pre_expanded_states.shape[2]
             )
 
-            if self._save_states is True:
+            if self._save_states:
                 self._linear_states = linear_states
-            
+
             self._states = linear_states
 
         if functional:
@@ -142,7 +135,7 @@ class NG_RC:
                 num_slices = 1
 
             elif self._mode == "inference":
-                num_slices = len(input_data) - (self._k - 1) * self._s - 1
+                num_slices = len(input_data) - (self._k - 1) * self._s
 
             indices = np.arange(0, self._k * self._s, self._s) + np.arange(num_slices)[:, np.newaxis]
             pre_expanded_states = input_data[indices]
@@ -153,7 +146,7 @@ class NG_RC:
 
             return linear_states
 
-    def nonlinear_expansion(self, functional: bool = False, input_data: np.array | None = None) -> None | np.ndarray:
+    def nonlinear_expansion(self, functional: bool = False, input_data: np.ndarray | None = None) -> None | np.ndarray:
 
         """Creates the nonlinear states of ngrc. This function takes the orders provided in 'orders' and creates a dictionary with the unique
         monomials of the provided orders. It updates self._states correspondingly.
@@ -198,8 +191,8 @@ class NG_RC:
 
             else:
                 raise ValueError(
-                    "specify order_type correctly. 'all' standard for using all monomial combinations. 'interactions' for only"
-                    " interactions terms in dictionary."
+                    "specify order_type correctly. 'all' standard for using all monomial combinations. 'interactions'"
+                    " for only interactions terms in dictionary."
                 )
 
             data_length = len(self._states)
@@ -208,7 +201,7 @@ class NG_RC:
             for i, monomial in enumerate(self._dictionary):
                 nonlinear_states[:, i] = np.prod(self._states[:, monomial], axis=1)
 
-            if self._save_states is True:
+            if self._save_states:
                 self._nonlinear_states = nonlinear_states
 
             self._states = nonlinear_states
@@ -249,10 +242,6 @@ class NG_RC:
         if functional is False:
 
             if self._expanding_orders is None:
-                if self._bias is False:
-                    if self._save_states is True:
-                        self._expanded_states = self._states
-
                 if self._bias is True:
                     self._states = np.insert(self._states, 0, 1, axis=1)
 
@@ -272,7 +261,7 @@ class NG_RC:
                 if self._bias is True:
                     expanded_states = np.insert(expanded_states, 0, 1, axis=1)
 
-                if self._save_states is True:
+                if self._save_states:
                     self._expanded_states = expanded_states
 
                 self._states = expanded_states
@@ -280,9 +269,6 @@ class NG_RC:
         if functional:
 
             if self._expanding_orders is None:
-                if self._bias is False:
-                    return input_data
-
                 if self._bias is True:
                     return np.insert(input_data, 0, 1, axis=1)
 
@@ -322,7 +308,7 @@ class NG_RC:
         """
 
         if functional == False:
-            
+
             self.linear_expansion()
 
             if self._orders is not None:
@@ -339,9 +325,9 @@ class NG_RC:
 
             if self._orders is not None:
                 state = self.nonlinear_expansion(functional=True, input_data=state)
-                
+
             if self._expanding_orders is not None or self._bias is True:
-                state = self.expanding_states(functional=True,input_data=state)
+                state = self.expanding_states(functional=True, input_data=state)
 
             return state
 
@@ -358,8 +344,12 @@ class NG_RC:
                 The feature space given the hyperparameter and input data.
 
         """
+        if self._mode == "coordinates" or self._mode == "differences":
+            self._input_data = np.array(X[:-1])
 
-        self.create_train_X_y(input_data=X)
+        if self._mode == "inference":
+            self._input_data = np.array(X)
+
         X_states = self.apply_NG_RC()
 
         return X_states
@@ -372,7 +362,8 @@ class NG_RC:
         y_target = self._target_data
 
         self._w_out = np.linalg.solve(
-            X_states.T @ X_states + self._regression_parameter * np.eye(X_states.shape[1]), X_states.T @ y_target).T
+            X_states.T @ X_states + self._regression_parameter * np.eye(X_states.shape[1]), X_states.T @ y_target
+        ).T
 
     def predict(self, steps: int, starting_series: np.ndarray | None = None) -> np.ndarray:
 
@@ -391,10 +382,10 @@ class NG_RC:
 
         """
 
-        if starting_series is not None and starting_series.shape[0] < (self._k - 1) * self._s + 1:
+        if starting_series is not None and starting_series.shape[0] < (self._k - 1) * self._s:
             raise ValueError(
-                "Starting series not correctly specified, make sure that it has a least (k-1)*s+1={} data points."
-                .format((self._k - 1) * self._s + 1)
+                "Starting series not correctly specified, make sure that it has a least (k-1)*s={} data points."
+                .format((self._k - 1) * self._s)
             )
 
         if starting_series is not None:
@@ -442,14 +433,12 @@ class NG_RC:
 
         if len(X) < (self._k - 1) * self._s:
             raise (
-                "Data length does not match minimal warmup time required, needs to be a least (k-1)*s+1={} data points."
-                .format((self._k - 1) * self._s + 1)
+                "Data length does not match minimal warmup time required, needs to be a least (k-1)*s={} data points."
+                .format((self._k - 1) * self._s)
             )
 
-        linear_states = self.linear_expansion(functional=True, input_data=X)
-        nonlinear_states = self.nonlinear_expansion(functional=True, input_data=linear_states)
-        expanded_nonlinear_states = self.expanding_states(functional=True, input_data=nonlinear_states)
+        states = self.apply_NG_RC(functional=True, input_data=X)
 
-        inference_output = self._w_out @ expanded_nonlinear_states.T
+        inference_output = self._w_out @ states.T
 
-        return inference_output
+        return inference_output.T
