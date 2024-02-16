@@ -4,50 +4,57 @@ from __future__ import annotations
 
 from copy import deepcopy
 from itertools import combinations, combinations_with_replacement
-from typing import Literal
+from typing import List, Literal
 
 import numpy as np
 
 
 class NG_RC:
+
+    mode_types = Literal["coordinates", "differences", "inference"]
+    order_types = Literal["all", "interactions"]
+
     def __init__(
         self,
         k: int,
         s: int,
-        orders: list[int] | None = None,
-        expanding_orders: list[int] | None = None,
-        mode: Literal["coordinates", "differences", "inference"] = "coordinates",
-        order_type: Literal["all", "interactions"] = "all",
+        orders: List[int] | None = None,
+        expanding_orders: List[int] | None = None,
+        mode: mode_types = "coordinates",
+        order_type: order_types = "all",
         bias: bool = False,
         regression_parameter: float = 0.01,
-        index: int = None,
-        features: int = None,
+        index: int | None = None,
+        features: int | None = None,
         save_states: bool = True,
     ):
 
         self._k = k  # number of data points used for ngrc.
         self._s = s  # spacing between the data points.
         self._orders = orders  # orders used to create unique monomials, e.g orders=[1,2,4], of linear state vectors.
-        self._expanding_orders = expanding_orders  # orders to expand the feature space of ngrc, e.g. expanding_orders= [1,2] -> r' = (r^1,r^2)
+        self._expanding_orders = expanding_orders  # orders to expand the feature space of ngrc,
+        # e.g. expanding_orders= [1,2] -> r' = (r^1,r^2)
         self._bias = bias  # Appends bias term to ngrc state vectors, r -> (1,r)
-        self._mode = mode  # Define on what the ngrc should be trained on. Options: For prediction choose"coordinates","differences".For inference choose "inference".
-        self._order_type = order_type  # Specific order_type. Options: "all" for all unique monomials of certain orders. "interactions" only interacting terms of certain orders.
+        self._mode = mode  # Define on what the ngrc should be trained on. Options:
+        # For prediction choose"coordinates","differences".For inference choose "inference".
+        self._order_type = order_type  # Specific order_type. Options: "all" for all unique monomials of certain orders.
+        # "interactions" only interacting terms of certain orders.
 
-        self._dictionary = None
+        self._dictionary: list | None = None
 
-        self._input_data = None
-        self._target_data = None
+        self._input_data: np.ndarray | None = None
+        self._target_data: np.ndarray | None = None
 
-        self._states = None
+        self._states: np.ndarray | None = None
 
-        self._linear_states = None
-        self._nonlinear_states = None
-        self._expanded_states = None
+        self._linear_states: np.ndarray | None = None
+        self._nonlinear_states: np.ndarray | None = None
+        self._expanded_states: np.ndarray | None = None
 
         self._regression_parameter = regression_parameter  # regression parameter for Ridge Regression.
-        self._w_out = None
+        self._w_out: np.ndarray | None = None
 
-        self._initial_prediction_data = None
+        self._initial_prediction_data: np.ndarray | None = None
 
         self._save_states = (
             save_states  # if save_states is True, saves the intermediate states of the ngrc feature space.
@@ -55,28 +62,29 @@ class NG_RC:
         self._index = index  # used for indexing the hyperparameter setup, no functionality.
         self._features = features  # used for book keeping feature dimension, no functionality.
 
-    def create_train_X_y(self, input_data: np.ndarray, target_data: np.ndarray | None = None):
-
-        """Creates and/or assigns the training and target data given the chosen ngrc "mode"= {"coordinates","differences","inference"}.
-        Further the last part of the data is saved to self._initial_prediction_data such that predictions, if not further specified, automatically start at from the end of the
-        provided data without further definitions when predict() is called.
-
-        This function is called automatically when apply_NG_RC() is called. #1
+    def create_train_X_y(self, input_data: np.ndarray, target_data: np.ndarray | None = None) -> None:
+        """Creates and/or assigns the training and target data given the chosen ngrc
+        "mode"= {"coordinates","differences","inference"}. Further the last part of the data is saved to
+        self._initial_prediction_data such that predictions, if not further specified, automatically starts from
+        the end of the provided data without further definitions when predict() is called.
+        This function is called automatically when apply_ngrc() is called. #1
 
         Args:
-
-                mode: str = "coordinates" -> Predicts the next coordinate of the data, given the current input.
-                mode: str = "differences" -> Predicts the difference between the current input and the next coordinate of the data.
-                                        In predict() the difference prediction is automatically added to current input data point, which predicts the coordinates of the next data point.
-                mode: str = "inference"   -> Allows to define a custom target data on which the ngrc is trained on.
+            mode: str = "coordinates" -> Predicts the next coordinate of the data, given the current input.
+            mode: str = "differences" -> Predicts the difference between the current input and the next coordinate
+                                            of the data. In predict() the difference prediction is automatically
+                                            added to current input data point, which predicts the coordinates of
+                                            the next data point.
+            mode: str = "inference"   -> Allows to define a custom target data on which the ngrc is trained on.
 
         Returns:
+            Saves training data and target data with respect to the necessary warmup time of ngrc given its
+            parameters the "k" and "s".
+            All are stored in class.
 
-                Saves training data and target data with respect to the necessary warmup time of ngrc given its parameters the "k" and "s".
-                All are stored in class.
         """
 
-        X = tuple(input_data)
+        x = tuple(input_data)
         self._dimension = input_data.shape[1]
 
         if self._mode == "coordinates":
@@ -85,9 +93,9 @@ class NG_RC:
                     "For prediction in \"coordinates\" mode, target_data is not processed, has to be 'None'."
                 )
             else:
-                self._target_data = np.array(X[(self._k - 1) * self._s + 1 :])
-                self._initial_prediction_data = np.array(X[-(self._k - 1) * self._s - 1 :])
-                self._input_data = np.array(X[:-1])
+                self._target_data = np.array(x[(self._k - 1) * self._s + 1 :])
+                self._initial_prediction_data = np.array(x[-(self._k - 1) * self._s - 1 :])
+                self._input_data = np.array(x[:-1])
 
         elif self._mode == "differences":
             if target_data is not None:
@@ -95,44 +103,44 @@ class NG_RC:
                     "For prediction in \"differences\" mode, target_data is not processed, has to be 'None'."
                 )
             else:
-                self._target_data = np.array(X[(self._k - 1) * self._s + 1 :]) - np.array(
-                    X[(self._k - 1) * self._s : -1]
+                self._target_data = np.array(x[(self._k - 1) * self._s + 1 :]) - np.array(
+                    x[(self._k - 1) * self._s : -1]
                 )
-                self._initial_prediction_data = np.array(X[-(self._k - 1) * self._s - 1 :])
-                self._input_data = np.array(X[:-1])
+                self._initial_prediction_data = np.array(x[-(self._k - 1) * self._s - 1 :])
+                self._input_data = np.array(x[:-1])
 
         elif self._mode == "inference":
             if target_data is None:
                 raise ValueError("Target data for inference mode is not specified")
             else:
                 self._target_data = np.array(deepcopy(target_data)[(self._k - 1) * self._s :])
-                self._input_data = np.array(X)
+                self._input_data = np.array(x)
 
         else:
             raise ValueError('Mode configuration Error: choose between "coordinates" , "differences" and "inference".')
 
     def linear_expansion(self, functional: bool = False, input_data: np.ndarray | None = None) -> None | np.ndarray:
+        """Creates the linear states of ngrc. Takes "k" past data points of the data, which are separated by "s"
+        indices and put them into one vector. This is repeated for the every index of the input data.
 
-        """Creates the linear states of ngrc. Takes "k" past data points of the data, which are separated by "s" indices and put them into one vector.
-        This is repeated for the every index of the input data.
-
-        This function is called automatically when apply_NG_RC() is called. #2
+        This function is called automatically when apply_ngrc() is called. #2
 
         Args:
-
-                functional: bool = False   -> Automatically set when states are created for training or inference.
-                functional: bool = True    -> Automatically set when states are created for prediction.
+            functional: bool = False   -> Automatically set when states are created for training or inference.
+            functional: bool = True    -> Automatically set when states are created for prediction.
 
         Returns:
-
-                If functional is 'False', updates self._states which are later used for training.
-                If functional is 'True', for "coordinates" or "differences" it returns one linear_state vector given the input data which is later used for prediction.
-                                       , for "inference" it returns the linear_state vectors of the whole input data at once.
-                linear_states: np.ndarray
+            If functional is 'False' updates self._states which are later used for training.
+            If functional is 'True' for "coordinates" or "differences" it returns one linear_state vector given
+                                    the input data which is later used for prediction.
+                                    For "inference" it returns the linear_state vectors of the input data at once.
+            linear_states: np.ndarray
 
         """
 
-        if functional is False:
+        if not functional:
+
+            assert self._input_data is not None
 
             num_slices = len(self._input_data) - (self._k - 1) * self._s
 
@@ -147,7 +155,11 @@ class NG_RC:
 
             self._states = linear_states
 
-        if functional:
+            return None
+
+        else:
+
+            assert isinstance(input_data, np.ndarray)
 
             if self._mode == "coordinates" or self._mode == "differences":
                 num_slices = 1
@@ -161,30 +173,32 @@ class NG_RC:
             linear_states = pre_expanded_states.reshape(
                 pre_expanded_states.shape[0], pre_expanded_states.shape[1] * pre_expanded_states.shape[2]
             )
-
+            assert isinstance(linear_states, np.ndarray)
             return linear_states
 
     def nonlinear_expansion(self, functional: bool = False, input_data: np.ndarray | None = None) -> None | np.ndarray:
+        """Creates the nonlinear states of ngrc. This function takes the orders provided in 'orders' and creates
+        a dictionary with the unique monomials of the provided orders. It updates self._states correspondingly.
 
-        """Creates the nonlinear states of ngrc. This function takes the orders provided in 'orders' and creates a dictionary with the unique
-        monomials of the provided orders. It updates self._states correspondingly.
-
-        This function is called automatically when apply_NG_RC() is called. #3
+        This function is called automatically when apply_ngrc() is called. #3
 
         Args:
-
-                functional: bool = False   -> Automatically set when states are created for training or inference.
-                functional: bool = True    -> Automatically set when states are created for prediction.
+            functional: bool = False   -> Automatically set when states are created for training or inference.
+            functional: bool = True    -> Automatically set when states are created for prediction.
 
         Returns:
-
-                If functional is 'False', updates self._states which are later used for training.
-                If functional is 'True', for "coordinates" or "differences" it returns the nonlinear_state vector given the input state vector which is later used for prediction.
-                                       , for "inference" it returns the nonlinear_state vectors of the input state vectors at once.
-                nonlinear_states: np.ndarray
+            If functional is 'False' updates self._states which are later used for training.
+            If functional is 'True' for "coordinates" or "differences" it returns the nonlinear_state vector given
+                                    the input state vector which is later used for prediction.
+                                    For "inference" it returns the nonlinear_state vectors of the input state
+                                    vectors at once.
+            nonlinear_states: np.ndarray
         """
 
-        if functional is False:
+        assert isinstance(self._states, np.ndarray)
+        assert isinstance(self._orders, list)
+
+        if not functional:
 
             dimension = self._states.shape[1]
 
@@ -225,7 +239,12 @@ class NG_RC:
 
             self._states = nonlinear_states
 
-        if functional:
+            return None
+
+        else:
+
+            assert isinstance(input_data, np.ndarray)
+            assert isinstance(self._dictionary, list)
 
             if self._orders == [1]:
                 return input_data
@@ -241,25 +260,25 @@ class NG_RC:
             return nonlinear_states
 
     def expanding_states(self, functional: bool = False, input_data: np.ndarray | None = None) -> None | np.ndarray:
-
         """Creates expanded states of ngrc. This function will update the self._states with different functionalities.
 
-        This function is called automatically when apply_NG_RC() is called. #4
+        This function is called automatically when apply_ngrc() is called. #4
 
         Args:
-
-                functional: bool = False   -> Automatically set when states are created for training or inference.
-                functional: bool = True    -> Automatically set when states are created for prediction.
+            functional: bool = False   -> Automatically set when states are created for training or inference.
+            functional: bool = True    -> Automatically set when states are created for prediction.
 
         Returns:
+            If functional is 'False' updates self._states which are later used for training.
+            If functional is 'True' for "coordinates" or "differences" it returns one expanded_state vector given
+                                        the input state vector which is later used for prediction.
+                                    for "inference" it returns expanded state vectors of the input state vectors.
+            expanded_states: np.ndarray
 
-                If functional is 'False', updates self._states which are later used for training.
-                If functional is 'True', for "coordinates" or "differences" it returns one expanded_state vector given the input state vector which is later used for prediction.
-                                       , for "inference" it returns the expanded state vectors of the input state vectors.
-                expanded_states: np.ndarray
         """
+        assert isinstance(self._states, np.ndarray)
 
-        if functional is False:
+        if not functional:
 
             if self._expanding_orders is None:
                 if self._bias is True:
@@ -286,11 +305,17 @@ class NG_RC:
 
                 self._states = expanded_states
 
-        if functional:
+            return None
+
+        else:
+
+            assert isinstance(input_data, np.ndarray)
 
             if self._expanding_orders is None:
                 if self._bias is True:
                     return np.insert(input_data, 0, 1, axis=1)
+                else:
+                    return None
 
             else:
                 data_length = input_data.shape[0]
@@ -309,27 +334,29 @@ class NG_RC:
 
                 return expanded_states
 
-    def apply_NG_RC(self, functional: bool = False, input_data: np.ndarray | None = None) -> np.ndarray:
-
-        """Creates the ngrc state vectors. This function will create the feature space of ngrc given the used hyperparameter and the input data.
+    def apply_ngrc(self, functional: bool = False, input_data: np.ndarray | None = None) -> np.ndarray:
+        """Creates the ngrc state vectors. This function will create the feature space of ngrc given the used
+        hyperparameter and the input data.
 
         This function is called automatically when when fit() or create_states() is called.
 
         Args:
-
-                functional: bool = False   -> Automatically set when states are created for training or inference.
-                functional: bool = True    -> Automatically set when states are created for prediction.
-                input_data: np.ndarray | None -> For training, input data is None,
+            functional: bool = False   -> Automatically set when states are created for training or inference.
+            functional: bool = True    -> Automatically set when states are created for prediction.
+            input_data: np.ndarray | None -> For training, input data is None,
 
         Returns:
+            If functional is 'False' creates self._states which are used for training.
+            If functional is 'True' for "coordinates" or "differences" it returns one state vector given the
+                                    input data which is used for prediction,
+                                    for "inference" it returns the state vectors of the whole input data
+                                    which are used for inference.
+            state: np.ndarray
 
-                If functional is 'False', creates self._states which are used for training.
-                If functional is 'True', for "coordinates" or "differences" it returns one state vector given the input data which is used for prediction.
-                                       , for "inference" it returns the state vectors of the whole input data which are used for inference.
-                state: np.ndarray
         """
+        assert isinstance(self._input_data, np.ndarray)
 
-        if functional == False:
+        if not functional:
 
             self.linear_expansion()
 
@@ -339,9 +366,12 @@ class NG_RC:
             if self._expanding_orders is not None or self._bias is True:
                 self.expanding_states()
 
+            assert isinstance(self._states, np.ndarray)
             return self._states
 
-        if functional == True:
+        else:
+
+            assert isinstance(input_data, np.ndarray)
 
             state = self.linear_expansion(functional=True, input_data=input_data)
 
@@ -351,32 +381,30 @@ class NG_RC:
             if self._expanding_orders is not None or self._bias is True:
                 state = self.expanding_states(functional=True, input_data=state)
 
+            assert isinstance(state, np.ndarray)
             return state
 
-    def create_states(self, X: np.ndarray) -> np.ndarray:
-
+    def create_states(self, x: np.ndarray) -> np.ndarray:
         """Creates the ngrc state vectors given input data X.
 
         Args:
-
-                X: np.ndarray   -> Creates ngrc states for data X.
+            x: np.ndarray   -> Creates ngrc states for data X.
 
         Returns:
-
-                X_states: np.ndarray    -> The ngrc feature space given its hyperparameters and the input data.
+            x_states: np.ndarray    -> The ngrc feature space given its hyperparameters and the input data.
 
         """
         if self._mode == "coordinates" or self._mode == "differences":
-            self._input_data = np.array(X[:-1])
+            self._input_data = np.array(x[:-1])
 
         if self._mode == "inference":
-            self._input_data = np.array(X)
+            self._input_data = np.array(x)
 
-        X_states = self.apply_NG_RC()
+        x_states = self.apply_ngrc()
 
-        return X_states
+        return x_states
 
-    def fit(self, X: np.ndarray, y_target: np.ndarray | None = None) -> None:
+    def fit(self, x: np.ndarray, y_target: np.ndarray | None = None) -> None:
         """This function will initiate ngrc on the input data 'X' to get ngrc states 'X_states', which
         are trained using ridge regression onto the target data 'y_target'.
         For prediction (self._mode = "coordinates" or "differences"), 'y_target' is automatically generated.
@@ -387,42 +415,65 @@ class NG_RC:
             y_target: np.ndarray | None, optional   -> target data on what in the input data should be trained on.
                                                     None for "mode" is "coordinates" or "differences"
                                                     np.ndarray for "mode" is "inference".
+
+        Returns:
+            self._w_out: np.ndarray stored in class. Learned weights from ridge regression.
+
         """
 
-        self.create_train_X_y(input_data=X, target_data=y_target)
+        if self._mode == "coordinates" or self._mode == "differences":
 
-        X_states = self.apply_NG_RC()
+            # ngrc warmup time -> (self._k-1)*self._s + 1
+            # prediction target -> adds +1 for minimal length
+            if len(x) < (self._k - 1) * self._s + 1 + 1:
+                raise ValueError(
+                    "Minimal time steps in x for prediction must be at least {} steps".format(
+                        (self._k - 1) * self._s + 1 + 1
+                    )
+                )
+
+        else:
+            if len(x) < (self._k - 1) * self._s + 1:
+                raise ValueError(
+                    "Minimal time steps in x for prediction must be at least {} steps".format(
+                        (self._k - 1) * self._s + 1 + 1
+                    )
+                )
+
+        self.create_train_X_y(input_data=x, target_data=y_target)
+
+        x_states = self.apply_ngrc()
         y_target = self._target_data
 
         self._w_out = np.linalg.solve(
-            X_states.T @ X_states + self._regression_parameter * np.eye(X_states.shape[1]), X_states.T @ y_target
+            x_states.T @ x_states + self._regression_parameter * np.eye(x_states.shape[1]), x_states.T @ y_target
         ).T
 
     def predict(self, steps: int, starting_series: np.ndarray | None = None) -> np.ndarray:
-
-        """Uses the trained ngrc to make predictions. By default self._initial_prediction_data is used as a starting_series for the prediction,
-        but it can be custom assigned wit starting_series. "mode" must be "coordinates" or "differences" during training.
+        """Uses the trained ngrc to make predictions. By default self._initial_prediction_data is used as a
+        starting_series for the prediction, but it can be custom assigned wit starting_series.
+        "mode" must be "coordinates" or "differences" during training.
 
         Args:
-
-                steps: int                      -> Specify the number of prediction steps to be made.
-                starting_series: np.ndarray     -> Define custom starting series from where to start the prediction.
-                                                   Necessary minimal warm_up time of "(k-1)*s" from "k" and "s" hyperparameters should be taken into account.
+            steps: int                      -> Specify the number of prediction steps to be made.
+            starting_series: np.ndarray     -> Define custom starting series from where to start the prediction.
+                                                Necessary minimal warm_up time of "(k-1)*s" from "k" and "s"
+                                                hyperparameters should be taken into account.
 
         Returns:
-
-                Returns the prediction.
-                predictions: np.ndarray
+            Returns the prediction.
+            predictions: np.ndarray
 
         """
-
         if self._mode != "coordinates" and self._mode != "differences":
             raise ValueError('To call predict(), ngrc._mode has to be "coordinates" or "differences".')
 
-        if starting_series is not None and starting_series.shape[0] < (self._k - 1) * self._s:
+        assert self._initial_prediction_data is not None
+
+        if starting_series is not None and starting_series.shape[0] < (self._k - 1) * self._s + 1:
             raise ValueError(
                 "Starting series not correctly specified, make sure that it has a least (k-1)*s={} data points.".format(
-                    (self._k - 1) * self._s
+                    (self._k - 1) * self._s + 1
                 )
             )
 
@@ -430,53 +481,51 @@ class NG_RC:
             self._initial_prediction_data = starting_series
 
         predictions = np.full(shape=(steps, self._initial_prediction_data.shape[1]), fill_value=np.nan)
-        X = self._initial_prediction_data[-self._k * self._s :]
+        x = self._initial_prediction_data[-self._k * self._s :]
 
         if self._mode == "coordinates":
 
             for i in range(steps):
 
-                state = self.apply_NG_RC(functional=True, input_data=X)
+                state = self.apply_ngrc(functional=True, input_data=x)
                 prediction = self._w_out @ state[0]
                 predictions[i] = prediction
-                X = np.append(X[1:], [prediction], axis=0)
+                x = np.append(x[1:], [prediction], axis=0)
 
         elif self._mode == "differences":
 
             for i in range(steps):
 
-                state = self.apply_NG_RC(functional=True, input_data=X)
-                prediction = X[-1] + self._w_out @ state[0]
+                state = self.apply_ngrc(functional=True, input_data=x)
+                prediction = x[-1] + self._w_out @ state[0]
                 predictions[i] = prediction
-                X = np.append(X[1:], [prediction], axis=0)
+                x = np.append(x[1:], [prediction], axis=0)
 
         return predictions
 
-    def inference(self, X: np.ndarray) -> np.ndarray:
-
+    def inference(self, x: np.ndarray) -> np.ndarray:
         """
-        Uses the trained ngrc to make inference on the provided data 'X'. Therefore, "mode" must be "inference" during training.
+        Uses the trained ngrc to make inference on the provided data 'x'.
+        Therefore, "mode" must be "inference" during training.
 
         Args:
-
-                X: np.ndarray   ->  Applied the trained ngrc on the data provided
+            x: np.ndarray   ->  Applied the trained ngrc on the data provided
 
         Returns:
-
-                Returns the prediction of the inference.
-                inference_output: np.ndarray
+            Returns the prediction of the inference.
+            inference_output: np.ndarray
 
         """
         if self._mode == "inference":
 
-            if len(X) < (self._k - 1) * self._s:
-                raise (
+            if len(x) < (self._k - 1) * self._s + 1:
+                raise ValueError(
                     "Data length does not match minimal warmup time required, needs to be a least (k-1)*s={} data"
                     " points.".format((self._k - 1) * self._s)
                 )
 
-            states = self.apply_NG_RC(functional=True, input_data=X)
-            inference_output = self._w_out @ states.T
+            states = self.apply_ngrc(functional=True, input_data=x)
+            inference_output: np.ndarray = self._w_out @ states.T
 
             return inference_output.T
 

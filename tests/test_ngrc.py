@@ -196,7 +196,8 @@ class TestNGRC(TestScanBase):
         assert ngrc._w_out.shape[0] == ngrc_no_expanding_orders._w_out.shape[0]
         assert len(ngrc._expanding_orders) * ngrc_no_expanding_orders._w_out.shape[1] + 1 == ngrc._w_out.shape[1]
 
-        ### orders = [1]
+    def test_VAR_functionality_ngrc_base_two_dimensional_data_expanding_orders_bias_order_var(self):
+
         data = np.ones((10, 3))
 
         ngrc_no_expanding_orders = scan.ngrc.NG_RC(k=3, s=2, bias=False)
@@ -204,6 +205,8 @@ class TestNGRC(TestScanBase):
 
         ngrc = scan.ngrc.NG_RC(k=3, s=2, orders=[1], expanding_orders=[1, 2, 3, 4], bias=True)
         ngrc.fit(data)
+
+        ngrc.predict(steps=2)
 
         assert type(ngrc._w_out) != type(None)
         assert ngrc._w_out.shape[0] == ngrc_no_expanding_orders._w_out.shape[0]
@@ -258,7 +261,7 @@ class TestNGRC(TestScanBase):
         ngrc.fit(data)
         assert type(ngrc._expanded_states) == type(None)
 
-    def test_prediction_ngrc_base_coordinates(self):
+    def test_prediction_ngrc_base_coordinates_ngrc_max(self):
         #### Max Expansion
         # NGRC
         data = np.ones((10, 2))
@@ -271,6 +274,9 @@ class TestNGRC(TestScanBase):
 
         assert prediction.shape == (data.shape[1], prediction_steps)
 
+    def test_prediction_ngrc_base_coordinates_sindy_max(self):
+
+        data = np.ones((10, 2))
         # SINDY
         ngrc = scan.ngrc.NG_RC(k=1, s=1, orders=[1, 3], expanding_orders=[1, 2], bias=True)
         ngrc.fit(data)
@@ -280,6 +286,9 @@ class TestNGRC(TestScanBase):
 
         assert prediction.shape == (data.shape[1], prediction_steps)
 
+    def test_prediction_ngrc_base_coordinates_var_max(self):
+
+        data = np.ones((10, 2))
         # VAR
         ngrc = scan.ngrc.NG_RC(k=3, s=2, expanding_orders=[1, 2], bias=True)
         ngrc.fit(data)
@@ -289,8 +298,8 @@ class TestNGRC(TestScanBase):
 
         assert prediction.shape == (data.shape[1], prediction_steps)
 
-        ### Expansion - No bias
-        # NGRC
+    def test_prediction_ngrc_base_coordinates_ngrc_exp_no_bias(self):
+
         data = np.ones((10, 2))
 
         ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 3, 5], expanding_orders=[1, 2])
@@ -301,7 +310,9 @@ class TestNGRC(TestScanBase):
 
         assert prediction.shape == (data.shape[1], prediction_steps)
 
-        # SINDY
+    def test_prediction_ngrc_base_coordinates_ngrc_exp_no_bias(self):
+
+        data = np.ones((10, 2))
         ngrc = scan.ngrc.NG_RC(k=1, s=1, orders=[1, 3], expanding_orders=[1, 2])
         ngrc.fit(data)
 
@@ -310,7 +321,9 @@ class TestNGRC(TestScanBase):
 
         assert prediction.shape == (data.shape[1], prediction_steps)
 
-        # VAR
+    def test_prediction_ngrc_base_coordinates_var_exp_no_bias(self):
+
+        data = np.ones((10, 2))
         ngrc = scan.ngrc.NG_RC(k=3, s=2, expanding_orders=[1, 2])
         ngrc.fit(data)
 
@@ -319,8 +332,8 @@ class TestNGRC(TestScanBase):
 
         assert prediction.shape == (data.shape[1], prediction_steps)
 
-        ### No Expansion - bias
-        # NGRC
+    def test_prediction_ngrc_base_coordinates_ngrc_bias(self):
+
         data = np.ones((10, 2))
 
         ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 3, 5], bias=True)
@@ -331,7 +344,9 @@ class TestNGRC(TestScanBase):
 
         assert prediction.shape == (data.shape[1], prediction_steps)
 
-        # SINDY
+    def test_prediction_ngrc_base_coordinates_sindy_bias(self):
+
+        data = np.ones((10, 2))
         ngrc = scan.ngrc.NG_RC(k=1, s=1, orders=[1, 3], bias=True)
         ngrc.fit(data)
 
@@ -340,7 +355,9 @@ class TestNGRC(TestScanBase):
 
         assert prediction.shape == (data.shape[1], prediction_steps)
 
-        # VAR
+    def test_prediction_ngrc_base_coordinates_var_bias(self):
+
+        data = np.ones((10, 2))
         ngrc = scan.ngrc.NG_RC(k=3, s=2, bias=True)
         ngrc.fit(data)
 
@@ -349,8 +366,8 @@ class TestNGRC(TestScanBase):
 
         assert prediction.shape == (data.shape[1], prediction_steps)
 
-        ### No Expansion - No bias
-        # NGRC
+    def test_prediction_ngrc_base_coordinates_ngrcs(self):
+
         data = np.ones((10, 2))
 
         ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 3, 5])
@@ -361,7 +378,9 @@ class TestNGRC(TestScanBase):
 
         assert prediction.shape == (data.shape[1], prediction_steps)
 
-        # SINDY
+    def test_prediction_ngrc_base_coordinates_sindy(self):
+
+        data = np.ones((10, 2))
         ngrc = scan.ngrc.NG_RC(k=1, s=1, orders=[1, 3])
         ngrc.fit(data)
 
@@ -370,7 +389,9 @@ class TestNGRC(TestScanBase):
 
         assert prediction.shape == (data.shape[1], prediction_steps)
 
-        # VAR
+    def test_prediction_ngrc_base_coordinates_var(self):
+
+        data = np.ones((10, 2))
         ngrc = scan.ngrc.NG_RC(k=3, s=2)
         ngrc.fit(data)
 
@@ -379,7 +400,7 @@ class TestNGRC(TestScanBase):
 
         assert prediction.shape == (data.shape[1], prediction_steps)
 
-    def test_prediction_ngrc_base_differences(self):
+    def test_prediction_ngrc_base_differences_ngrc_max(self):
         #### Max Expansion
         # NGRC - Max Expansion
         data = np.ones((10, 2))
@@ -392,7 +413,9 @@ class TestNGRC(TestScanBase):
 
         assert prediction.shape == (data.shape[1], prediction_steps)
 
-        # SINDY - Max Expansion
+    def test_prediction_ngrc_base_differences_sindy_max(self):
+
+        data = np.ones((10, 2))
         ngrc = scan.ngrc.NG_RC(k=1, s=1, orders=[1, 3], expanding_orders=[1, 2], bias=True, mode="differences")
         ngrc.fit(data)
 
@@ -401,7 +424,9 @@ class TestNGRC(TestScanBase):
 
         assert prediction.shape == (data.shape[1], prediction_steps)
 
-        # VAR - Max Expansion
+    def test_prediction_ngrc_base_differences_var_max(self):
+
+        data = np.ones((10, 2))
         ngrc = scan.ngrc.NG_RC(k=3, s=2, expanding_orders=[1, 2], bias=True, mode="differences")
         ngrc.fit(data)
 
@@ -410,8 +435,8 @@ class TestNGRC(TestScanBase):
 
         assert prediction.shape == (data.shape[1], prediction_steps)
 
-        ### Expansion - No bias
-        # NGRC - Expansion - No bias
+    def test_prediction_ngrc_base_differences_ngrc_exp_no_bias(self):
+
         data = np.ones((10, 2))
 
         ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 3, 5], expanding_orders=[1, 2], mode="differences")
@@ -422,7 +447,9 @@ class TestNGRC(TestScanBase):
 
         assert prediction.shape == (data.shape[1], prediction_steps)
 
-        # SINDY - Expansion - No bias
+    def test_prediction_ngrc_base_differences_sindy_exp_no_bias(self):
+
+        data = np.ones((10, 2))
         ngrc = scan.ngrc.NG_RC(k=1, s=1, orders=[1, 3], expanding_orders=[1, 2], mode="differences")
         ngrc.fit(data)
 
@@ -431,7 +458,9 @@ class TestNGRC(TestScanBase):
 
         assert prediction.shape == (data.shape[1], prediction_steps)
 
-        # VAR - Expansion - No bias
+    def test_prediction_ngrc_base_differences_var_exp_no_bias(self):
+
+        data = np.ones((10, 2))
         ngrc = scan.ngrc.NG_RC(k=3, s=2, expanding_orders=[1, 2], mode="differences")
         ngrc.fit(data)
 
@@ -440,10 +469,9 @@ class TestNGRC(TestScanBase):
 
         assert prediction.shape == (data.shape[1], prediction_steps)
 
-        ### No Expansion - bias
-        # NGRC - No Expansion - bias
-        data = np.ones((10, 2))
+    def test_prediction_ngrc_base_differences_ngrc_bias(self):
 
+        data = np.ones((10, 2))
         ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 3, 5], bias=True, mode="differences")
         ngrc.fit(data)
 
@@ -452,7 +480,9 @@ class TestNGRC(TestScanBase):
 
         assert prediction.shape == (data.shape[1], prediction_steps)
 
-        # SINDY - No Expansion - bias
+    def test_prediction_ngrc_base_differences_sindy_bias(self):
+
+        data = np.ones((10, 2))
         ngrc = scan.ngrc.NG_RC(k=1, s=1, orders=[1, 3], bias=True, mode="differences")
         ngrc.fit(data)
 
@@ -461,7 +491,9 @@ class TestNGRC(TestScanBase):
 
         assert prediction.shape == (data.shape[1], prediction_steps)
 
-        # VAR - No Expansion - bias
+    def test_prediction_ngrc_base_differences_var_bias(self):
+
+        data = np.ones((10, 2))
         ngrc = scan.ngrc.NG_RC(k=3, s=2, bias=True, mode="differences")
         ngrc.fit(data)
 
@@ -470,10 +502,9 @@ class TestNGRC(TestScanBase):
 
         assert prediction.shape == (data.shape[1], prediction_steps)
 
-        ### No Expansion - No bias
-        # NGRC - No bias
-        data = np.ones((10, 2))
+    def test_prediction_ngrc_base_differences_ngrc(self):
 
+        data = np.ones((10, 2))
         ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 3, 5], mode="differences")
         ngrc.fit(data)
 
@@ -482,7 +513,9 @@ class TestNGRC(TestScanBase):
 
         assert prediction.shape == (data.shape[1], prediction_steps)
 
-        # SINDY - No bias
+    def test_prediction_ngrc_base_differences_sindy(self):
+
+        data = np.ones((10, 2))
         ngrc = scan.ngrc.NG_RC(k=1, s=1, orders=[1, 3], mode="differences")
         ngrc.fit(data)
 
@@ -491,7 +524,9 @@ class TestNGRC(TestScanBase):
 
         assert prediction.shape == (data.shape[1], prediction_steps)
 
-        # VAR - No bias
+    def test_prediction_ngrc_base_differences_var(self):
+
+        data = np.ones((10, 2))
         ngrc = scan.ngrc.NG_RC(k=3, s=2, mode="differences")
         ngrc.fit(data)
 
@@ -500,140 +535,8 @@ class TestNGRC(TestScanBase):
 
         assert prediction.shape == (data.shape[1], prediction_steps)
 
-    def test_prediction_ngrc_base_differences(self):
-        #### Max Expansion
-        # NGRC - Max Expansion
-        data = np.ones((10, 2))
+    def test_inference_ngrc_base_ngrc_max(self):
 
-        ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 3, 5], expanding_orders=[1, 2], bias=True, mode="differences")
-        ngrc.fit(data)
-
-        prediction_steps = 2
-        prediction = ngrc.predict(prediction_steps)
-
-        assert prediction.shape == (data.shape[1], prediction_steps)
-
-        # SINDY - Max Expansion
-        ngrc = scan.ngrc.NG_RC(k=1, s=1, orders=[1, 3], expanding_orders=[1, 2], bias=True, mode="differences")
-        ngrc.fit(data)
-
-        prediction_steps = 2
-        prediction = ngrc.predict(prediction_steps)
-
-        assert prediction.shape == (data.shape[1], prediction_steps)
-
-        # VAR - Max Expansion orders=None
-        ngrc = scan.ngrc.NG_RC(k=3, s=2, expanding_orders=[1, 2], bias=True, mode="differences")
-        ngrc.fit(data)
-
-        prediction_steps = 2
-        prediction = ngrc.predict(prediction_steps)
-
-        assert prediction.shape == (data.shape[1], prediction_steps)
-
-        # VAR - Max Expansion orders=[1]
-        ngrc = scan.ngrc.NG_RC(k=3, s=2, orders=[1], expanding_orders=[1, 2], bias=True, mode="differences")
-        ngrc.fit(data)
-
-        prediction_steps = 2
-        prediction = ngrc.predict(prediction_steps)
-
-        assert prediction.shape == (data.shape[1], prediction_steps)
-
-        ### Expansion - No bias
-        # NGRC - Expansion - No bias
-        data = np.ones((10, 2))
-
-        ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 3, 5], expanding_orders=[1, 2], mode="differences")
-        ngrc.fit(data)
-
-        prediction_steps = 2
-        prediction = ngrc.predict(prediction_steps)
-
-        assert prediction.shape == (data.shape[1], prediction_steps)
-
-        # SINDY - Expansion - No bias
-        ngrc = scan.ngrc.NG_RC(k=1, s=1, orders=[1, 3], expanding_orders=[1, 2], mode="differences")
-        ngrc.fit(data)
-
-        prediction_steps = 2
-        prediction = ngrc.predict(prediction_steps)
-
-        assert prediction.shape == (data.shape[1], prediction_steps)
-
-        # VAR - Expansion - No bias
-        ngrc = scan.ngrc.NG_RC(k=3, s=2, expanding_orders=[1, 2], mode="differences")
-        ngrc.fit(data)
-
-        prediction_steps = 2
-        prediction = ngrc.predict(prediction_steps)
-
-        assert prediction.shape == (data.shape[1], prediction_steps)
-
-        ### No Expansion - bias
-        # NGRC - No Expansion - bias
-        data = np.ones((10, 2))
-
-        ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 3, 5], bias=True, mode="differences")
-        ngrc.fit(data)
-
-        prediction_steps = 2
-        prediction = ngrc.predict(prediction_steps)
-
-        assert prediction.shape == (data.shape[1], prediction_steps)
-
-        # SINDY - No Expansion - bias
-        ngrc = scan.ngrc.NG_RC(k=1, s=1, orders=[1, 3], bias=True, mode="differences")
-        ngrc.fit(data)
-
-        prediction_steps = 2
-        prediction = ngrc.predict(prediction_steps)
-
-        assert prediction.shape == (data.shape[1], prediction_steps)
-
-        # VAR - No Expansion - bias
-        ngrc = scan.ngrc.NG_RC(k=3, s=2, bias=True, mode="differences")
-        ngrc.fit(data)
-
-        prediction_steps = 2
-        prediction = ngrc.predict(prediction_steps)
-
-        assert prediction.shape == (data.shape[1], prediction_steps)
-
-        ### No Expansion - No bias
-        # NGRC - No bias
-        data = np.ones((10, 2))
-
-        ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 3, 5], mode="differences")
-        ngrc.fit(data)
-
-        prediction_steps = 2
-        prediction = ngrc.predict(prediction_steps)
-
-        assert prediction.shape == (data.shape[1], prediction_steps)
-
-        # SINDY - No bias
-        ngrc = scan.ngrc.NG_RC(k=1, s=1, orders=[1, 3], mode="differences")
-        ngrc.fit(data)
-
-        prediction_steps = 2
-        prediction = ngrc.predict(prediction_steps)
-
-        assert prediction.shape == (data.shape[1], prediction_steps)
-
-        # VAR - No bias
-        ngrc = scan.ngrc.NG_RC(k=3, s=2, mode="differences")
-        ngrc.fit(data)
-
-        prediction_steps = 2
-        prediction = ngrc.predict(prediction_steps)
-
-        assert prediction.shape == (data.shape[1], prediction_steps)
-
-    def testinference__ngrc_base_differences(self):
-
-        #### Max Expansion
-        # NGRC - Max Expansion
         data = np.ones((10, 2))
         target_data = np.zeros((10, 3))
 
@@ -644,7 +547,10 @@ class TestNGRC(TestScanBase):
 
         assert inference.shape == (data.shape[0] - (ngrc._k - 1) * ngrc._s, target_data.shape[1])
 
-        # SINDY - Max Expansion
+    def test_inference_ngrc_base_sindy_max(self):
+
+        data = np.ones((10, 2))
+        target_data = np.zeros((10, 3))
         ngrc = scan.ngrc.NG_RC(k=1, s=1, orders=[1, 3], expanding_orders=[1, 2], bias=True, mode="inference")
         ngrc.fit(data, target_data)
 
@@ -652,7 +558,10 @@ class TestNGRC(TestScanBase):
 
         assert inference.shape == (data.shape[0] - (ngrc._k - 1) * ngrc._s, target_data.shape[1])
 
-        # VAR - Max Expansion
+    def test_inference_ngrc_base_var_max(self):
+
+        data = np.ones((10, 2))
+        target_data = np.zeros((10, 3))
         ngrc = scan.ngrc.NG_RC(k=3, s=2, expanding_orders=[1, 2], bias=True, mode="inference")
         ngrc.fit(data, target_data)
 
@@ -660,10 +569,10 @@ class TestNGRC(TestScanBase):
 
         assert inference.shape == (data.shape[0] - (ngrc._k - 1) * ngrc._s, target_data.shape[1])
 
-        ### Expansion - No bias
-        # NGRC - Expansion - No bias
-        data = np.ones((10, 2))
+    def test_inference_ngrc_base_ngrc_exp_no_bias(self):
 
+        data = np.ones((10, 2))
+        target_data = np.zeros((10, 3))
         ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 3, 5], expanding_orders=[1, 2], mode="inference")
         ngrc.fit(data, target_data)
 
@@ -671,7 +580,10 @@ class TestNGRC(TestScanBase):
 
         assert inference.shape == (data.shape[0] - (ngrc._k - 1) * ngrc._s, target_data.shape[1])
 
-        # SINDY - Expansion - No bias
+    def test_inference_ngrc_base_sindy_exp_no_bias(self):
+
+        data = np.ones((10, 2))
+        target_data = np.zeros((10, 3))
         ngrc = scan.ngrc.NG_RC(k=1, s=1, orders=[1, 3], expanding_orders=[1, 2], mode="inference")
         ngrc.fit(data, target_data)
 
@@ -679,7 +591,10 @@ class TestNGRC(TestScanBase):
 
         assert inference.shape == (data.shape[0] - (ngrc._k - 1) * ngrc._s, target_data.shape[1])
 
-        # VAR - Expansion - No bias
+    def test_inference_ngrc_base_var_exp_no_bias(self):
+
+        data = np.ones((10, 2))
+        target_data = np.zeros((10, 3))
         ngrc = scan.ngrc.NG_RC(k=3, s=2, expanding_orders=[1, 2], mode="inference")
         ngrc.fit(data, target_data)
 
@@ -687,10 +602,10 @@ class TestNGRC(TestScanBase):
 
         assert inference.shape == (data.shape[0] - (ngrc._k - 1) * ngrc._s, target_data.shape[1])
 
-        ### No Expansion - bias
-        # NGRC - No Expansion - bias
-        data = np.ones((10, 2))
+    def test_inference_ngrc_base_ngrc_bias(self):
 
+        data = np.ones((10, 2))
+        target_data = np.zeros((10, 3))
         ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 3, 5], bias=True, mode="inference")
         ngrc.fit(data, target_data)
 
@@ -698,7 +613,10 @@ class TestNGRC(TestScanBase):
 
         assert inference.shape == (data.shape[0] - (ngrc._k - 1) * ngrc._s, target_data.shape[1])
 
-        # SINDY - No Expansion - bias
+    def test_inference_ngrc_base_sindy_bias(self):
+
+        data = np.ones((10, 2))
+        target_data = np.zeros((10, 3))
         ngrc = scan.ngrc.NG_RC(k=1, s=1, orders=[1, 3], bias=True, mode="inference")
         ngrc.fit(data, target_data)
 
@@ -706,7 +624,10 @@ class TestNGRC(TestScanBase):
 
         assert inference.shape == (data.shape[0] - (ngrc._k - 1) * ngrc._s, target_data.shape[1])
 
-        # VAR - No Expansion - bias
+    def test_inference_ngrc_base_var_bias(self):
+
+        data = np.ones((10, 2))
+        target_data = np.zeros((10, 3))
         ngrc = scan.ngrc.NG_RC(k=3, s=2, bias=True, mode="inference")
         ngrc.fit(data, target_data)
 
@@ -714,10 +635,10 @@ class TestNGRC(TestScanBase):
 
         assert inference.shape == (data.shape[0] - (ngrc._k - 1) * ngrc._s, target_data.shape[1])
 
-        ### No Expansion - No bias
-        # NGRC - No bias
-        data = np.ones((10, 2))
+    def test_inference_ngrc_base_ngrc(self):
 
+        data = np.ones((10, 2))
+        target_data = np.zeros((10, 3))
         ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 3, 5], mode="inference")
         ngrc.fit(data, target_data)
 
@@ -725,7 +646,10 @@ class TestNGRC(TestScanBase):
 
         assert inference.shape == (data.shape[0] - (ngrc._k - 1) * ngrc._s, target_data.shape[1])
 
-        # SINDY - No bias
+    def test_inference_ngrc_base_sindy(self):
+
+        data = np.ones((10, 2))
+        target_data = np.zeros((10, 3))
         ngrc = scan.ngrc.NG_RC(k=1, s=1, orders=[1, 3], mode="inference")
         ngrc.fit(data, target_data)
 
@@ -733,7 +657,10 @@ class TestNGRC(TestScanBase):
 
         assert inference.shape == (data.shape[0] - (ngrc._k - 1) * ngrc._s, target_data.shape[1])
 
-        # VAR - No bias
+    def test_inference_ngrc_base_var(self):
+
+        data = np.ones((10, 2))
+        target_data = np.zeros((10, 3))
         ngrc = scan.ngrc.NG_RC(k=3, s=2, mode="inference")
         ngrc.fit(data, target_data)
 
@@ -752,3 +679,99 @@ class TestNGRC(TestScanBase):
         prediction = ngrc.predict(prediction_steps, starting_series=data[-2:])
 
         assert prediction.shape == (data.shape[1], prediction_steps)
+
+    def test_error_prediction_with_external_target_data(self):
+
+        data = np.ones((10, 2))
+
+        ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 3, 5], expanding_orders=[1, 2], bias=True, mode="coordinates")
+        with pytest.raises(ValueError):
+            ngrc.fit(data, y_target=[1])
+
+        ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 3, 5], expanding_orders=[1, 2], bias=True, mode="differences")
+
+        with pytest.raises(ValueError):
+            ngrc.fit(data, y_target=[1])
+
+    def test_error_inference_with_no_external_target_data(self):
+
+        data = np.ones((10, 2))
+
+        ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 3, 5], expanding_orders=[1, 2], bias=True, mode="inference")
+        with pytest.raises(ValueError):
+            ngrc.fit(data, y_target=None)
+
+    def test_error_mode_incorrectly_specified(self):
+
+        data = np.ones((10, 2))
+
+        ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 3, 5], expanding_orders=[1, 2], bias=True, mode="test")
+        with pytest.raises(ValueError):
+            ngrc.fit(data, y_target=None)
+
+    def test_error_order_type_incorrectly_specified(self):
+
+        data = np.ones((10, 2))
+
+        ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 3, 5], expanding_orders=[1, 2], bias=True, order_type="test")
+        with pytest.raises(ValueError):
+            ngrc.fit(data, y_target=None)
+
+    def test_non_return_expanding_orders(self):
+        data = np.ones((10, 2))
+
+        ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 3, 5])
+
+        ngrc.fit(data)
+        test = ngrc.expanding_states(functional=True, input_data=ngrc._states)
+        assert test is None
+
+    def test_error_mode_inference_with_prediction_function(self):
+
+        data = np.ones((10, 2))
+        target_data = np.zeros((10, 3))
+        ngrc = scan.ngrc.NG_RC(k=1, s=1, orders=[1, 3], mode="inference")
+        ngrc.fit(data, target_data)
+        with pytest.raises(ValueError):
+            ngrc.predict(steps=2)
+
+    def test_error_mode_short_starting_series_for_prediction(self):
+
+        data = np.ones((10, 2))
+        target_data = np.zeros((10, 3))
+        ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 3], mode="coordinates")
+        ngrc.fit(data)
+
+        with pytest.raises(ValueError):
+            ngrc.predict(steps=2, starting_series=data[-1:])
+
+    def test_error_mode_inference_with_short_input_data(self):
+
+        data = np.ones((10, 2))
+        target_data = np.zeros((10, 3))
+        ngrc = scan.ngrc.NG_RC(k=3, s=1, orders=[1, 3], mode="inference")
+        ngrc.fit(data, target_data)
+
+        with pytest.raises(ValueError):
+            ngrc.inference(x=data[-2:])
+
+    def test_error_mode_prediction_with_inference_function(self):
+
+        data = np.ones((10, 2))
+        target_data = np.zeros((10, 3))
+        ngrc = scan.ngrc.NG_RC(k=1, s=1, orders=[1, 3], mode="coordinates")
+        ngrc.fit(data)
+        with pytest.raises(ValueError):
+            ngrc.inference(x=data)
+
+    def test_error_minimal_input_fit(self):
+
+        data = np.ones((10, 2))
+        target_data = np.zeros((10, 3))
+        ngrc = scan.ngrc.NG_RC(k=4, s=1, orders=[1, 3], mode="coordinates")
+        with pytest.raises(ValueError):
+            ngrc.fit(data[:3])
+
+        ngrc = scan.ngrc.NG_RC(k=4, s=1, orders=[1, 3], mode="inference")
+        with pytest.raises(ValueError):
+            ngrc.fit(data[:3])
