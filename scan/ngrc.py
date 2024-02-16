@@ -44,7 +44,7 @@ class NG_RC:
         self._nonlinear_states = None
         self._expanded_states = None
 
-        self._regression_parameter = regression_parameter
+        self._regression_parameter = regression_parameter  # regression parameter for Ridge Regression.
         self._w_out = None
 
         self._initial_prediction_data = None
@@ -377,6 +377,17 @@ class NG_RC:
         return X_states
 
     def fit(self, X: np.ndarray, y_target: np.ndarray | None = None) -> None:
+        """This function will initiate ngrc on the input data 'X' to get ngrc states 'X_states', which
+        are trained using ridge regression onto the target data 'y_target'.
+        For prediction (self._mode = "coordinates" or "differences"), 'y_target' is automatically generated.
+        For inference (self._mode = "inference") 'y_target' must be specified in fit().
+
+        Args:
+            X: np.ndarray -> input data from where ngrc states should be created
+            y_target: np.ndarray | None, optional   -> target data on what in the input data should be trained on.
+                                                    None for "mode" is "coordinates" or "differences"
+                                                    np.ndarray for "mode" is "inference".
+        """
 
         self.create_train_X_y(input_data=X, target_data=y_target)
 
@@ -390,7 +401,7 @@ class NG_RC:
     def predict(self, steps: int, starting_series: np.ndarray | None = None) -> np.ndarray:
 
         """Uses the trained ngrc to make predictions. By default self._initial_prediction_data is used as a starting_series for the prediction,
-        but it can be custom assigned. Therefore, "mode" must be "coordinates" or "differences" during training.
+        but it can be custom assigned wit starting_series. "mode" must be "coordinates" or "differences" during training.
 
         Args:
 
