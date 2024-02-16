@@ -741,15 +741,14 @@ class TestNGRC(TestScanBase):
 
         assert inference.shape == (data.shape[0] - (ngrc._k - 1) * ngrc._s, target_data.shape[1])
 
+    def test_prediction_starting_series_ngrc_base(self):
 
-def test_prediction_starting_series_ngrc_base(self):
+        data = np.ones((10, 2))
 
-    data = np.ones((10, 2))
+        ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 3, 5], expanding_orders=[1, 2], bias=True)
+        ngrc.fit(data)
 
-    ngrc = scan.ngrc.NG_RC(k=2, s=1, orders=[1, 3, 5], expanding_orders=[1, 2], bias=True)
-    ngrc.fit(data)
+        prediction_steps = 2
+        prediction = ngrc.predict(prediction_steps, starting_series=data[-2:])
 
-    prediction_steps = 2
-    prediction = ngrc.predict(prediction_steps, starting_series=data[-2:])
-
-    assert prediction.shape == (data.shape[1], prediction_steps)
+        assert prediction.shape == (data.shape[1], prediction_steps)
