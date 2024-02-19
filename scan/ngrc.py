@@ -58,7 +58,7 @@ class NGRC:
         self._index = index  # for indexing ngrc, no functionality.
         self._features = features  # for bookkeeping feature dimension, no functionality.
 
-    def create_train_X_y(self, input_data: np.ndarray, target_data: np.ndarray | None = None) -> None:
+    def create_train_and_target_data(self, input_data: np.ndarray, target_data: np.ndarray | None = None) -> None:
         """Creates and/or assigns the training and target data given
         'mode'= {"coordinates","differences","inference"}. Last part of
         data is saved to self._initial_prediction_data for initial
@@ -361,9 +361,9 @@ class NGRC:
 
     def apply_ngrc(self, training: bool = True, input_data: np.ndarray | None = None) -> np.ndarray:
         """Creates the ngrc state vectors. Function creates the feature
-        space of ngrc (states), when called.
+        space of ngrc (states) when called.
 
-        Function is called automatically when when fit() or
+        Function is called automatically when fit() or
         create_states() is called.
 
         Args:
@@ -471,7 +471,7 @@ class NGRC:
                     "Minimal steps in x for inference must be at least {} steps".format((self._k - 1) * self._s + 1 + 1)
                 )
 
-        self.create_train_X_y(input_data=x, target_data=y_target)
+        self.create_train_and_target_data(input_data=x, target_data=y_target)
 
         x_states = self.apply_ngrc(training=True)
         y_target = self._target_data
