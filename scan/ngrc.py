@@ -276,8 +276,8 @@ class NGRC:
         the self._states with different functionalities.
         Adding bias to ngrc states r.
         self._bias = True -> r_new -> (1,r_old)
-        
-        Expands states with orders of it self. 
+
+        Expands states with orders of it self.
         e.g. self._expanding_orders = [1,2] -> r_new = (r_old,r_old**2)
 
         Function is called automatically when apply_ngrc() is called. #4
@@ -450,7 +450,7 @@ class NGRC:
                             None for 'coordinates' or 'differences'.
 
         Returns:
-            self._w_out:    Learned weights from ridge regression. 
+            self._w_out:    Learned weights from ridge regression.
                             Stored in class.
 
         """

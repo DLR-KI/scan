@@ -784,46 +784,36 @@ class TestNGRC(TestScanBase):
         train_steps = 400
         train_data = sim_data[:train_steps]
 
-        ng_rc = scan.ngrc.NGRC(regression_parameter=9*10**-2,
-            k=2,
-            s=1,
-            orders=[1,2],
-            mode="coordinates"
-            )
+        ng_rc = scan.ngrc.NGRC(regression_parameter=9 * 10**-2, k=2, s=1, orders=[1, 2], mode="coordinates")
 
         ng_rc.fit(train_data)
 
-        staser = sim_data[-(ng_rc._k-1)*ng_rc._s-1:]
-        lorenz_prediction = ng_rc.predict(steps=100,starting_series=staser)
+        staser = sim_data[-(ng_rc._k - 1) * ng_rc._s - 1 :]
+        lorenz_prediction = ng_rc.predict(steps=100, starting_series=staser)
 
-        test = np.array([-9.3696167086 , -1.73024410942, 35.54744294115])
+        test = np.array([-9.3696167086, -1.73024410942, 35.54744294115])
         pred_ = lorenz_prediction[-1]
-        assert_array_almost_equal(test,pred_)
-        
+        assert_array_almost_equal(test, pred_)
+
     def test_precision_first_pred(self):
-        
+
         sp = np.array([-14.03020521, -20.88693127, 25.53545])
         sim_data = scan.simulations.Lorenz63(dt=2e-2).simulate(time_steps=400, starting_point=sp)
 
         train_steps = 400
         train_data = sim_data[:train_steps]
 
-        ng_rc = scan.ngrc.NGRC(regression_parameter=9*10**-2,
-            k=1,
-            s=1,
-            orders=[1,2],
-            mode="differences"
-            )
+        ng_rc = scan.ngrc.NGRC(regression_parameter=9 * 10**-2, k=1, s=1, orders=[1, 2], mode="differences")
 
         ng_rc.fit(train_data)
 
-        staser = sim_data[-(ng_rc._k-1)*ng_rc._s-1:]
-        lorenz_prediction = ng_rc.predict(steps=1,starting_series=staser)
+        staser = sim_data[-(ng_rc._k - 1) * ng_rc._s - 1 :]
+        lorenz_prediction = ng_rc.predict(steps=1, starting_series=staser)
 
         test = np.array([-4.82184971595, -2.37195797593, 26.20243990289])
         pred_ = lorenz_prediction[-1]
-        assert_array_almost_equal(test,pred_)
-        
+        assert_array_almost_equal(test, pred_)
+
     def test_precision_expanding_orders_mid_term(self):
         sp = np.array([-14.03020521, -20.88693127, 25.53545])
         sim_data = scan.simulations.Lorenz63(dt=2e-2).simulate(time_steps=400, starting_point=sp)
@@ -831,21 +821,22 @@ class TestNGRC(TestScanBase):
         train_steps = 400
         train_data = sim_data[:train_steps]
 
-        ng_rc = scan.ngrc.NGRC(regression_parameter=9*10**-2,
+        ng_rc = scan.ngrc.NGRC(
+            regression_parameter=9 * 10**-2,
             k=2,
             s=1,
-            orders=[1,2],
+            orders=[1, 2],
             mode="differences",
-            bias= True,
-            expanding_orders=[1,3]
-            )
+            bias=True,
+            expanding_orders=[1, 3],
+        )
 
         ng_rc.fit(train_data)
 
-        staser = sim_data[-(ng_rc._k-1)*ng_rc._s-1:]
-        lorenz_prediction = ng_rc.predict(steps=100,starting_series=staser)
+        staser = sim_data[-(ng_rc._k - 1) * ng_rc._s - 1 :]
+        lorenz_prediction = ng_rc.predict(steps=100, starting_series=staser)
 
-        test = np.array([-10.1723369755 ,  -2.36401695605,  36.50132478729])
+        test = np.array([-10.1723369755, -2.36401695605, 36.50132478729])
 
         pred_ = lorenz_prediction[-1]
-        assert_array_almost_equal(test,pred_)
+        assert_array_almost_equal(test, pred_)
