@@ -126,9 +126,9 @@ class NGRC:
 
         Args:
             training:   True    -> Is set when states are created for
-                                    training or inference.
+                                    training.
             training:   False   -> Is set when states are created for
-                                    prediction.
+                                    prediction and inference.
 
         Returns:
             training:   True    -> Updates self._states
