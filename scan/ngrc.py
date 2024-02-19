@@ -60,7 +60,7 @@ class NGRC:
 
     def create_train_X_y(self, input_data: np.ndarray, target_data: np.ndarray | None = None) -> None:
         """Creates and/or assigns the training and target data given
-        "mode"= {"coordinates","differences","inference"}. Last part of
+        'mode'= {"coordinates","differences","inference"}. Last part of
         data is saved to self._initial_prediction_data for initial
         prediction, if not otherwise specified.
 
@@ -118,8 +118,8 @@ class NGRC:
             raise ValueError('Mode configuration Error: choose between "coordinates", "differences" and "inference".')
 
     def linear_expansion(self, training: bool = True, input_data: np.ndarray | None = None) -> None | np.ndarray:
-        """Creates the linear states of ngrc. Takes "k" past data points
-        of the data, which are separated by "s" indices and puts them
+        """Creates the linear states of ngrc. Takes 'k' past data points
+        of the data, which are separated by 's' indices and puts them
         into one vector. Repeated for the every index of the input data.
 
         Function is called automatically when apply_ngrc() is called. #2
@@ -416,10 +416,10 @@ class NGRC:
             return state
 
     def create_states(self, x: np.ndarray) -> np.ndarray:
-        """Creates the ngrc state vectors given input data X.
+        """Creates the ngrc state vectors given input data 'x'.
 
         Args:
-            x:  -> Creates ngrc states for data X.
+            x:  -> Creates ngrc states for data 'x'.
 
         Returns:
             x_states:   -> The ngrc feature space given its
@@ -446,8 +446,8 @@ class NGRC:
         Args:
             x:  -> Input data from where ngrc states should be created.
             y_target:   -> Target data on which the input data is
-                            trained on for 'inference'. Must be
-                            None for 'coordinates' or 'differences'.
+                            trained on for "inference". Must be
+                            None for "coordinates" or 'differences'.
 
         Returns:
             self._w_out:    Learned weights from ridge regression.
@@ -539,7 +539,7 @@ class NGRC:
     def inference(self, x: np.ndarray) -> np.ndarray:
         """
         Uses trained ngrc to make inference on data 'x'.
-        "mode" must be "inference" during training.
+        'mode' must be "inference" during training.
 
         Args:
             x:  ->  Apply the trained ngrc on that data for inference.
