@@ -11,6 +11,7 @@ from . import (
     logging,
     measures,
     mpi,
+    ngrc,
     simulations,
     utilities,
 )
