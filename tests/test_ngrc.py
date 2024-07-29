@@ -793,7 +793,7 @@ class TestNGRC(TestScanBase):
 
         test = np.array([-9.3696167086, -1.73024410942, 35.54744294115])
         pred_ = lorenz_prediction[-1]
-        assert_array_almost_equal(test, pred_)
+        assert_array_almost_equal(test, pred_, decimal=7)
 
     def test_precision_first_pred(self):
 
@@ -839,4 +839,4 @@ class TestNGRC(TestScanBase):
         test = np.array([-10.1723369755, -2.36401695605, 36.50132478729])
 
         pred_ = lorenz_prediction[-1]
-        assert_array_almost_equal(test, pred_)
+        assert_array_almost_equal(test, pred_, decimal=7)
