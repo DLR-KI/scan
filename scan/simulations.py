@@ -141,10 +141,10 @@ class Lorenz63(_SimBaseRungeKutta):
             dt: Size of time steps.
         """
 
-        self.sigma = sigma or self.default_parameters["sigma"]
-        self.rho = rho or self.default_parameters["rho"]
-        self.beta = beta or self.default_parameters["beta"]
-        self.dt = dt or self.default_parameters["dt"]
+        self.sigma = sigma if sigma is not None else self.default_parameters["sigma"]
+        self.rho = rho if rho is not None else self.default_parameters["rho"]
+        self.beta = beta if beta is not None else self.default_parameters["beta"]
+        self.dt = dt if dt is not None else self.default_parameters["dt"]
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -189,10 +189,10 @@ class Roessler(_SimBaseRungeKutta):
             dt: Size of time steps.
         """
 
-        self.a = a or self.default_parameters["a"]
-        self.b = b or self.default_parameters["b"]
-        self.c = c or self.default_parameters["c"]
-        self.dt = dt or self.default_parameters["dt"]
+        self.a = a if a is not None else self.default_parameters["a"]
+        self.b = b if b is not None else self.default_parameters["b"]
+        self.c = c if c is not None else self.default_parameters["c"]
+        self.dt = dt if dt is not None else self.default_parameters["dt"]
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -232,8 +232,8 @@ class ComplexButterly(_SimBaseRungeKutta):
             a: 'a' parameter in the Complex butterfly equations.
             dt: Size of time steps.
         """
-        self.a = a or self.default_parameters["a"]
-        self.dt = dt or self.default_parameters["dt"]
+        self.a = a if a is not None else self.default_parameters["a"]
+        self.dt = dt if dt is not None else self.default_parameters["dt"]
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -277,10 +277,10 @@ class Chen(_SimBaseRungeKutta):
             c: 'c' parameter in the Chen system.
             dt: Size of time steps.
         """
-        self.a = a or self.default_parameters["a"]
-        self.b = b or self.default_parameters["b"]
-        self.c = c or self.default_parameters["c"]
-        self.dt = dt or self.default_parameters["dt"]
+        self.a = a if a is not None else self.default_parameters["a"]
+        self.b = b if b is not None else self.default_parameters["b"]
+        self.c = c if c is not None else self.default_parameters["c"]
+        self.dt = dt if dt is not None else self.default_parameters["dt"]
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -336,11 +336,11 @@ class ChuaCircuit(_SimBaseRungeKutta):
             b: 'b' parameter in the Chua equations.
             dt: Size of time steps.
         """
-        self.alpha = alpha or self.default_parameters["alpha"]
-        self.beta = beta or self.default_parameters["beta"]
-        self.a = a or self.default_parameters["a"]
-        self.b = b or self.default_parameters["b"]
-        self.dt = dt or self.default_parameters["dt"]
+        self.alpha = alpha if alpha is not None else self.default_parameters["alpha"]
+        self.beta = beta if beta is not None else self.default_parameters["beta"]
+        self.a = a if a is not None else self.default_parameters["a"]
+        self.b = b if b is not None else self.default_parameters["b"]
+        self.dt = dt if dt is not None else self.default_parameters["dt"]
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -387,8 +387,8 @@ class Thomas(_SimBaseRungeKutta):
             b: 'b' parameter of Thomas' cyclically symmetric attractor.
             dt: Size of time steps.
         """
-        self.b = b or self.default_parameters["b"]
-        self.dt = dt or self.default_parameters["dt"]
+        self.b = b if b is not None else self.default_parameters["b"]
+        self.dt = dt if dt is not None else self.default_parameters["dt"]
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -429,9 +429,9 @@ class WindmiAttractor(_SimBaseRungeKutta):
             b: 'b' parameter in the WINDMI equations.
             dt: Size of time steps.
         """
-        self.a = a or self.default_parameters["a"]
-        self.b = b or self.default_parameters["b"]
-        self.dt = dt or self.default_parameters["dt"]
+        self.a = a if a is not None else self.default_parameters["a"]
+        self.b = b if b is not None else self.default_parameters["b"]
+        self.dt = dt if dt is not None else self.default_parameters["dt"]
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -481,9 +481,9 @@ class Rucklidge(_SimBaseRungeKutta):
             lam: 'lambda' parameter in the Rucklidge equations.
         """
 
-        self.kappa = kappa or self.default_parameters["kappa"]
-        self.lam = lam or self.default_parameters["lam"]
-        self.dt = dt or self.default_parameters["dt"]
+        self.kappa = kappa if kappa is not None else self.default_parameters["kappa"]
+        self.lam = lam if lam is not None else self.default_parameters["lam"]
+        self.dt = dt if dt is not None else self.default_parameters["dt"]
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -526,8 +526,8 @@ class SimplestQuadraticChaotic(_SimBaseRungeKutta):
             a: 'a' parameter in the Simplest Quadratic Chaotic flow.
             dt: Size of time steps.
         """
-        self.a = a or self.default_parameters["a"]
-        self.dt = dt or self.default_parameters["dt"]
+        self.a = a if a is not None else self.default_parameters["a"]
+        self.dt = dt if dt is not None else self.default_parameters["dt"]
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -570,8 +570,8 @@ class SimplestCubicChaotic(_SimBaseRungeKutta):
             a: 'a' parameter in the Simplest Cubic Chaotic flow.
             dt: Size of time steps.
         """
-        self.a = a or self.default_parameters["a"]
-        self.dt = dt or self.default_parameters["dt"]
+        self.a = a if a is not None else self.default_parameters["a"]
+        self.dt = dt if dt is not None else self.default_parameters["dt"]
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -614,8 +614,8 @@ class SimplestPiecewiseLinearChaotic(_SimBaseRungeKutta):
             a: 'a' parameter in the Simplest Piecewise Linear Chaotic flow.
             dt: Size of time steps.
         """
-        self.a = a or self.default_parameters["a"]
-        self.dt = dt or self.default_parameters["dt"]
+        self.a = a if a is not None else self.default_parameters["a"]
+        self.dt = dt if dt is not None else self.default_parameters["dt"]
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -655,8 +655,8 @@ class DoubleScroll(_SimBaseRungeKutta):
             a: 'a' parameter in Double Scroll system.
             dt: Size of time steps.
         """
-        self.a = a or self.default_parameters["a"]
-        self.dt = dt or self.default_parameters["dt"]
+        self.a = a if a is not None else self.default_parameters["a"]
+        self.dt = dt if dt is not None else self.default_parameters["dt"]
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -695,11 +695,11 @@ class LotkaVolterra(_SimBaseRungeKutta):
             d: 'd' parameter in Lotka Volterra System.
             dt: Size of time steps.
         """
-        self.a = a or self.default_parameters["a"]
-        self.b = b or self.default_parameters["b"]
-        self.c = c or self.default_parameters["c"]
-        self.d = d or self.default_parameters["d"]
-        self.dt = dt or self.default_parameters["dt"]
+        self.a = a if a is not None else self.default_parameters["a"]
+        self.b = b if b is not None else self.default_parameters["b"]
+        self.c = c if c is not None else self.default_parameters["c"]
+        self.d = d if d is not None else self.default_parameters["d"]
+        self.dt = dt if dt is not None else self.default_parameters["dt"]
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dz/dt) with given (x,y,z) for RK4.
@@ -740,8 +740,8 @@ class Henon(_SimBase):
             a: 'a' parameter of Henon map.
             b: 'b' parameter of Henon map.
         """
-        self.a = a or self.default_parameters["a"]
-        self.b = b or self.default_parameters["b"]
+        self.a = a if a is not None else self.default_parameters["a"]
+        self.b = b if b is not None else self.default_parameters["b"]
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
         """Calculates next timestep (x(i+1), y(i+1)) with given (x(i),y(i)).
@@ -780,7 +780,7 @@ class Logistic(_SimBase):
         Args:
             r: 'r' parameter of Logistic map.
         """
-        self.r = r or self.default_parameters["r"]
+        self.r = r if r is not None else self.default_parameters["r"]
 
     def iterate(self, x: np.ndarray) -> np.ndarray:
         """Calculates next timestep (x(i+1), ) with given (x(i), ).
@@ -830,8 +830,8 @@ class SimplestDrivenChaotic(_SimBaseRungeKutta):
             omega: 'omega' parameter of the Simplest Driven Chaotic flow.
             dt: Size of time steps.
         """
-        self.omega = omega or self.default_parameters["omega"]
-        self.dt = dt or self.default_parameters["dt"]
+        self.omega = omega if omega is not None else self.default_parameters["omega"]
+        self.dt = dt if dt is not None else self.default_parameters["dt"]
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dt/dt) with given (x,y,t) for RK4.
@@ -878,10 +878,10 @@ class UedaOscillator(_SimBaseRungeKutta):
             omega: 'omega' parameter of Ueda Oscillator.
             dt: Size of time steps.
         """
-        self.b = b or self.default_parameters["b"]
-        self.A = A or self.default_parameters["A"]
-        self.omega = omega or self.default_parameters["omega"]
-        self.dt = dt or self.default_parameters["dt"]
+        self.b = b if b is not None else self.default_parameters["b"]
+        self.A = A if A is not None else self.default_parameters["A"]
+        self.omega = omega if omega is not None else self.default_parameters["omega"]
+        self.dt = dt if dt is not None else self.default_parameters["dt"]
 
     def flow(self, x: np.ndarray) -> np.ndarray:
         """Calculates (dx/dt, dy/dt, dt/dt) with given (x,y,t) for RK4.
@@ -943,10 +943,10 @@ class KuramotoSivashinsky(_SimBase):
         if sys_dim is not None:
             if sys_dim % 2 != 0:  # check if even number.
                 raise ValueError("Parameter dimension must be an even number.")
-        self.sys_dim = sys_dim or self.default_parameters["sys_dim"]
-        self.sys_length = sys_length or self.default_parameters["sys_length"]
-        self.eps = eps or self.default_parameters["eps"]
-        self.dt = dt or self.default_parameters["dt"]
+        self.sys_dim = sys_dim if sys_dim is not None else self.default_parameters["sys_dim"]
+        self.sys_length = sys_length if sys_length is not None else self.default_parameters["sys_length"]
+        self.eps = eps if eps is not None else self.default_parameters["eps"]
+        self.dt = dt if dt is not None else self.default_parameters["dt"]
         self.set_default_starting_point()
         self._prepare()
 
@@ -1062,11 +1062,11 @@ class KuramotoSivashinskyCustom(_SimBase):
             if sys_dim % 2 != 0:  # check if even number.
                 raise ValueError("Parameter dimension must be an even number.")
 
-        self.sys_dim = sys_dim or self.default_parameters["sys_dim"]
-        self.sys_length = sys_length or self.default_parameters["sys_length"]
-        self.dt = dt or self.default_parameters["dt"]
-        self.precision = precision or self.default_parameters["precision"]
-        self.fft_type = fft_type or self.default_parameters["fft_type"]
+        self.sys_dim = sys_dim if sys_dim is not None else self.default_parameters["sys_dim"]
+        self.sys_length = sys_length if sys_length is not None else self.default_parameters["sys_length"]
+        self.dt = dt if dt is not None else self.default_parameters["dt"]
+        self.precision = precision if precision is not None else self.default_parameters["precision"]
+        self.fft_type = fft_type if fft_type is not None else self.default_parameters["fft_type"]
 
         self.set_default_starting_point()
         self._set_precision_and_fft_type()
@@ -1227,9 +1227,9 @@ class Lorenz96(_SimBaseRungeKutta):
             force: 'force' parameter in the Lorenz 96 equations.
             dt: Size of time steps.
         """
-        self.sys_dim = sys_dim or int(self.default_parameters["sys_dim"])
-        self.force = force or self.default_parameters["force"]
-        self.dt = dt or self.default_parameters["dt"]
+        self.sys_dim = sys_dim if sys_dim is not None else int(self.default_parameters["sys_dim"])
+        self.force = force if force is not None else self.default_parameters["force"]
+        self.dt = dt if dt is not None else self.default_parameters["dt"]
 
         self.default_starting_point = np.sin(np.arange(self.sys_dim))
 
@@ -1277,8 +1277,8 @@ class LinearSystem(_SimBaseRungeKutta):
             dt: Size of time steps.
         """
 
-        self.A = A or np.array(self.default_parameters["A"])
-        self.dt = dt or float(self.default_parameters["dt"])
+        self.A = A if A is not None else np.array(self.default_parameters["A"])
+        self.dt = dt if dt is not None else float(self.default_parameters["dt"])
 
         self.sys_dim = self.A.shape[0]
         self.default_starting_point = np.ones(self.sys_dim)
