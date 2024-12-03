@@ -223,7 +223,7 @@ def compare_version_file_vs_env(segment_threshold: str = "minor") -> bool:
 
     Compares the internally defined version number of the scan package
     as specified in scan._version with the version number specified in the
-    activate python environment up to the defined component threshold
+    activate python environment up to the defined component threshold.
 
     Args:
         segment_threshold: Defines up to which segment of the version

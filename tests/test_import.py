@@ -1,4 +1,4 @@
-""" Tests if the scan modules can be imported as intended """
+"""Tests if the scan modules can be imported as intended"""
 
 import importlib
 import unittest

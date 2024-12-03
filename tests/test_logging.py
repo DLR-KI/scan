@@ -1,4 +1,4 @@
-""" Tests if the scan loguru logging works as it should """
+"""Tests if the scan loguru logging works as it should"""
 
 import unittest
 

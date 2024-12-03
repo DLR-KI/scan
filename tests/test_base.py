@@ -1,4 +1,4 @@
-""" Base class for the pytest testing """
+"""Base class for the pytest testing"""
 
 from __future__ import annotations
 

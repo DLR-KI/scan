@@ -1,4 +1,4 @@
-""" Tests if the scan.utilities module works as it should """
+"""Tests if the scan.utilities module works as it should"""
 
 import copy
 import fractions
