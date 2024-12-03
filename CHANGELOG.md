@@ -1,5 +1,9 @@
 ## Changelog
 
+
+### Scan 0.8.1 - Update requirements and python version compatability
+- Python 3.12 is now supported
+
 ### Scan 0.8.0 - Implemented smooth function to data_processing
 - The smooth-function, in its current state, evaluates iteratively the mean of the neighborhood
 within a certain range for each value and it has a specially handling of the boundaries.

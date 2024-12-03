@@ -1,4 +1,4 @@
-""" Tests if the scan.measures module works as it should """
+"""Tests if the scan.measures module works as it should"""
 
 import unittest
 

@@ -1,4 +1,4 @@
-""" Measures for the calculation of generalized local neighborhoods."""
+"""Measures for the calculation of generalized local neighborhoods."""
 
 from __future__ import annotations
 

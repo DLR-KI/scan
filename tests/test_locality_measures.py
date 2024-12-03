@@ -1,4 +1,4 @@
-""" Tests if the scan.locality_measures module works as it should """
+"""Tests if the scan.locality_measures module works as it should"""
 
 import unittest
 

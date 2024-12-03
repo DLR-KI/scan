@@ -3,6 +3,7 @@
 Content to be moved to pyproject.toml eventually.
 
 """
+
 import setuptools
 from setuptools import setup
 
@@ -34,7 +35,8 @@ if __name__ == "__main__":
             "Programming Language :: Python :: 3.8",
             "Programming Language :: Python :: 3.9",
             "Programming Language :: Python :: 3.10",
-            # "Programming Language :: Python :: 3.11",
+            "Programming Language :: Python :: 3.11",
+            "Programming Language :: Python :: 3.12",
         ],
         python_requires=">=3.8",
         # In the interest of ease of use, the highest package versions supported and tested are not specified here.

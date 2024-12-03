@@ -8,7 +8,7 @@ import numpy as np
 def embedding(x_data: np.ndarray, embedding_dim: int, embedding_delay: int) -> np.ndarray:
     """Embed the x_data using a time series embedding.
 
-    WARNING: Adds np.NANs at the end!
+    WARNING: Adds np.nans at the end!
     WARNING: Also shifts the xdim=0 into the future, so that all other xdim columns only contain information further in
     the past. This avoids accidentally prediction the xdim=0 column with data from the future, the ML algorithm
     shouldn't have access to. Due to this, the training data embedding is best done with the original data before any
@@ -36,7 +36,7 @@ def embedding(x_data: np.ndarray, embedding_dim: int, embedding_delay: int) -> n
         [[1.0,    5.0,    0.0, 4.0],
          [2.0,    6.0,    1.0, 5.0],
          [3.0,    7.0,    2.0, 6.0],
-         [np.NAN, np.NAN, 3.0, 7.0]]
+         [np.nan, np.nan, 3.0, 7.0]]
 
     """
     if embedding_dim == 0:
@@ -52,7 +52,7 @@ def embedding(x_data: np.ndarray, embedding_dim: int, embedding_delay: int) -> n
 
     x_dims_after_embedding = x_dim * embedding_dim
 
-    x_data_embedded = np.empty(shape=(time_steps, x_dims_after_embedding, slices)) * np.NAN
+    x_data_embedded = np.empty(shape=(time_steps, x_dims_after_embedding, slices)) * np.nan
 
     for i in range(embedding_dim):
         shift = embedding_delay * i

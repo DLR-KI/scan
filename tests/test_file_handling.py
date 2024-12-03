@@ -1,4 +1,4 @@
-""" Tests if the scan.file_handling module works as it should """
+"""Tests if the scan.file_handling module works as it should"""
 
 import numpy as np
 import pandas as pd

@@ -1,17 +1,12 @@
 ## Scan 
 
-This repository contains the python 3 package _scan_, implementing the machine learning technique Reservoir 
-Computing (RC) and related methods.
+This repository contains the python 3 package SCAN, implementing the machine 
+learning technique Reservoir Computing (RC) and related methods.
 
-SCAN stands for some combination of: {'science', 'simulation', 'system', 'solution', 'software'}, {'chaos', 'control', 
-'complex', 'computing'}, {'analysis, analytic'}, {'neural', 'net/network'}.  
-At some point we should probably choose what it actually stands for.
+SCAN: **S**oftware for **C**omplex system **A**nalysis via **N**etworks.
 
-### Documentation Website
-
-The PDF-Docuemntation has not yet been transferred to this GitLab repository, mostly due to the necessary CI/CD-Pipeline 
-not yet being available. Until then, please see the code docstrings, tests and the related
-[Rescomp documentation website](https://glsrc.github.io/rescomp/).
+### License
+The SCAN software is provided under the MIT License.
 
 ### Installation
 #### Prerequisites
@@ -124,7 +119,3 @@ following:
     ```
     tox --develop -c tox-conda.ini
     ```
-5. Once all of the above run without error, push the code to your personal GitLab repository and then open a merge 
-request using the website interface.
-
-Once we have a CI/CD Pipeline setup, all of this will run automatically. Until then, we'll need to do it manually.

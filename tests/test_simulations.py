@@ -1,4 +1,4 @@
-""" Tests if the scan.simulations module works as it should """
+"""Tests if the scan.simulations module works as it should"""
 
 import unittest
 
@@ -14,6 +14,7 @@ from tests.test_base import (
 )
 
 DECIMALS = 14
+
 
 # Use print(np.array_repr(np_array, max_line_width=120, precision=18)) in the debugger to easily get the copy-pastable
 # representation of a numpy array.

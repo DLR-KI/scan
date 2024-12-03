@@ -60,7 +60,7 @@ class NGRC:
 
     def create_train_and_target_data(self, input_data: np.ndarray, target_data: np.ndarray | None = None) -> None:
         """Creates and/or assigns the training and target data given
-        'mode'= {"coordinates","differences","inference"}. Last part of
+        'mode'= {"coordinates","differences","inference"}. Last part of the
         data is saved to self._initial_prediction_data for initial
         prediction, if not otherwise specified.
 

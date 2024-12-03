@@ -1,4 +1,4 @@
-""" Tests if the scan.utilities module works as it should """
+"""Tests if the scan.utilities module works as it should"""
 
 import unittest
 
@@ -25,7 +25,7 @@ class TestUtilities(TestScanBase):
             x_data, embedding_dim=embedding_dim, embedding_delay=embedding_delay
         )
 
-        exp_x_data_embedded = np.array([[1, 0], [np.NAN, 1]])
+        exp_x_data_embedded = np.array([[1, 0], [np.nan, 1]])
 
         assert_array_equal(x_data_embedded, exp_x_data_embedded)
 
@@ -43,7 +43,7 @@ class TestUtilities(TestScanBase):
             x_data, embedding_dim=embedding_dim, embedding_delay=embedding_delay
         )
 
-        exp_x_data_embedded = np.array([[1, 3, 0, 2], [np.NAN, np.NAN, 1, 3]])
+        exp_x_data_embedded = np.array([[1, 3, 0, 2], [np.nan, np.nan, 1, 3]])
 
         assert_array_equal(x_data_embedded, exp_x_data_embedded)
 
@@ -98,7 +98,7 @@ class TestUtilities(TestScanBase):
                     [1, 5],           [3, 7],           [0, 4], [2, 6]
                 ],
                 [
-                    [np.NAN, np.NAN], [np.NAN, np.NAN], [1, 5], [3, 7]
+                    [np.nan, np.nan], [np.nan, np.nan], [1, 5], [3, 7]
                 ]
             ]
         )
@@ -122,7 +122,7 @@ class TestUtilities(TestScanBase):
 
         x_dims_after_embedding = x_dim * embedding_dim
 
-        exp_x_train_3d_embedded = np.empty(shape=(time_steps, x_dims_after_embedding, slices)) * np.NAN
+        exp_x_train_3d_embedded = np.empty(shape=(time_steps, x_dims_after_embedding, slices)) * np.nan
 
         for i in range(x_dims_after_embedding):
             shift = embedding_delay * i

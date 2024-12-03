@@ -1,4 +1,4 @@
-""" Tests if the scan.esn module works as it should """
+"""Tests if the scan.esn module works as it should"""
 
 import copy
 

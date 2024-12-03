@@ -42,7 +42,7 @@ n_type_flag_synonyms = utilities.SynonymDict(
 class _ESNCore:
     """The non-reducible core of ESN RC training and prediction.
 
-    While technically possible to be used on it's own, this is very much not recommended. Use the child class(es)
+    While technically possible to be used on its own, this is very much not recommended. Use the child class(es)
     instead.
 
     """
